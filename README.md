@@ -122,7 +122,7 @@ to use:
 
 ## Requirements
 
-- Python 3.5+
+- Python 3.6+
 - pkg-config
 - [yajl](https://lloyd.github.io/yajl/) JSON pasing library
 
