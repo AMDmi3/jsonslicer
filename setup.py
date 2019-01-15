@@ -28,7 +28,7 @@ def get_version():
     #        if line.startswith('__version__'):
     #            return line.strip().split(' = ')[-1].strip('\'')
 
-    return '0.0.0'
+    return '0.0.1'
 
     raise RuntimeError('Cannot determine package version from package source')
 
