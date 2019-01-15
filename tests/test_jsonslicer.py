@@ -304,7 +304,7 @@ class TestJsonSlicer(unittest.TestCase):
         data = b"""
         {
             "people": [
-                {"name":"John","age":31},
+                {"name": "John", "age": 31},
                 {"name": "Ivan", "age": 26},
                 {"name": "Angela", "age": 33}
             ]
