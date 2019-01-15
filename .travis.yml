@@ -5,10 +5,28 @@ matrix:
   include:
     - python: 3.5
     - python: 3.6
+      env: ASAN=YES
 before_script:
   - sudo apt-get update -qq
   - sudo apt-get install libyajl-dev
 script:
-  - python setup.py build
+  - |-
+    if [ -z "$ASAN" ]; then
+        python setup.py build
+    else
+        env \
+            CFLAGS="-O0 -g -fno-omit-frame-pointer -fsanitize=address" \
+            LDFLAGS="-fsanitize=address" \
+            python setup.py build -g
+    fi
   - python setup.py install
-  - python setup.py test
+  - |-
+    if [ -z "$ASAN" ]; then
+        python setup.py test
+    else
+        env \
+            LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libasan.so.2 \
+            LSAN_OPTIONS=suppressions=$(pwd)/.lsan.suppressions \
+            PYTHONPATH=. \
+            python setup.py test
+    fi
