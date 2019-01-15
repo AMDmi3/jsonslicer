@@ -1,4 +1,4 @@
-# JsonSlicer stream JSON parser
+# JsonSlicer - stream JSON parser
 
 <a href="https://repology.org/metapackage/python:jsonslicer/versions">
 	<img src="https://repology.org/badge/vertical-allrepos/python:jsonslicer.svg" alt="py-jsonslicer packaging status" align="right">
@@ -23,12 +23,12 @@ For instance, for JSON
 
 ```json
 {
-    "animals": {
+	"animals": {
 		"dogs": [
-            "sparky",
-            "barky"
-        ]
-    }
+			"sparky",
+			"barky"
+		]
+	}
 }
 ```
 
@@ -67,12 +67,12 @@ Consider a very large JSON list of people:
 
 ```json
 {
-    "people": [
-         {"name": "John", "age": 31},
-         {"name": "Ivan", "age": 26},
-         {"name": "Angela", "age": 33},
-         ...
-    ]
+	"people": [
+		{"name": "John", "age": 31},
+		{"name": "Ivan", "age": 26},
+		{"name": "Angela", "age": 33},
+		...
+	]
 }
 ```
 
@@ -86,7 +86,7 @@ from jsonslicer import JsonSlicer
 #
 with open('people.json', 'b') as data:
 	for *path, person in JsonSlicer(data, (b'people', None)):
-        print(item)
+		print(item)
 		# {b'name': b'John', b'age': 31}
 		# {b'name': b'Ivan', b'age': 26}
 		# {b'name': b'Angela', b'age': 33}
