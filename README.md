@@ -97,12 +97,13 @@ with open('people.json', 'b') as data:
 #
 with open('people.json', 'b') as data:
 	*_, person = next(JsonSlicer(data, (b'people', 2)))
+	# note that you may ignore path by using _ placeholder
 
 #
-# extract maximal age from the list
+# extract highest age from the list
 #
 with open('people.json', 'b') as data:
-	max_age = max((age for _*, age in JsonSlicer(data, (b'people', None, b'age'))))
+	max_age = max((age for *_, age in JsonSlicer(data, (b'people', None, b'age'))))
 ```
 
 ## Status/TODO
