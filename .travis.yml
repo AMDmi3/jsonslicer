@@ -11,6 +11,7 @@ matrix:
       env: ASAN=YES
     - python: 3.6
       env: TRACEMALLOC=YES
+    - python: 3.7
 before_script:
   - sudo apt-get update -qq
   - sudo apt-get install libyajl-dev
