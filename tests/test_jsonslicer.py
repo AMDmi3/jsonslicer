@@ -20,7 +20,14 @@
 
 import io
 import json
+import os
+import random
+import sys
 import unittest
+
+if os.environ.get('TRACEMALLOC'):
+    import gc
+    import tracemalloc
 
 from jsonslicer import JsonSlicer
 
@@ -51,7 +58,44 @@ def deep_decode(obj, encoding):
         return obj
 
 
+def rand_bytes():
+    return str(int(random.random() * 100)).encode('utf-8')
+
+
 class TestJsonSlicer(unittest.TestCase):
+    def assertNoLeaks(self, func):
+        tracemalloc.start(25)
+
+        # run function once so unrelated objects get allocated
+        func()
+
+        gc.collect()
+        snapshot1 = tracemalloc.take_snapshot()
+
+        # run function again to monitor new allocations
+        func()
+
+        gc.collect()
+        snapshot2 = tracemalloc.take_snapshot()
+        tracemalloc.stop()
+
+        filters = (
+            tracemalloc.Filter(False, tracemalloc.__file__),
+        )
+        snapshot1 = snapshot1.filter_traces(filters)
+        snapshot2 = snapshot2.filter_traces(filters)
+
+        leak_message = ''
+        for stat in snapshot2.compare_to(snapshot1, 'lineno'):
+            if stat.size_diff != 0:
+                leak_message += 'tracemalloc: possible leak: {} bytes, {} allocations\n'.format(stat.size_diff, stat.count_diff)
+                for line in stat.traceback.format():
+                    leak_message += line + '\n'
+
+        if leak_message:
+            self.fail('Memory leaks detected\n' + leak_message)
+
+
     def run_checks(self, data, cases):
         json_bytes = json.dumps(data).encode('utf-8')
 
@@ -61,6 +105,39 @@ class TestJsonSlicer(unittest.TestCase):
             results = deep_decode(list(slicer), 'utf-8')
 
             self.assertEqual(results, expected)
+
+    @unittest.skipIf(not os.environ.get('TRACEMALLOC'), 'TRACEMALLOC not set')
+    def test_leaks_construct(self):
+        def wrapper():
+            JsonSlicer(io.BytesIO(b'0'), ())
+
+        self.assertNoLeaks(wrapper)
+
+    @unittest.skipIf(not os.environ.get('TRACEMALLOC'), 'TRACEMALLOC not set')
+    def test_leaks_construct_with_path(self):
+        def wrapper():
+            JsonSlicer(io.BytesIO(b'0'), (rand_bytes(), rand_bytes()))
+
+        self.assertNoLeaks(wrapper)
+
+    @unittest.skipIf(not os.environ.get('TRACEMALLOC'), 'TRACEMALLOC not set')
+    def test_leaks_reinit(self):
+        def wrapper():
+            js = JsonSlicer(io.BytesIO(b'0'), (rand_bytes(), rand_bytes()))
+            js.__init__(io.BytesIO(b'0'), (rand_bytes(), rand_bytes()))
+
+        self.assertNoLeaks(wrapper)
+
+    @unittest.skipIf(not os.environ.get('TRACEMALLOC'), 'TRACEMALLOC not set')
+    def test_leaks_iterate(self):
+        def wrapper():
+            js = JsonSlicer(io.BytesIO(b'[0,1,2]'), (None,))
+
+        self.assertNoLeaks(wrapper)
+
+
+    def test_just_next(self):
+        self.assertIsNotNone(next(JsonSlicer(io.BytesIO(b'0'), ())))
 
     def test_root_elems(self):
         self.assertEqual(*next(JsonSlicer(io.BytesIO(b'0'), ())), 0)

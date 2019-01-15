@@ -6,6 +6,8 @@ matrix:
     - python: 3.5
     - python: 3.6
       env: ASAN=YES
+    - python: 3.6
+      env: TRACEMALLOC=YES
 before_script:
   - sudo apt-get update -qq
   - sudo apt-get install libyajl-dev
