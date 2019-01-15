@@ -5,6 +5,10 @@ matrix:
   include:
     - python: 3.5
     - python: 3.6
+    - python: 3.6
+      compiler: clang
+      env: CC="clang" LDSHARED="clang -shared"
+    - python: 3.6
       env: ASAN=YES
     - python: 3.6
       env: TRACEMALLOC=YES
