@@ -11,11 +11,11 @@
 
 ## Overview
 
-JsonSlicer performs a **stream** JSON parsing which means it **does
-not load** whole JSON into memory and is able to parse **very large**
-JSON files or streams. The module is written in C and uses
-[YAJL](https://lloyd.github.io/yajl/) JSON parsing library, so it's
-also quite fast.
+JsonSlicer performs a **stream** or **iterative** JSON parsing,
+which means it **does not load** whole JSON into memory and is able
+to parse **very large** JSON files or streams. The module is written
+in C and uses [YAJL](https://lloyd.github.io/yajl/) JSON parsing
+library, so it's also quite fast.
 
 JsonSlicer takes a path of JSON map keys or array indexes, and
 extracts data under that path in form of complete Python object.
@@ -105,6 +105,26 @@ with open('people.json', 'b') as data:
 with open('people.json', 'b') as data:
 	max_age = max((age for *_, age in JsonSlicer(data, (b'people', None, b'age'))))
 ```
+
+## Performance/competitors
+
+The closest competitor is [ijson](https://github.com/isagalaev/ijson),
+and JsonSlicer was written to be better. Namely,
+
+* It's about 10x faster, pretty close to Python's native `json` module
+* It allows iterating over dictionaries and allows more flexibility when
+  specifying paths/patterns of objects to iterate over
+
+The results of bundled benchmark on Python 3.7 / clang 6.0.1 / FreeBSD 12.0 amd64 / Core i7-6600U CPU @ 2.60GHz.
+
+| Facility              | Type   | Objects/sec   |
+|-----------------------|:------:|--------------:|
+| json.loads()          |    str |       1115.5K |
+| json.load(StringIO()) |    str |       1042.9K |
+| JsonSlicer            |  bytes |        822.5K |
+| ijson.yajl2_cffi      |  bytes |         72.0K |
+| ijson.yajl2           |  bytes |         44.7K |
+| ijson.python          |    str |         28.4K |
 
 ## Status/TODO
 

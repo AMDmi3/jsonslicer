@@ -4,13 +4,14 @@ sudo: required
 matrix:
   include:
     - python: 3.6
+      env: BENCHMARK=yes
     - python: 3.6
       compiler: clang
       env: CC="clang" LDSHARED="clang -shared"
     - python: 3.6
-      env: ASAN=YES
+      env: ASAN=yes
     - python: 3.6
-      env: TRACEMALLOC=YES
+      env: TRACEMALLOC=yes
     - python: 3.7
 before_script:
   - sudo apt-get update -qq
@@ -35,4 +36,8 @@ script:
             LSAN_OPTIONS=suppressions=$(pwd)/.lsan.suppressions \
             PYTHONPATH=. \
             python setup.py test
+    fi
+  - |-
+    if [ -n "$BENCHMARK" ]; then
+        python benchmark.py
     fi
