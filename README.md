@@ -121,7 +121,7 @@ The results of bundled benchmark on Python 3.7 / clang 6.0.1 / FreeBSD 12.0 amd6
 |-----------------------|:------:|--------------:|
 | json.loads()          |    str |       1115.5K |
 | json.load(StringIO()) |    str |       1042.9K |
-| JsonSlicer            |  bytes |        822.5K |
+| **JsonSlicer**        |  bytes |        822.5K |
 | ijson.yajl2_cffi      |  bytes |         72.0K |
 | ijson.yajl2           |  bytes |         44.7K |
 | ijson.python          |    str |         28.4K |
