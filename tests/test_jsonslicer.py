@@ -58,8 +58,11 @@ def deep_decode(obj, encoding):
         return obj
 
 
-def rand_bytes():
-    return str(int(random.random() * 100)).encode('utf-8')
+gen_index = 0
+def gen_bytes():
+    global gen_index
+    gen_index += 1
+    return ('gen_' + str(gen_index)).encode('utf-8')
 
 
 class TestJsonSlicer(unittest.TestCase):
@@ -116,15 +119,15 @@ class TestJsonSlicer(unittest.TestCase):
     @unittest.skipIf(not os.environ.get('TRACEMALLOC'), 'TRACEMALLOC not set')
     def test_leaks_construct_with_path(self):
         def wrapper():
-            JsonSlicer(io.BytesIO(b'0'), (rand_bytes(), rand_bytes()))
+            JsonSlicer(io.BytesIO(b'0'), (gen_bytes(), gen_bytes()))
 
         self.assertNoLeaks(wrapper)
 
     @unittest.skipIf(not os.environ.get('TRACEMALLOC'), 'TRACEMALLOC not set')
     def test_leaks_reinit(self):
         def wrapper():
-            js = JsonSlicer(io.BytesIO(b'0'), (rand_bytes(), rand_bytes()))
-            js.__init__(io.BytesIO(b'0'), (rand_bytes(), rand_bytes()))
+            js = JsonSlicer(io.BytesIO(b'0'), (gen_bytes(), gen_bytes()))
+            js.__init__(io.BytesIO(b'0'), (gen_bytes(), gen_bytes()))
 
         self.assertNoLeaks(wrapper)
 
