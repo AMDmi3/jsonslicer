@@ -1,10 +1,10 @@
-# JsonSlicer - stream JSON parser
+# jsonslicer - stream JSON parser
 
 <a href="https://repology.org/metapackage/python:jsonslicer/versions">
-	<img src="https://repology.org/badge/vertical-allrepos/python:jsonslicer.svg" alt="py-jsonslicer packaging status" align="right">
+	<img src="https://repology.org/badge/vertical-allrepos/python:jsonslicer.svg" alt="jsonslicer packaging status" align="right">
 </a>
 
-[![Build Status](https://travis-ci.org/repology/py-jsonslicer.svg?branch=master)](https://travis-ci.org/repology/py-jsonslicer)
+[![Build Status](https://travis-ci.org/repology/jsonslicer.svg?branch=master)](https://travis-ci.org/repology/jsonslicer)
 [![PyPI downloads](https://img.shields.io/pypi/dm/jsonslicer.svg)](https://pypi.org/project/jsonslicer/)
 [![PyPI version](https://img.shields.io/pypi/v/jsonslicer.svg)](https://pypi.org/project/jsonslicer/)
 [![PyPI pythons](https://img.shields.io/pypi/pyversions/jsonslicer.svg)](https://pypi.org/project/jsonslicer/)

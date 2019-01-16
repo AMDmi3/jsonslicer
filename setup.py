@@ -48,7 +48,7 @@ setup(
     long_description_content_type='text/markdown',
     author='Dmitry Marakasov',
     author_email='amdmi3@amdmi3.ru',
-    url='https://github.com/repology/py-jsonslicer',
+    url='https://github.com/repology/jsonslicer',
     license='MIT',
     keywords=['json', 'parser', 'pull', 'stream'],
     classifiers=[
