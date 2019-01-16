@@ -43,20 +43,16 @@ typedef struct {
 	int mode;
 
 	// pattern argument
-	PyObjectListNode* pattern_head;
-	PyObjectListNode* pattern_tail;
+	PyObjList pattern;
 
 	// current path in json
-	PyObjectListNode* path_head;
-	PyObjectListNode* path_tail;
+	PyObjList path;
 
 	// stack of objects being currently constructed
-	PyObjectListNode* constructing_head;
-	PyObjectListNode* constructing_tail;
+	PyObjList constructing;
 
 	// complete python objects ready to be returned to caller
-	PyObjectListNode* complete_head;
-	PyObjectListNode* complete_tail;
+	PyObjList complete;
 } JsonSlicer;
 
 PyTypeObject JsonSlicerType;

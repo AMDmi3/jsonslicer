@@ -24,58 +24,87 @@
 
 #include <stdlib.h>
 
-int pyobjlist_push_front(PyObjectListNode** head, PyObjectListNode** tail, PyObject* obj) {
-	PyObjectListNode* node = (PyObjectListNode*)malloc(sizeof(PyObjectListNode));
+void pyobjlist_init(PyObjList* list) {
+	list->front = NULL;
+	list->back = NULL;
+}
+
+void pyobjlist_clear(PyObjList* list) {
+	PyObjListNode* cur = list->back;
+
+	list->front = NULL;
+	list->back = NULL;
+
+	while (cur != NULL) {
+		Py_DECREF(cur->obj);
+		PyObjListNode* tmp = cur;
+		cur = cur->prev;
+		free(tmp);
+	}
+}
+
+size_t pyobjlist_size(PyObjList* list) {
+	size_t count = 0;
+
+	for (PyObjListNode* node = list->front; node; node = node->next) {
+		count++;
+	}
+
+	return count;
+}
+
+int pyobjlist_push_front(PyObjList* list, PyObject* obj) {
+	PyObjListNode* node = (PyObjListNode*)malloc(sizeof(PyObjListNode));
 	if (node == NULL)
 		return 0;
 
 	node->obj = obj;
 	node->prev = NULL;
-	node->next = *head;
+	node->next = list->front;
 
 	if (node->next) {
 		node->next->prev = node;
 	} else {
-		*tail = node;
+		list->back = node;
 	}
 
-	*head = node;
+	list->front = node;
 
 	return 1;
 }
 
-int pyobjlist_push_back(PyObjectListNode** head, PyObjectListNode** tail, PyObject* obj) {
-	PyObjectListNode* node = (PyObjectListNode*)malloc(sizeof(PyObjectListNode));
+int pyobjlist_push_back(PyObjList* list, PyObject* obj) {
+	PyObjListNode* node = (PyObjListNode*)malloc(sizeof(PyObjListNode));
 	if (node == NULL)
 		return 0;
 
 	node->obj = obj;
-	node->prev = *tail;
+	node->prev = list->back;
 	node->next = NULL;
 
 	if (node->prev) {
 		node->prev->next = node;
 	} else {
-		*head = node;
+		list->front = node;
 	}
 
-	*tail = node;
+	list->back = node;
 
 	return 1;
 }
 
-PyObject* pyobjlist_pop_front(PyObjectListNode** head, PyObjectListNode** tail) {
-	PyObjectListNode* node = *head;
+PyObject* pyobjlist_pop_front(PyObjList* list) {
+	PyObjListNode* node = list->front;
 	if (!node)
 		return NULL;
 
 	if (node->next) {
 		node->next->prev = NULL;
 	} else {
-		*tail = NULL;
+		list->back = NULL;
 	}
 
-	*head = node->next;
+	list->front = node->next;
 
 	PyObject* result = node->obj;
 	free(node);
@@ -83,45 +112,21 @@ PyObject* pyobjlist_pop_front(PyObjectListNode** head, PyObjectListNode** tail) 
 	return result;
 }
 
-PyObject* pyobjlist_pop_back(PyObjectListNode** head, PyObjectListNode** tail) {
-	PyObjectListNode* node = *tail;
+PyObject* pyobjlist_pop_back(PyObjList* list) {
+	PyObjListNode* node = list->back;
 	if (!node)
 		return NULL;
 
 	if (node->prev) {
 		node->prev->next = NULL;
 	} else {
-		*head = NULL;
+		list->front = NULL;
 	}
 
-	*tail = node->prev;
+	list->back = node->prev;
 
 	PyObject* result = node->obj;
 	free(node);
 
 	return result;
-}
-
-void pyobjlist_clear(PyObjectListNode** head, PyObjectListNode** tail) {
-	PyObjectListNode* cur = *tail;
-
-	*head = NULL;
-	*tail = NULL;
-
-	while (cur != NULL) {
-		Py_DECREF(cur->obj);
-		PyObjectListNode* tmp = cur;
-		cur = cur->prev;
-		free(tmp);
-	}
-}
-
-size_t pyobjlist_size(PyObjectListNode* head) {
-	size_t count = 0;
-
-	for (PyObjectListNode* node = head; node; node = node->next) {
-		count++;
-	}
-
-	return count;
 }

@@ -28,12 +28,10 @@
 
 #include <Python.h>
 
-#include <stdio.h>
-
 // helpers
 static int check_pattern(JsonSlicer* self) {
-	PyObjectListNode* pattern = self->pattern_head;
-	PyObjectListNode* path = self->path_head;
+	PyObjListNode* pattern = self->pattern.front;
+	PyObjListNode* path = self->path.front;
 
 	while (pattern && path) {
 		if (pattern->obj != Py_None && PyObject_RichCompareBool(pattern->obj, path->obj, Py_EQ) != 1) {
@@ -48,13 +46,13 @@ static int check_pattern(JsonSlicer* self) {
 }
 
 static int wrap_finished_object(JsonSlicer* self, PyObject** obj) {
-	PyObject* tuple = PyTuple_New(pyobjlist_size(self->path_head) + 1);
+	PyObject* tuple = PyTuple_New(pyobjlist_size(&self->path) + 1);
 	if (!tuple) {
 		return 0;
 	}
 
 	size_t tuple_idx = 0;
-	for (PyObjectListNode* node = self->path_head; node; node = node->next) {
+	for (PyObjListNode* node = self->path.front; node; node = node->next) {
 		Py_INCREF(node->obj);
 		PyTuple_SET_ITEM(tuple, tuple_idx++, node->obj);
 	}
@@ -66,8 +64,8 @@ static int wrap_finished_object(JsonSlicer* self, PyObject** obj) {
 }
 
 int handle_path_change(JsonSlicer* self) {
-	if (self->path_tail && PyLong_Check(self->path_tail->obj)) {
-		PyObject* old_index = self->path_tail->obj;
+	if (self->path.back && PyLong_Check(self->path.back->obj)) {
+		PyObject* old_index = self->path.back->obj;
 		long long value = PyLong_AsLongLong(old_index);
 		if (value == -1 && PyErr_Occurred()) {
 			return 0;
@@ -77,7 +75,7 @@ int handle_path_change(JsonSlicer* self) {
 		if (!new_index) {
 			return 0;
 		}
-		self->path_tail->obj = new_index;
+		self->path.back->obj = new_index;
 		Py_DECREF(old_index);
 	}
 
@@ -89,7 +87,7 @@ int finish_complete_object(JsonSlicer* self, PyObject* obj) {
 		return 0;
 	}
 
-	int res = pyobjlist_push_back(&self->complete_head, &self->complete_tail, obj);
+	int res = pyobjlist_push_back(&self->complete, obj);
 
     self->mode = MODE_SEEKING;
 
@@ -141,12 +139,12 @@ int seek_handle_string(JsonSlicer* self, const char* str, size_t len) {
 
 // map key
 int seek_handle_map_key(JsonSlicer* self, const char* str, size_t len) {
-	assert(self->path_tail && self->path_tail->obj);
+	assert(self->path.back && self->path.back->obj);
 
-	Py_DECREF(self->path_tail->obj);
+	Py_DECREF(self->path.back->obj);
 
-	self->path_tail->obj = PyBytes_FromStringAndSize(str, len);
-	if (self->path_tail->obj == NULL) {
+	self->path.back->obj = PyBytes_FromStringAndSize(str, len);
+	if (self->path.back->obj == NULL) {
 		return 0;
 	}
 	return 1;
@@ -159,12 +157,12 @@ int seek_handle_start_map(JsonSlicer* self) {
 		return construct_handle_start_map(self);
 	} else {
 		Py_INCREF(Py_None);
-		return pyobjlist_push_back(&self->path_head, &self->path_tail, Py_None);
+		return pyobjlist_push_back(&self->path, Py_None);
 	}
 }
 
 int seek_handle_end_map(JsonSlicer* self) {
-	PyObject* popped = pyobjlist_pop_back(&self->path_head, &self->path_tail);
+	PyObject* popped = pyobjlist_pop_back(&self->path);
 	assert(popped);
 	Py_DECREF(popped);
 	return handle_path_change(self);
@@ -179,12 +177,12 @@ int seek_handle_start_array(JsonSlicer* self) {
 		if (index == NULL) {
 			return 0;
 		}
-		return pyobjlist_push_back(&self->path_head, &self->path_tail, index);
+		return pyobjlist_push_back(&self->path, index);
 	}
 }
 
 int seek_handle_end_array(JsonSlicer* self) {
-	PyObject* popped = pyobjlist_pop_back(&self->path_head, &self->path_tail);
+	PyObject* popped = pyobjlist_pop_back(&self->path);
 	assert(popped);
 	Py_DECREF(popped);
 	return handle_path_change(self);

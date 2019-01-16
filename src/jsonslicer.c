@@ -36,29 +36,19 @@ static PyObject* JsonSlicer_new(PyTypeObject *type, PyObject *args, PyObject *kw
 		self->last_map_key = NULL;
 		self->mode = MODE_SEEKING;
 
-		self->pattern_head = NULL;
-		self->pattern_tail = NULL;
-
-		self->path_head = NULL;
-		self->path_tail = NULL;
-
-		self->constructing_head = NULL;
-		self->constructing_tail = NULL;
-
-		self->complete_head = NULL;
-		self->complete_tail = NULL;
+		pyobjlist_init(&self->pattern);
+		pyobjlist_init(&self->path);
+		pyobjlist_init(&self->constructing);
+		pyobjlist_init(&self->complete);
 	}
 	return (PyObject*)self;
 }
 
 static void JsonSlicer_dealloc(JsonSlicer* self) {
-	pyobjlist_clear(&self->complete_head, &self->complete_tail);
-
-	pyobjlist_clear(&self->constructing_head, &self->constructing_tail);
-
-	pyobjlist_clear(&self->path_head, &self->path_tail);
-
-	pyobjlist_clear(&self->pattern_head, &self->pattern_tail);
+	pyobjlist_clear(&self->complete);
+	pyobjlist_clear(&self->constructing);
+	pyobjlist_clear(&self->path);
+	pyobjlist_clear(&self->pattern);
 
 	Py_CLEAR(self->last_map_key);
 
@@ -85,17 +75,17 @@ static int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwds) {
 	assert(pattern != NULL);
 
 	// prepare all new data members
-	PyObjectListNode* new_pattern_head = NULL;
-	PyObjectListNode* new_pattern_tail = NULL;
+	PyObjList new_pattern;
+	pyobjlist_init(&new_pattern);
 
 	for (Py_ssize_t i = 0; i < PySequence_Size(pattern); i++) {
 		PyObject* item = PySequence_GetItem(pattern, i);
 		if (item == NULL) {
-			pyobjlist_clear(&new_pattern_head, &new_pattern_tail);
+			pyobjlist_clear(&new_pattern);
 			return -1;
 		}
-		if (!pyobjlist_push_back(&new_pattern_head, &new_pattern_tail, item)) {
-			pyobjlist_clear(&new_pattern_head, &new_pattern_tail);
+		if (!pyobjlist_push_back(&new_pattern, item)) {
+			pyobjlist_clear(&new_pattern);
 			Py_DECREF(item);
 			return -1;
 		}
@@ -103,25 +93,23 @@ static int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwds) {
 
 	yajl_handle new_yajl = yajl_alloc(&yajl_handlers, NULL, (void*)self);
 	if (new_yajl == NULL) {
-		pyobjlist_clear(&new_pattern_head, &new_pattern_tail);
+		pyobjlist_clear(&new_pattern);
 		return -1;
 	}
 
 	Py_INCREF(io);
 
 	// swap initialized members with new ones, clearing the rest
-	pyobjlist_clear(&self->complete_head, &self->complete_tail);
+	pyobjlist_clear(&self->complete);
 
-	pyobjlist_clear(&self->constructing_head, &self->constructing_tail);
+	pyobjlist_clear(&self->constructing);
 
-	pyobjlist_clear(&self->path_head, &self->path_tail);
+	pyobjlist_clear(&self->path);
 
 	{
-		PyObjectListNode* tmp_head = self->pattern_head;
-		PyObjectListNode* tmp_tail = self->pattern_tail;
-		self->pattern_head = new_pattern_head;
-		self->pattern_tail = new_pattern_tail;
-		pyobjlist_clear(&tmp_head, &tmp_tail);
+		PyObjList tmp = self->pattern;
+		self->pattern = new_pattern;
+		pyobjlist_clear(&tmp);
 	}
 
 	self->mode = MODE_SEEKING;
@@ -152,7 +140,7 @@ static JsonSlicer* JsonSlicer_iter(JsonSlicer* self) {
 
 static PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 	// return complete objects from previous runs, if any
-	PyObject* complete = pyobjlist_pop_front(&self->complete_head, &self->complete_tail);
+	PyObject* complete = pyobjlist_pop_front(&self->complete);
 	if (complete) {
 		return complete;
 	}
@@ -199,7 +187,7 @@ static PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 		Py_XDECREF(buffer);
 
 		// return complete object, if any
-		PyObject* complete = pyobjlist_pop_front(&self->complete_head, &self->complete_tail);
+		PyObject* complete = pyobjlist_pop_front(&self->complete);
 		if (complete) {
 			return complete;
 		}

@@ -25,20 +25,26 @@
 
 #include <Python.h>
 
-typedef struct PyObjectListNode {
+typedef struct PyObjListNode {
 	PyObject* obj;
-	struct PyObjectListNode* next;
-	struct PyObjectListNode* prev;
-} PyObjectListNode;
+	struct PyObjListNode* next;
+	struct PyObjListNode* prev;
+} PyObjListNode;
 
-int pyobjlist_push_front(PyObjectListNode** head, PyObjectListNode** tail, PyObject* obj);
-int pyobjlist_push_back(PyObjectListNode** head, PyObjectListNode** tail, PyObject* obj);
+typedef struct PyObjList {
+	PyObjListNode* front;
+	PyObjListNode* back;
+} PyObjList;
 
-PyObject* pyobjlist_pop_front(PyObjectListNode** head, PyObjectListNode** tail);
-PyObject* pyobjlist_pop_back(PyObjectListNode** head, PyObjectListNode** tail);
+void pyobjlist_init(PyObjList* list);
+void pyobjlist_clear(PyObjList* list);
 
-void pyobjlist_clear(PyObjectListNode** head, PyObjectListNode** tail);
+size_t pyobjlist_size(PyObjList* list);
 
-size_t pyobjlist_size(PyObjectListNode* head);
+int pyobjlist_push_front(PyObjList* list, PyObject* obj);
+int pyobjlist_push_back(PyObjList* list, PyObject* obj);
+
+PyObject* pyobjlist_pop_front(PyObjList* list);
+PyObject* pyobjlist_pop_back(PyObjList* list);
 
 #endif
