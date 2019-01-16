@@ -16,6 +16,11 @@ matrix:
 before_script:
   - sudo apt-get update -qq
   - sudo apt-get install libyajl-dev
+  - |-
+    if [ -n "$BENCHMARK" ]; then
+        pip install ijson
+        pip install tabulate
+    fi
 script:
   - |-
     if [ -z "$ASAN" ]; then
