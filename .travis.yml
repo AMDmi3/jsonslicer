@@ -20,6 +20,7 @@ before_script:
     if [ -n "$BENCHMARK" ]; then
         pip install ijson
         pip install tabulate
+        pip install cffi
     fi
 script:
   - |-
