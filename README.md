@@ -4,7 +4,7 @@
 	<img src="https://repology.org/badge/vertical-allrepos/python:jsonslicer.svg" alt="jsonslicer packaging status" align="right">
 </a>
 
-[![Build Status](https://travis-ci.org/repology/jsonslicer.svg?branch=master)](https://travis-ci.org/repology/jsonslicer)
+[![Build Status](https://travis-ci.org/AMDmi3/jsonslicer.svg?branch=master)](https://travis-ci.org/AMDmi3/jsonslicer)
 [![PyPI downloads](https://img.shields.io/pypi/dm/jsonslicer.svg)](https://pypi.org/project/jsonslicer/)
 [![PyPI version](https://img.shields.io/pypi/v/jsonslicer.svg)](https://pypi.org/project/jsonslicer/)
 [![PyPI pythons](https://img.shields.io/pypi/pyversions/jsonslicer.svg)](https://pypi.org/project/jsonslicer/)
