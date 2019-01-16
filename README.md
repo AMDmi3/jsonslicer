@@ -86,7 +86,7 @@ from jsonslicer import JsonSlicer
 #
 with open('people.json', 'b') as data:
 	for *path, person in JsonSlicer(data, (b'people', None)):
-		print(item)
+		print(person)
 		# {b'name': b'John', b'age': 31}
 		# {b'name': b'Ivan', b'age': 26}
 		# {b'name': b'Angela', b'age': 33}
