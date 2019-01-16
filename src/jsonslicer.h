@@ -52,7 +52,6 @@ typedef struct {
 	// stack of objects being currently constructed
 	PyObjectListNode* constructing_head;
 	PyObjectListNode* constructing_tail;
-	PyObject* constructing_key;
 
 	// complete python objects ready to be returned to caller
 	PyObjectListNode* complete_head;
