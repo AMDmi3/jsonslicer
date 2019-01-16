@@ -103,13 +103,17 @@ PyObject* pyobjlist_pop_back(PyObjectListNode** head, PyObjectListNode** tail) {
 }
 
 void pyobjlist_clear(PyObjectListNode** head, PyObjectListNode** tail) {
-	PyObject* current;
-	while ((current = pyobjlist_pop_back(head, tail))) {
-		Py_DECREF(current);
-	}
+	PyObjectListNode* cur = *tail;
 
-	assert(*head == NULL);
-	assert(*tail == NULL);
+	*head = NULL;
+	*tail = NULL;
+
+	while (cur != NULL) {
+		Py_DECREF(cur->obj);
+		PyObjectListNode* tmp = cur;
+		cur = cur->prev;
+		free(tmp);
+	}
 }
 
 size_t pyobjlist_size(PyObjectListNode* head) {
