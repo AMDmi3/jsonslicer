@@ -53,6 +53,10 @@ size_t pyobjlist_size(PyObjList* list) {
 	return count;
 }
 
+int pyobjlist_empty(PyObjList* list) {
+	return list->front == NULL;
+}
+
 int pyobjlist_push_front(PyObjList* list, PyObject* obj) {
 	PyObjListNode* node = (PyObjListNode*)malloc(sizeof(PyObjListNode));
 	if (node == NULL)

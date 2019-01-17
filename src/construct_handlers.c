@@ -56,7 +56,7 @@ static int add_to_parent(JsonSlicer* self, PyObject* value) {
 }
 
 static int push_constructing_object(JsonSlicer* self, PyObject* obj) {
-	if (self->constructing.back != NULL) {
+	if (!pyobjlist_empty(&self->constructing)) {
 		if (!add_to_parent(self, obj)) {
 			return 0;
 		}
@@ -70,7 +70,7 @@ static PyObject* pop_constructing_object(JsonSlicer* self) {
 }
 
 static int handle_scalar(JsonSlicer* self, PyObject* value) {
-	if (self->constructing.back == NULL) {
+	if (pyobjlist_empty(&self->constructing)) {
 		return finish_complete_object(self, value);
 	} else {
 		return add_to_parent(self, value);
@@ -168,7 +168,7 @@ int construct_handle_start_map(JsonSlicer* self) {
 int construct_handle_end_map(JsonSlicer* self) {
 	PyObject* map = pop_constructing_object(self);
 
-	if (self->constructing.back == NULL) {
+	if (pyobjlist_empty(&self->constructing)) {
 		if (!finish_complete_object(self, map)) {
 			Py_DECREF(map);
 			return 0;
@@ -194,7 +194,7 @@ int construct_handle_start_array(JsonSlicer* self) {
 int construct_handle_end_array(JsonSlicer* self) {
 	PyObject* array = pop_constructing_object(self);
 
-	if (self->constructing.back == NULL) {
+	if (pyobjlist_empty(&self->constructing)) {
 		if (!finish_complete_object(self, array)) {
 			Py_DECREF(array);
 			return 0;

@@ -40,6 +40,7 @@ void pyobjlist_init(PyObjList* list);
 void pyobjlist_clear(PyObjList* list);
 
 size_t pyobjlist_size(PyObjList* list);
+int pyobjlist_empty(PyObjList* list);
 
 int pyobjlist_push_front(PyObjList* list, PyObject* obj);
 int pyobjlist_push_back(PyObjList* list, PyObject* obj);
