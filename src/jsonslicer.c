@@ -62,12 +62,14 @@ static void JsonSlicer_dealloc(JsonSlicer* self) {
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
-static int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwds) {
+static int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	// parse args
 	PyObject* io = NULL;
 	PyObject* pattern = NULL;
 
-	if (!PyArg_ParseTuple(args, "OO", &io, &pattern)) {
+	static char *keywords[] = {"file", "path_prefix", NULL};
+
+	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|$", keywords, &io, &pattern)) {
         return -1;
 	}
 
