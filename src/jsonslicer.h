@@ -36,9 +36,14 @@ enum JsonSlicerMode {
 typedef struct {
 	PyObject_HEAD
 
+	// arguments
 	PyObject* io;
+	Py_ssize_t read_size;
+
+	// YAJL handle
 	yajl_handle yajl;
 
+	// parser state
 	PyObject* last_map_key;
 	int mode;
 

@@ -31,6 +31,8 @@ static PyObject* JsonSlicer_new(PyTypeObject *type, PyObject *args, PyObject *kw
 	JsonSlicer* self = (JsonSlicer*)type->tp_alloc(type, 0);
 	if (self != NULL) {
 		self->io = NULL;
+		self->read_size = 1024;  // XXX: bump somewhat for production use
+
 		self->yajl = NULL;
 
 		self->last_map_key = NULL;
@@ -66,10 +68,11 @@ static int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	// parse args
 	PyObject* io = NULL;
 	PyObject* pattern = NULL;
+	Py_ssize_t read_size = self->read_size;
 
-	static char *keywords[] = {"file", "path_prefix", NULL};
+	static char *keywords[] = {"file", "path_prefix", "read_size", NULL};
 
-	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|$", keywords, &io, &pattern)) {
+	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|$n", keywords, &io, &pattern, &read_size)) {
         return -1;
 	}
 
@@ -126,6 +129,8 @@ static int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 		}
 	}
 
+	self->read_size = read_size;
+
 	{
 		PyObject* tmp = self->io;
 		self->io = io;
@@ -148,12 +153,11 @@ static PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 	}
 
 	PyObject* read = PyDict_GetItemString(self->io, "read");
-	int read_size = 1024;
 	int eof = 0;
 
 	do {
 		// read chunk of data from IO
-		PyObject* buffer = PyObject_CallMethod(self->io, "read", "i", read_size);
+		PyObject* buffer = PyObject_CallMethod(self->io, "read", "n", self->read_size);
 
 		// handle i/o errors
 		if (!buffer) {
