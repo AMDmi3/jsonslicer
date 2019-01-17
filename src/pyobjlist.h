@@ -50,4 +50,8 @@ PyObject* pyobjlist_pop_back(PyObjList* list);
 
 PyObject* pyobjlist_as_tuple_prefix(PyObjList* list, PyObject* obj);
 
+typedef int (*PyObjListMatchFunc)(PyObject*, PyObject*);
+
+int pyobjlist_match(PyObjList* lhs, PyObjList* rhs, PyObjListMatchFunc compare);
+
 #endif

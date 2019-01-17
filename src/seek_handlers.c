@@ -29,20 +29,12 @@
 #include <Python.h>
 
 // helpers
+static int path_matches_pattern(PyObject* path, PyObject* pattern) {
+	return pattern == Py_None || PyObject_RichCompareBool(path, pattern, Py_EQ);
+}
+
 static int check_pattern(JsonSlicer* self) {
-	PyObjListNode* pattern = self->pattern.front;
-	PyObjListNode* path = self->path.front;
-
-	while (pattern && path) {
-		if (pattern->obj != Py_None && PyObject_RichCompareBool(pattern->obj, path->obj, Py_EQ) != 1) {
-			return 0;
-		}
-
-		pattern = pattern->next;
-		path = path->next;
-	}
-
-	return !pattern && !path;
+	return pyobjlist_match(&self->path, &self->pattern, &path_matches_pattern);
 }
 
 int handle_path_change(JsonSlicer* self) {

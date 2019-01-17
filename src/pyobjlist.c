@@ -152,3 +152,16 @@ PyObject* pyobjlist_as_tuple_prefix(PyObjList* list, PyObject* obj) {
 
 	return tuple;
 }
+
+int pyobjlist_match(PyObjList* lhs, PyObjList* rhs, PyObjListMatchFunc equals) {
+	PyObjListNode* lnode = lhs->front;
+	PyObjListNode* rnode = rhs->front;
+
+	for (; lnode != NULL && rnode != NULL; lnode = lnode->next, rnode = rnode->next) {
+		if (!equals(lnode->obj, rnode->obj)) {
+			return 0;
+		}
+	}
+
+	return lnode == NULL && rnode == NULL;
+}
