@@ -45,24 +45,6 @@ static int check_pattern(JsonSlicer* self) {
 	return !pattern && !path;
 }
 
-static int wrap_finished_object(JsonSlicer* self, PyObject** obj) {
-	PyObject* tuple = PyTuple_New(pyobjlist_size(&self->path) + 1);
-	if (!tuple) {
-		return 0;
-	}
-
-	size_t tuple_idx = 0;
-	for (PyObjListNode* node = self->path.front; node; node = node->next) {
-		Py_INCREF(node->obj);
-		PyTuple_SET_ITEM(tuple, tuple_idx++, node->obj);
-	}
-
-	PyTuple_SET_ITEM(tuple, tuple_idx, *obj);
-	*obj = tuple;
-
-	return 1;
-}
-
 int handle_path_change(JsonSlicer* self) {
 	if (self->path.back && PyLong_Check(self->path.back->obj)) {
 		PyObject* old_index = self->path.back->obj;
@@ -83,17 +65,22 @@ int handle_path_change(JsonSlicer* self) {
 }
 
 int finish_complete_object(JsonSlicer* self, PyObject* obj) {
-	if (!wrap_finished_object(self, &obj)) {
+	// regardless of result, we've finished parsing an object
+	self->mode = MODE_SEEKING;
+
+	// construct tuple with prepended path
+	PyObject* tuple = pyobjlist_as_tuple_prefix(&self->path, obj);
+	if (tuple == NULL) {
 		return 0;
 	}
 
-	int res = pyobjlist_push_back(&self->complete, obj);
+	// save in list of complete objects
+	if (!pyobjlist_push_back(&self->complete, tuple)) {
+		Py_DECREF(tuple);
+		return 0;
+	}
 
-    self->mode = MODE_SEEKING;
-
-	res &= handle_path_change(self);
-
-    return res;
+	return handle_path_change(self);
 }
 
 // scalars

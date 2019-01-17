@@ -134,3 +134,21 @@ PyObject* pyobjlist_pop_back(PyObjList* list) {
 
 	return result;
 }
+
+PyObject* pyobjlist_as_tuple_prefix(PyObjList* list, PyObject* obj) {
+	PyObject* tuple = PyTuple_New(pyobjlist_size(list) + 1);
+	if (tuple == NULL) {
+		return NULL;
+	}
+
+	size_t tuple_idx = 0;
+	for (PyObjListNode* node = list->front; node; node = node->next) {
+		Py_INCREF(node->obj);
+		PyTuple_SET_ITEM(tuple, tuple_idx++, node->obj);
+	}
+
+	Py_INCREF(obj);
+	PyTuple_SET_ITEM(tuple, tuple_idx, obj);
+
+	return tuple;
+}

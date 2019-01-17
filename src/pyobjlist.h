@@ -48,4 +48,6 @@ int pyobjlist_push_back(PyObjList* list, PyObject* obj);
 PyObject* pyobjlist_pop_front(PyObjList* list);
 PyObject* pyobjlist_pop_back(PyObjList* list);
 
+PyObject* pyobjlist_as_tuple_prefix(PyObjList* list, PyObject* obj);
+
 #endif
