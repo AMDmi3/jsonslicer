@@ -40,12 +40,12 @@ static int add_to_parent(JsonSlicer* self, PyObject* value) {
 			return 0;
 		}
 
-		Py_INCREF(self->last_map_key);
+		// adds references
 		if (PyDict_SetItem(container, self->last_map_key, value) != 0) {
-			Py_DECREF(self->last_map_key);
 			return 0;
 		}
 	} else if (PyList_Check(container)) {
+		// adds reference
 		return PyList_Append(container, value) == 0;
 	} else {
 		PyErr_SetString(PyExc_RuntimeError, "Unexpected container type on the stack");
