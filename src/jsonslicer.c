@@ -76,7 +76,7 @@ static int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 
 	const char* path_mode_arg = NULL;
 	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|$ns", keywords, &io, &pattern, &read_size, &path_mode_arg)) {
-        return -1;
+		return -1;
 	}
 
 	if (path_mode_arg) {
@@ -245,16 +245,16 @@ PyTypeObject JsonSlicerType = {
 	0,                         /* tp_richcompare */
 	0,                         /* tp_weaklistoffset */
 	(getiterfunc)JsonSlicer_iter, /* tp_iter */
-    (iternextfunc)JsonSlicer_iternext, /* tp_iternext */
+	(iternextfunc)JsonSlicer_iternext, /* tp_iternext */
 	0,                         /* tp_methods */
-    0,                         /* tp_members */
-    0,                         /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc)JsonSlicer_init, /* tp_init */
-    0,                         /* tp_alloc */
-    JsonSlicer_new,            /* tp_new */
+	0,                         /* tp_members */
+	0,                         /* tp_getset */
+	0,                         /* tp_base */
+	0,                         /* tp_dict */
+	0,                         /* tp_descr_get */
+	0,                         /* tp_descr_set */
+	0,                         /* tp_dictoffset */
+	(initproc)JsonSlicer_init, /* tp_init */
+	0,                         /* tp_alloc */
+	JsonSlicer_new,            /* tp_new */
 };
