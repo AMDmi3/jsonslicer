@@ -15,96 +15,152 @@ JsonSlicer performs a **stream** or **iterative** JSON parsing,
 which means it **does not load** whole JSON into memory and is able
 to parse **very large** JSON files or streams. The module is written
 in C and uses [YAJL](https://lloyd.github.io/yajl/) JSON parsing
-library, so it's also quite fast.
+library, so it's also quite **fast**.
 
-JsonSlicer takes a path of JSON map keys or array indexes, and
-extracts data under that path in form of complete Python object.
-For instance, for JSON
+JsonSlicer takes a path of JSON map keys or array indexes, and provides
+iterator interface which yields JSON data matching given path as complete
+Python objects.
+
+## Example
 
 ```json
 {
-	"animals": {
-		"dogs": [
-			"sparky",
-			"barky"
-		]
+	"friends": [
+		{"name": "John", "age": 31},
+		{"name": "Ivan", "age": 26}
+	],
+    "colleagues": {
+		"manager": {"name": "Jack", "age": 33},
+		"subordinate": {"name": "Lucy", "age": 21}
 	}
 }
 ```
 
-for path `(b'animals', b'dogs', 1)` JsonSlicer would return `b'barky'`,
-and for path `(b'animals', b'dogs')` `[b'sparky', b'barky']` would
-be returned. Wildcards are allowed in paths in form of `None` items,
-which would match any map key or array index in the corresponding place.
-So for path `(b'animals', b'dogs', None)` JsonSlicer would return
-`b'sparky'` and `b'barky'` as two separate objects.
-
-Each object is returned in a form of tuple containing a complete
-path and a returned object as the last element. Here's complete
-data the examples above would return:
-
-```python
-# path (b'animals', b'dogs', 1)
-(b'animals', b'dogs', 1, b'barky')
-
-# path (b'animals', b'dogs')
-(b'animals', b'dogs', [b'sparky', b'barky'])
-
-# path (b'animals', b'dogs', None)
-(b'animals', b'dogs', 0, b'sparky')
-(b'animals', b'dogs', 1, b'barky')
-```
-
-JsonSlicer itself provides an iterator interface.
-
-Summarizing, to use JsonWriter you just provide an I/O handle and
-JSON path/pattern to it, iterate over it and process paths extracted
-objects and optional path information as you see fit.
-
-## Example
-
-Consider a very large JSON list of people:
-
-```json
-{
-	"people": [
-		{"name": "John", "age": 31},
-		{"name": "Ivan", "age": 26},
-		{"name": "Angela", "age": 33},
-		...
-	]
-}
-```
-
-Here's how you can work with it with JsonSlicer:
-
 ```python
 from jsonslicer import JsonSlicer
 
-#
-# Iterate over all people
-#
+# Extract specific elements:
 with open('people.json', 'b') as data:
-	for *path, person in JsonSlicer(data, (b'people', None)):
+	ivans_age = next(JsonSlicer(data, (b'friends', 1, b'age')))
+
+with open('people.json', 'b') as data:
+	managers_name = next(JsonSlicer(data, (b'collegues', b'manager', b'name')))
+
+# Iterate over collection(s) by using wildcards in the path:
+with open('people.json', 'b') as data:
+	for person in JsonSlicer(data, (b"friends", None)):
 		print(person)
 		# {b'name': b'John', b'age': 31}
 		# {b'name': b'Ivan', b'age': 26}
-		# {b'name': b'Angela', b'age': 33}
-		# ...
 
-#
-# extract 3'th person (e.g. at index 2) from the file
-#
+# Uniform iteration is possible
 with open('people.json', 'b') as data:
-	*_, person = next(JsonSlicer(data, (b'people', 2)))
-	# note that you may ignore path by using _ placeholder
+	for person in JsonSlicer(data, (None, None)):
+		print(person)
+		# {b'name': b'John', b'age': 31}
+		# {b'name': b'Ivan', b'age': 26}
+		# {b'name': b'Jack', b'age': 33}
+		# {b'name': b'Lucy', b'age': 21}
 
-#
-# extract highest age from the list
-#
+# Map key of returned objects is available on demand...
 with open('people.json', 'b') as data:
-	max_age = max((age for *_, age in JsonSlicer(data, (b'people', None, b'age'))))
+	for position, person in JsonSlicer(data, ('colleagues', None), path_format='map_keys'):
+		print(position, person)
+		# b'manager' {b'name': b'Jack', b'age': 33}
+		# b'subordinate' {b'name': b'Lucy', b'age': 21}
+
+# ...as well as complete path information
+with open('people.json', 'b') as data:
+	for person in JsonSlicer(data, (None, None), path_format='full'):
+		print(person)
+		# (b'friends', 0, {b'name': b'John', b'age': 31})
+		# (b'friends', 1, {b'name': b'Ivan', b'age': 26})
+		# (b'colleagues', b'manager', {b'name': b'Jack', b'age': 33})
+		# (b'colleagues', b'subordinate', {b'name': b'Lucy', b'age': 21})
+
+# Extract all instances of deep nested field
+with open('people.json', 'b') as data:
+	max_age = max(JsonSlicer(data, (b'people', None, b'age')))
+	# 33
 ```
+
+## API
+
+```
+jsonslicer.JsonSlicer(file, path_prefix, read_size=1024, path_mode=None)
+```
+
+Constructs iterative JSON parser which reads JSON data from _file_ (a `.read()`-supporting [file-like object](https://docs.python.org/3/glossary.html#term-file-like-object) containing a JSON document).
+
+_path_prefix_ is an iterable (usually a list or a tuple) specifying
+a path or a path pattern of objects which the parser should extract
+from JSON.
+
+For instance, in the example above a path `(b'friends', 0, b'name')`
+will yield string `'John'`, by descending from the root element
+into the dictionary element by key `'friends'`, then into the array
+element by index `0`, then into the dictionary element by key
+`'name'`. Note that integers only match array indexes and strings
+only match dictionary keys.
+
+The path can be turned into a pattern by specifying `None` as a
+placeholder in some path positions. For instance,  `(None, None,
+'name')` will yield all four names from the example above, because
+it matches an item under 'name' key on the second nesting level of
+any arrays or map structure.
+
+_read_size_ is a size of block read by the parser at a time.
+
+_path_mode_ is a string which specifies how a parser should
+return path information along with objects. The following modes are
+supported:
+
+* _ignore_ (the default) - do not output any path information, just
+objects as is (`b'friends'`).
+
+  ```python
+  {b'name': b'John', b'age': 31}
+  {b'name': b'Ivan', b'age': 26}
+  {b'name': b'Jack', b'age': 33}
+  {b'name': b'Lucy', b'age': 21}
+  ```
+
+  Common usage pattern for this mode is `for object in JsonWriter(...)`
+
+* _map_keys_ - output objects as is when traversing arrays and tuples
+consisting of map key and object when traversing maps.
+
+  ```python
+  {b'name': b'John', b'age': 31}
+  {b'name': b'Ivan', b'age': 26}
+  (b'manager', {b'name': b'Jack', b'age': 33})
+  (b'subordinate', {b'name': b'Lucy', b'age': 21})
+  ```
+
+  This format may seem inconsistent (and therefore it's not the default),
+  however in practice only collection of a single type is iterated at
+  a time and this type is known, so this format is likely the most useful
+  as in most cases you do need dictionary keys. Common
+
+  Common usage pattern for this mode is `for object in JsonSlicer(...)`
+  when iterating arrays and `for key object in JsonSlicer(...)`
+  when iterating maps.
+
+* _full_paths_ - output tuples consisting of all path components
+(both map keys and array indexes) and an object as the last element.
+
+  ```python
+  (b'friends', 0, {b'name': b'John', b'age': 31})
+  (b'friends', 1, {b'name': b'Ivan', b'age': 26})
+  (b'colleagues', b'manager', {b'name': b'Jack', b'age': 33})
+  (b'colleagues', b'subordinate', {b'name': b'Lucy', b'age': 21})
+  ```
+
+  Common usage pattern for this mode is `for *path, object in JsonWriter(...)`.
+
+The constructed object is as iterator. You may call `next()` to extract
+single element from it, iterate it via `for` loop, or use it in generator
+comprehensions or in any place where iterator is accepted.
 
 ## Performance/competitors
 
@@ -137,8 +193,6 @@ to use:
 - Allow to transparently operate on text I/O handles (in addition
   to bytes I/O) and return text data (instead of bytes) with specified
   encoding
-- Allow simplified output format, e.g. returning just objects or
-  key/object pairs instead of complete paths
 
 ## Requirements
 
