@@ -27,10 +27,9 @@
 
 static struct PyModuleDef jsonslicer_module_def = {
 	PyModuleDef_HEAD_INIT,
-	"jsonslicer",
-	"jsonslicer module",
-	-1,
-	NULL, NULL, NULL, NULL, NULL
+	.m_name = "jsonslicer",
+	.m_doc = "jsonslicer module",
+	.m_size = -1,
 };
 
 PyMODINIT_FUNC PyInit_jsonslicer(void) {
