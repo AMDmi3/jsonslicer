@@ -21,6 +21,7 @@
  */
 
 #include "pyobjlist.h"
+#include "pymutindex.h"
 
 #include <stdlib.h>
 
@@ -143,8 +144,17 @@ PyObject* pyobjlist_as_tuple_prefix(PyObjList* list, PyObject* obj) {
 
 	size_t tuple_idx = 0;
 	for (PyObjListNode* node = list->front; node; node = node->next) {
-		Py_INCREF(node->obj);
-		PyTuple_SET_ITEM(tuple, tuple_idx++, node->obj);
+		if (PyMutIndex_Check(node->obj)) {
+			PyObject* index = PyMutIndex_AsPyLong(node->obj);
+			if (index == NULL) {
+				Py_DECREF(tuple);
+				return NULL;
+			}
+			PyTuple_SET_ITEM(tuple, tuple_idx++, index);
+		} else {
+			Py_INCREF(node->obj);
+			PyTuple_SET_ITEM(tuple, tuple_idx++, node->obj);
+		}
 	}
 
 	Py_INCREF(obj);

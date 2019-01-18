@@ -25,6 +25,7 @@
 #include "construct_handlers.h"
 
 #include "pyobjlist.h"
+#include "pymutindex.h"
 
 #include <Python.h>
 
@@ -37,23 +38,10 @@ static int check_pattern(JsonSlicer* self) {
 	return pyobjlist_match(&self->path, &self->pattern, &path_matches_pattern);
 }
 
-int handle_path_change(JsonSlicer* self) {
-	if (self->path.back && PyLong_Check(self->path.back->obj)) {
-		PyObject* old_index = self->path.back->obj;
-		long long value = PyLong_AsLongLong(old_index);
-		if (value == -1 && PyErr_Occurred()) {
-			return 0;
-		}
-
-		PyObject* new_index = PyLong_FromLongLong(value + 1);
-		if (!new_index) {
-			return 0;
-		}
-		self->path.back->obj = new_index;
-		Py_DECREF(old_index);
+void update_path(JsonSlicer* self) {
+	if (self->path.back && PyMutIndex_Check(self->path.back->obj)) {
+		PyMutIndex_Increment(self->path.back->obj);
 	}
-
-	return 1;
 }
 
 int finish_complete_object(JsonSlicer* self, PyObject* obj) {
@@ -72,7 +60,8 @@ int finish_complete_object(JsonSlicer* self, PyObject* obj) {
 		return 0;
 	}
 
-	return handle_path_change(self);
+	update_path(self);
+	return 1;
 }
 
 // scalars
@@ -81,7 +70,8 @@ int seek_handle_null(JsonSlicer* self) {
 		self->mode = MODE_CONSTRUCTING;
 		return construct_handle_null(self);
 	}
-	return handle_path_change(self);
+	update_path(self);
+	return 1;
 }
 
 int seek_handle_boolean(JsonSlicer* self, int val) {
@@ -89,7 +79,8 @@ int seek_handle_boolean(JsonSlicer* self, int val) {
 		self->mode = MODE_CONSTRUCTING;
 		return construct_handle_boolean(self, val);
 	}
-	return handle_path_change(self);
+	update_path(self);
+	return 1;
 }
 
 int seek_handle_integer(JsonSlicer* self, long long val) {
@@ -97,7 +88,8 @@ int seek_handle_integer(JsonSlicer* self, long long val) {
 		self->mode = MODE_CONSTRUCTING;
 		return construct_handle_integer(self, val);
 	}
-	return handle_path_change(self);
+	update_path(self);
+	return 1;
 }
 
 int seek_handle_double(JsonSlicer* self, double val) {
@@ -105,7 +97,8 @@ int seek_handle_double(JsonSlicer* self, double val) {
 		self->mode = MODE_CONSTRUCTING;
 		return construct_handle_double(self, val);
 	}
-	return handle_path_change(self);
+	update_path(self);
+	return 1;
 }
 
 int seek_handle_string(JsonSlicer* self, const char* str, size_t len) {
@@ -113,7 +106,8 @@ int seek_handle_string(JsonSlicer* self, const char* str, size_t len) {
 		self->mode = MODE_CONSTRUCTING;
 		return construct_handle_string(self, str, len);
 	}
-	return handle_path_change(self);
+	update_path(self);
+	return 1;
 }
 
 // map key
@@ -144,7 +138,8 @@ int seek_handle_end_map(JsonSlicer* self) {
 	PyObject* popped = pyobjlist_pop_back(&self->path);
 	assert(popped);
 	Py_DECREF(popped);
-	return handle_path_change(self);
+	update_path(self);
+	return 1;
 }
 
 int seek_handle_start_array(JsonSlicer* self) {
@@ -152,7 +147,7 @@ int seek_handle_start_array(JsonSlicer* self) {
 		self->mode = MODE_CONSTRUCTING;
 		return construct_handle_start_array(self);
 	} else {
-		PyObject* index = PyLong_FromLong(0);
+		PyObject* index = PyMutIndex_New();
 		if (index == NULL) {
 			return 0;
 		}
@@ -164,5 +159,6 @@ int seek_handle_end_array(JsonSlicer* self) {
 	PyObject* popped = pyobjlist_pop_back(&self->path);
 	assert(popped);
 	Py_DECREF(popped);
-	return handle_path_change(self);
+	update_path(self);
+	return 1;
 }
