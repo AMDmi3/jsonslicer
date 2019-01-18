@@ -20,20 +20,22 @@
  * THE SOFTWARE.
  */
 
-#include "jsonslicer.h"
+#ifndef JSONSLICER_HANDLERS_H
+#define JSONSLICER_HANDLERS_H
 
-#include <Python.h>
+#include <yajl/yajl_parse.h>
 
-PyTypeObject JsonSlicerType = {
-	PyVarObject_HEAD_INIT(NULL, 0)
-	.tp_name = "jsonslicer.JsonSlicer",
-	.tp_doc = "JsonSlicer objects",
-	.tp_basicsize = sizeof(JsonSlicer),
-	.tp_itemsize = 0,
-	.tp_flags = Py_TPFLAGS_DEFAULT,
-	.tp_new = JsonSlicer_new,
-	.tp_init = (initproc)JsonSlicer_init,
-	.tp_dealloc = (destructor)JsonSlicer_dealloc,
-	.tp_iter = (getiterfunc)JsonSlicer_iter,
-	.tp_iternext = (iternextfunc)JsonSlicer_iternext,
-};
+extern const yajl_callbacks yajl_handlers;
+
+int handle_null(void* ctx);
+int handle_boolean(void* ctx, int val);
+int handle_integer(void* ctx, long long val);
+int handle_double(void* ctx, double val);
+int handle_string(void* ctx, const unsigned char* str, size_t len);
+int handle_start_map(void* ctx);
+int handle_map_key(void* ctx, const unsigned char* str, size_t len);
+int handle_end_map(void* ctx);
+int handle_start_array(void* ctx);
+int handle_end_array(void* ctx);
+
+#endif

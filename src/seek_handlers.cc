@@ -20,14 +20,14 @@
  * THE SOFTWARE.
  */
 
-#include "seek_handlers.h"
+#include "seek_handlers.hh"
 
-#include "construct_handlers.h"
+#include "construct_handlers.hh"
 
-#include "output_formatting.h"
+#include "output_formatting.hh"
 
-#include "pyobjlist.h"
-#include "pymutindex.h"
+#include "pyobjlist.hh"
+#include "pymutindex.hh"
 
 #include <Python.h>
 

@@ -20,24 +20,13 @@
  * THE SOFTWARE.
  */
 
-#ifndef JSONSLICER_SEEK_HANDLERS_H
-#define JSONSLICER_SEEK_HANDLERS_H
+#ifndef JSONSLICER_OUTPUT_H
+#define JSONSLICER_OUTPUT_H
 
-#include "jsonslicer.h"
+#include "jsonslicer.hh"
 
 #include <Python.h>
 
-int finish_complete_object(JsonSlicer* self, PyObject* obj);
-
-int seek_handle_null(JsonSlicer* self);
-int seek_handle_boolean(JsonSlicer* self, int val);
-int seek_handle_integer(JsonSlicer* self, long long val);
-int seek_handle_double(JsonSlicer* self, double val);
-int seek_handle_string(JsonSlicer* self, const char* str, size_t len);
-int seek_handle_map_key(JsonSlicer* self, const char* str, size_t len);
-int seek_handle_start_map(JsonSlicer* self);
-int seek_handle_end_map(JsonSlicer* self);
-int seek_handle_start_array(JsonSlicer* self);
-int seek_handle_end_array(JsonSlicer* self);
+PyObject* generate_output_object(JsonSlicer* self, PyObject* obj);
 
 #endif

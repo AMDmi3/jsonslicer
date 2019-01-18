@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-#include "pymutindex.h"
+#include "pymutindex.hh"
 
 int PyMutIndex_Check(PyObject* p) {
 	return Py_TYPE(p) == &PyMutIndex_type;

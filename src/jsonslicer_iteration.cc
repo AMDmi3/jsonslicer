@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-#include "jsonslicer.h"
+#include "jsonslicer.hh"
 
 #include <Python.h>
 #include <yajl/yajl_parse.h>

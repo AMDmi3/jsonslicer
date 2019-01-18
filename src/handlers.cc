@@ -20,10 +20,10 @@
  * THE SOFTWARE.
  */
 
-#include "handlers.h"
+#include "handlers.hh"
 
-#include "seek_handlers.h"
-#include "construct_handlers.h"
+#include "seek_handlers.hh"
+#include "construct_handlers.hh"
 
 #include <Python.h>
 

@@ -20,60 +20,20 @@
  * THE SOFTWARE.
  */
 
-#ifndef JSONSLICER_JSONSLICER_H
-#define JSONSLICER_JSONSLICER_H
+#ifndef JSONSLICER_CONSTRUCT_HANDLERS_H
+#define JSONSLICER_CONSTRUCT_HANDLERS_H
 
-#include "pyobjlist.h"
+#include "jsonslicer.hh"
 
-#include <Python.h>
-#include <yajl/yajl_parse.h>
-
-enum JsonSlicerMode {
-	MODE_SEEKING,
-	MODE_CONSTRUCTING
-};
-
-enum JsonSlicerPathMode {
-	PATHMODE_IGNORE,
-	PATHMODE_MAP_KEYS,
-	PATHMODE_FULL,
-};
-
-typedef struct {
-	PyObject_HEAD
-
-	// arguments
-	PyObject* io;
-	Py_ssize_t read_size;
-	int path_mode;
-
-	// YAJL handle
-	yajl_handle yajl;
-
-	// parser state
-	PyObject* last_map_key;
-	int mode;
-
-	// pattern argument
-	PyObjList pattern;
-
-	// current path in json
-	PyObjList path;
-
-	// stack of objects being currently constructed
-	PyObjList constructing;
-
-	// complete python objects ready to be returned to caller
-	PyObjList complete;
-} JsonSlicer;
-
-PyObject* JsonSlicer_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
-void JsonSlicer_dealloc(JsonSlicer* self);
-int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs);
-
-JsonSlicer* JsonSlicer_iter(JsonSlicer* self);
-PyObject* JsonSlicer_iternext(JsonSlicer* self);
-
-PyTypeObject JsonSlicerType;
+int construct_handle_null(JsonSlicer* self);
+int construct_handle_boolean(JsonSlicer* self, int val);
+int construct_handle_integer(JsonSlicer* self, long long val);
+int construct_handle_double(JsonSlicer* self, double val);
+int construct_handle_string(JsonSlicer* self, const char* str, size_t len);
+int construct_handle_map_key(JsonSlicer* self, const char* str, size_t len);
+int construct_handle_start_map(JsonSlicer* self);
+int construct_handle_end_map(JsonSlicer* self);
+int construct_handle_start_array(JsonSlicer* self);
+int construct_handle_end_array(JsonSlicer* self);
 
 #endif

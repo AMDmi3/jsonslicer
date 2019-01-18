@@ -20,20 +20,21 @@
  * THE SOFTWARE.
  */
 
-#ifndef JSONSLICER_CONSTRUCT_HANDLERS_H
-#define JSONSLICER_CONSTRUCT_HANDLERS_H
+#ifndef JSONSLICER_PYMUTINDEX_H
+#define JSONSLICER_PYMUTINDEX_H
 
-#include "jsonslicer.h"
+#include <Python.h>
 
-int construct_handle_null(JsonSlicer* self);
-int construct_handle_boolean(JsonSlicer* self, int val);
-int construct_handle_integer(JsonSlicer* self, long long val);
-int construct_handle_double(JsonSlicer* self, double val);
-int construct_handle_string(JsonSlicer* self, const char* str, size_t len);
-int construct_handle_map_key(JsonSlicer* self, const char* str, size_t len);
-int construct_handle_start_map(JsonSlicer* self);
-int construct_handle_end_map(JsonSlicer* self);
-int construct_handle_start_array(JsonSlicer* self);
-int construct_handle_end_array(JsonSlicer* self);
+typedef struct {
+	PyObject_HEAD
+	size_t value;
+} PyMutIndex;
+
+int PyMutIndex_Check(PyObject* object);
+PyObject* PyMutIndex_New();
+void PyMutIndex_Increment(PyObject* self);
+PyObject* PyMutIndex_AsPyLong(PyObject* self);
+
+extern PyTypeObject PyMutIndex_type;
 
 #endif

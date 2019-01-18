@@ -20,21 +20,24 @@
  * THE SOFTWARE.
  */
 
-#ifndef JSONSLICER_PYMUTINDEX_H
-#define JSONSLICER_PYMUTINDEX_H
+#ifndef JSONSLICER_SEEK_HANDLERS_H
+#define JSONSLICER_SEEK_HANDLERS_H
+
+#include "jsonslicer.hh"
 
 #include <Python.h>
 
-typedef struct {
-	PyObject_HEAD
-	size_t value;
-} PyMutIndex;
+int finish_complete_object(JsonSlicer* self, PyObject* obj);
 
-int PyMutIndex_Check(PyObject* object);
-PyObject* PyMutIndex_New();
-void PyMutIndex_Increment(PyObject* self);
-PyObject* PyMutIndex_AsPyLong(PyObject* self);
-
-PyTypeObject PyMutIndex_type;
+int seek_handle_null(JsonSlicer* self);
+int seek_handle_boolean(JsonSlicer* self, int val);
+int seek_handle_integer(JsonSlicer* self, long long val);
+int seek_handle_double(JsonSlicer* self, double val);
+int seek_handle_string(JsonSlicer* self, const char* str, size_t len);
+int seek_handle_map_key(JsonSlicer* self, const char* str, size_t len);
+int seek_handle_start_map(JsonSlicer* self);
+int seek_handle_end_map(JsonSlicer* self);
+int seek_handle_start_array(JsonSlicer* self);
+int seek_handle_end_array(JsonSlicer* self);
 
 #endif

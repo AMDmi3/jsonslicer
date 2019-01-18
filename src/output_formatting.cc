@@ -20,10 +20,10 @@
  * THE SOFTWARE.
  */
 
-#include "output_formatting.h"
+#include "output_formatting.hh"
 
-#include "pyobjlist.h"
-#include "pymutindex.h"
+#include "pyobjlist.hh"
+#include "pymutindex.hh"
 
 PyObject* generate_output_object(JsonSlicer* self, PyObject* obj) {
 	if (self->path_mode == PATHMODE_IGNORE) {

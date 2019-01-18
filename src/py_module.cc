@@ -20,13 +20,30 @@
  * THE SOFTWARE.
  */
 
-#ifndef JSONSLICER_OUTPUT_H
-#define JSONSLICER_OUTPUT_H
-
-#include "jsonslicer.h"
+#include "jsonslicer.hh"
+#include "pymutindex.hh"
 
 #include <Python.h>
 
-PyObject* generate_output_object(JsonSlicer* self, PyObject* obj);
+static struct PyModuleDef jsonslicer_module_def = {
+	PyModuleDef_HEAD_INIT,
+	.m_name = "jsonslicer",
+	.m_doc = "jsonslicer module",
+	.m_size = -1,
+};
 
-#endif
+PyMODINIT_FUNC PyInit_jsonslicer(void) {
+	if (PyType_Ready(&JsonSlicerType) < 0)
+		return NULL;
+	if (PyType_Ready(&PyMutIndex_type) < 0)
+		return NULL;
+
+	PyObject* m = PyModule_Create(&jsonslicer_module_def);
+	if (m == NULL)
+		return NULL;
+
+	Py_INCREF(&JsonSlicerType);
+	PyModule_AddObject(m, "JsonSlicer", (PyObject*)&JsonSlicerType);
+
+	return m;
+}

@@ -20,30 +20,20 @@
  * THE SOFTWARE.
  */
 
-#include "jsonslicer.h"
-#include "pymutindex.h"
+#include "jsonslicer.hh"
 
 #include <Python.h>
 
-static struct PyModuleDef jsonslicer_module_def = {
-	PyModuleDef_HEAD_INIT,
-	.m_name = "jsonslicer",
-	.m_doc = "jsonslicer module",
-	.m_size = -1,
+PyTypeObject JsonSlicerType = {
+	PyVarObject_HEAD_INIT(NULL, 0)
+	.tp_name = "jsonslicer.JsonSlicer",
+	.tp_doc = "JsonSlicer objects",
+	.tp_basicsize = sizeof(JsonSlicer),
+	.tp_itemsize = 0,
+	.tp_flags = Py_TPFLAGS_DEFAULT,
+	.tp_new = JsonSlicer_new,
+	.tp_init = (initproc)JsonSlicer_init,
+	.tp_dealloc = (destructor)JsonSlicer_dealloc,
+	.tp_iter = (getiterfunc)JsonSlicer_iter,
+	.tp_iternext = (iternextfunc)JsonSlicer_iternext,
 };
-
-PyMODINIT_FUNC PyInit_jsonslicer(void) {
-	if (PyType_Ready(&JsonSlicerType) < 0)
-		return NULL;
-	if (PyType_Ready(&PyMutIndex_type) < 0)
-		return NULL;
-
-	PyObject* m = PyModule_Create(&jsonslicer_module_def);
-	if (m == NULL)
-		return NULL;
-
-	Py_INCREF(&JsonSlicerType);
-	PyModule_AddObject(m, "JsonSlicer", (PyObject*)&JsonSlicerType);
-
-	return m;
-}

@@ -20,11 +20,11 @@
  * THE SOFTWARE.
  */
 
-#include "construct_handlers.h"
+#include "construct_handlers.hh"
 
-#include "seek_handlers.h"
+#include "seek_handlers.hh"
 
-#include "pyobjlist.h"
+#include "pyobjlist.hh"
 
 #include <Python.h>
 

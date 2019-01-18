@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "pyobjlist.h"
-#include "pymutindex.h"
+#include "pyobjlist.hh"
+#include "pymutindex.hh"
 
 #include <stdlib.h>
 

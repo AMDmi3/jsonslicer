@@ -20,9 +20,9 @@
  * THE SOFTWARE.
  */
 
-#include "jsonslicer.h"
+#include "jsonslicer.hh"
 
-#include "handlers.h"
+#include "handlers.hh"
 
 #include <Python.h>
 #include <yajl/yajl_parse.h>
@@ -72,10 +72,10 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	Py_ssize_t read_size = self->read_size;
 	int path_mode = self->path_mode;
 
-	static char *keywords[] = {"file", "path_prefix", "read_size", "path_mode", NULL};
+	static const char* keywords[] = {"file", "path_prefix", "read_size", "path_mode", NULL};
 
 	const char* path_mode_arg = NULL;
-	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|$ns", keywords, &io, &pattern, &read_size, &path_mode_arg)) {
+	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|$ns", const_cast<char**>(keywords), &io, &pattern, &read_size, &path_mode_arg)) {
 		return -1;
 	}
 

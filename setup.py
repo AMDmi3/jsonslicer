@@ -55,7 +55,7 @@ setup(
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: C',
+        'Programming Language :: C++',
         'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
@@ -63,17 +63,18 @@ setup(
     ext_modules=[
         Extension(
             'jsonslicer',
+            language='c++',
             sources=[
-                'src/construct_handlers.c',
-                'src/handlers.c',
-                'src/jsonslicer_construction.c',
-                'src/jsonslicer_iteration.c',
-                'src/jsonslicer_type.c',
-                'src/output_formatting.c',
-                'src/py_module.c',
-                'src/pymutindex.c',
-                'src/pyobjlist.c',
-                'src/seek_handlers.c',
+                'src/construct_handlers.cc',
+                'src/handlers.cc',
+                'src/jsonslicer_construction.cc',
+                'src/jsonslicer_iteration.cc',
+                'src/jsonslicer_type.cc',
+                'src/output_formatting.cc',
+                'src/py_module.cc',
+                'src/pymutindex.cc',
+                'src/pyobjlist.cc',
+                'src/seek_handlers.cc',
             ],
             **pkgconfig('yajl')
         )
