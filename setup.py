@@ -68,6 +68,7 @@ setup(
                 'src/handlers.c',
                 'src/jsonslicer.c',
                 'src/py_module.c',
+                'src/pymutindex.c',
                 'src/pyobjlist.c',
                 'src/seek_handlers.c',
             ],

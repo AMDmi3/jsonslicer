@@ -20,31 +20,21 @@
  * THE SOFTWARE.
  */
 
-#include "jsonslicer.h"
-#include "pymutindex.h"
+#ifndef JSONSLICER_PYMUTINDEX_H
+#define JSONSLICER_PYMUTINDEX_H
 
 #include <Python.h>
 
-static struct PyModuleDef jsonslicer_module_def = {
-	PyModuleDef_HEAD_INIT,
-	"jsonslicer",
-	"jsonslicer module",
-	-1,
-	NULL, NULL, NULL, NULL, NULL
-};
+typedef struct {
+	PyObject_HEAD
+    size_t value;
+} PyMutIndex;
 
-PyMODINIT_FUNC PyInit_jsonslicer(void) {
-	if (PyType_Ready(&JsonSlicerType) < 0)
-		return NULL;
-	if (PyType_Ready(&PyMutIndex_type) < 0)
-		return NULL;
+int PyMutIndex_Check(PyObject* object);
+PyObject* PyMutIndex_New();
+void PyMutIndex_Increment(PyObject* self);
+PyObject* PyMutIndex_AsPyLong(PyObject* self);
 
-	PyObject* m = PyModule_Create(&jsonslicer_module_def);
-	if (m == NULL)
-		return NULL;
+PyTypeObject PyMutIndex_type;
 
-	Py_INCREF(&JsonSlicerType);
-	PyModule_AddObject(m, "JsonSlicer", (PyObject*)&JsonSlicerType);
-
-	return m;
-}
+#endif
