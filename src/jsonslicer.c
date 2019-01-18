@@ -152,7 +152,6 @@ static PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 		return complete;
 	}
 
-	PyObject* read = PyDict_GetItemString(self->io, "read");
 	int eof = 0;
 
 	do {
