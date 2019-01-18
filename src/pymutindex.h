@@ -27,7 +27,7 @@
 
 typedef struct {
 	PyObject_HEAD
-    size_t value;
+	size_t value;
 } PyMutIndex;
 
 int PyMutIndex_Check(PyObject* object);
