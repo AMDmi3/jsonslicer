@@ -66,7 +66,9 @@ setup(
             sources=[
                 'src/construct_handlers.c',
                 'src/handlers.c',
-                'src/jsonslicer.c',
+                'src/jsonslicer_construction.c',
+                'src/jsonslicer_iteration.c',
+                'src/jsonslicer_type.c',
                 'src/output_formatting.c',
                 'src/py_module.c',
                 'src/pymutindex.c',

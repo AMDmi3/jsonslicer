@@ -27,7 +27,7 @@
 #include <Python.h>
 #include <yajl/yajl_parse.h>
 
-static PyObject* JsonSlicer_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
+PyObject* JsonSlicer_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 	JsonSlicer* self = (JsonSlicer*)type->tp_alloc(type, 0);
 	if (self != NULL) {
 		self->io = NULL;
@@ -47,7 +47,7 @@ static PyObject* JsonSlicer_new(PyTypeObject *type, PyObject *args, PyObject *kw
 	return (PyObject*)self;
 }
 
-static void JsonSlicer_dealloc(JsonSlicer* self) {
+void JsonSlicer_dealloc(JsonSlicer* self) {
 	pyobjlist_clear(&self->complete);
 	pyobjlist_clear(&self->constructing);
 	pyobjlist_clear(&self->path);
@@ -65,7 +65,7 @@ static void JsonSlicer_dealloc(JsonSlicer* self) {
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
-static int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
+int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	// parse args
 	PyObject* io = NULL;
 	PyObject* pattern = NULL;
@@ -156,78 +156,3 @@ static int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 
 	return 0;
 }
-
-static JsonSlicer* JsonSlicer_iter(JsonSlicer* self) {
-	Py_INCREF(self);
-	return self;
-}
-
-static PyObject* JsonSlicer_iternext(JsonSlicer* self) {
-	// return complete objects from previous runs, if any
-	PyObject* complete = pyobjlist_pop_front(&self->complete);
-	if (complete) {
-		return complete;
-	}
-
-	int eof = 0;
-
-	do {
-		// read chunk of data from IO
-		PyObject* buffer = PyObject_CallMethod(self->io, "read", "n", self->read_size);
-
-		// handle i/o errors
-		if (!buffer) {
-			return NULL;
-		}
-		if (!PyBytes_Check(buffer)) {
-			PyErr_Format(PyExc_RuntimeError, "Unexpected read result type %s, expected bytes", buffer->ob_type->tp_name);
-			Py_XDECREF(buffer);
-			return NULL;
-		}
-
-		// advance or finalize parser
-		yajl_status status;
-		if (PyBytes_GET_SIZE(buffer) == 0) {
-			eof = 1;
-			status = yajl_complete_parse(self->yajl);
-		} else {
-			status = yajl_parse(self->yajl, (const unsigned char*)PyBytes_AS_STRING(buffer), PyBytes_GET_SIZE(buffer));
-		}
-
-		// handle parser errors
-		if (status != yajl_status_ok) {
-			unsigned char* error = yajl_get_error(self->yajl, 1, (const unsigned char*)PyBytes_AS_STRING(buffer), PyBytes_GET_SIZE(buffer));
-			if (status == yajl_status_error) {
-				PyErr_Format(PyExc_RuntimeError, "YAJL error: %s", error);
-			} // else it's interrupted parsing and PyErr is already set
-			yajl_free_error(self->yajl, error);
-			Py_XDECREF(buffer);
-			return NULL;
-		}
-
-		// free buffer
-		Py_XDECREF(buffer);
-
-		// return complete object, if any
-		PyObject* complete = pyobjlist_pop_front(&self->complete);
-		if (complete) {
-			return complete;
-		}
-	} while (!eof);
-
-	return NULL;
-}
-
-PyTypeObject JsonSlicerType = {
-	PyVarObject_HEAD_INIT(NULL, 0)
-	.tp_name = "jsonslicer.JsonSlicer",
-	.tp_doc = "JsonSlicer objects",
-	.tp_basicsize = sizeof(JsonSlicer),
-	.tp_itemsize = 0,
-	.tp_flags = Py_TPFLAGS_DEFAULT,
-	.tp_new = JsonSlicer_new,
-	.tp_init = (initproc)JsonSlicer_init,
-	.tp_dealloc = (destructor)JsonSlicer_dealloc,
-	.tp_iter = (getiterfunc)JsonSlicer_iter,
-	.tp_iternext = (iternextfunc)JsonSlicer_iternext,
-};
