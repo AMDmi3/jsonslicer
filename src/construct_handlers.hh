@@ -25,6 +25,8 @@
 
 #include "jsonslicer.hh"
 
+int add_to_parent(JsonSlicer* self, PyObject* value);
+
 int construct_handle_null(JsonSlicer* self);
 int construct_handle_boolean(JsonSlicer* self, int val);
 int construct_handle_integer(JsonSlicer* self, long long val);

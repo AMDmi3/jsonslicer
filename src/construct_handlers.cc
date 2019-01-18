@@ -31,7 +31,7 @@
 #include <assert.h>
 
 // helpers
-static int add_to_parent(JsonSlicer* self, PyObject* value) {
+int add_to_parent(JsonSlicer* self, PyObject* value) {
 	PyObject* container = self->constructing.back->obj;
 
 	if (PyDict_Check(container)) {
@@ -67,76 +67,6 @@ static int push_constructing_object(JsonSlicer* self, PyObject* obj) {
 
 static PyObject* pop_constructing_object(JsonSlicer* self) {
 	return pyobjlist_pop_back(&self->constructing);
-}
-
-static int handle_scalar(JsonSlicer* self, PyObject* value) {
-	if (pyobjlist_empty(&self->constructing)) {
-		return finish_complete_object(self, value);
-	} else {
-		return add_to_parent(self, value);
-	}
-}
-
-// scalars
-int construct_handle_null(JsonSlicer* self) {
-	PyObject* scalar = Py_None;
-	Py_INCREF(scalar);
-
-	if (!handle_scalar(self, scalar)) {
-		Py_DECREF(scalar);
-		return 0;
-	}
-	return 1;
-}
-
-int construct_handle_boolean(JsonSlicer* self, int val) {
-	PyObject* scalar = val ? Py_True : Py_False;
-	Py_INCREF(scalar);
-
-	if (!handle_scalar(self, scalar)) {
-		Py_DECREF(scalar);
-		return 0;
-	}
-	return 1;
-}
-
-int construct_handle_integer(JsonSlicer* self, long long val) {
-	PyObject* scalar = PyLong_FromLongLong(val);
-	if (scalar == NULL) {
-		return 0;
-	}
-
-	if (!handle_scalar(self, scalar)) {
-		Py_DECREF(scalar);
-		return 0;
-	}
-	return 1;
-}
-
-int construct_handle_double(JsonSlicer* self, double val) {
-	PyObject* scalar = PyFloat_FromDouble(val);
-	if (scalar == NULL) {
-		return 0;
-	}
-
-	if (!handle_scalar(self, scalar)) {
-		Py_DECREF(scalar);
-		return 0;
-	}
-	return 1;
-}
-
-int construct_handle_string(JsonSlicer* self, const char* str, size_t len) {
-	PyObject* scalar = PyBytes_FromStringAndSize(str, len);
-	if (scalar == NULL) {
-		return 0;
-	}
-
-	if (!handle_scalar(self, scalar)) {
-		Py_DECREF(scalar);
-		return 0;
-	}
-	return 1;
 }
 
 // map key

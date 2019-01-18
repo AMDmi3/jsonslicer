@@ -36,7 +36,7 @@ static int path_matches_pattern(PyObject* path, PyObject* pattern) {
 	return pattern == Py_None || PyObject_RichCompareBool(path, pattern, Py_EQ);
 }
 
-static int check_pattern(JsonSlicer* self) {
+int check_pattern(JsonSlicer* self) {
 	return pyobjlist_match(&self->path, &self->pattern, &path_matches_pattern);
 }
 
@@ -62,52 +62,6 @@ int finish_complete_object(JsonSlicer* self, PyObject* obj) {
 		return 0;
 	}
 
-	update_path(self);
-	return 1;
-}
-
-// scalars
-int seek_handle_null(JsonSlicer* self) {
-	if (check_pattern(self)) {
-		self->mode = MODE_CONSTRUCTING;
-		return construct_handle_null(self);
-	}
-	update_path(self);
-	return 1;
-}
-
-int seek_handle_boolean(JsonSlicer* self, int val) {
-	if (check_pattern(self)) {
-		self->mode = MODE_CONSTRUCTING;
-		return construct_handle_boolean(self, val);
-	}
-	update_path(self);
-	return 1;
-}
-
-int seek_handle_integer(JsonSlicer* self, long long val) {
-	if (check_pattern(self)) {
-		self->mode = MODE_CONSTRUCTING;
-		return construct_handle_integer(self, val);
-	}
-	update_path(self);
-	return 1;
-}
-
-int seek_handle_double(JsonSlicer* self, double val) {
-	if (check_pattern(self)) {
-		self->mode = MODE_CONSTRUCTING;
-		return construct_handle_double(self, val);
-	}
-	update_path(self);
-	return 1;
-}
-
-int seek_handle_string(JsonSlicer* self, const char* str, size_t len) {
-	if (check_pattern(self)) {
-		self->mode = MODE_CONSTRUCTING;
-		return construct_handle_string(self, str, len);
-	}
 	update_path(self);
 	return 1;
 }

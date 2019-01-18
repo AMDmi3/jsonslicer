@@ -41,50 +41,70 @@ const yajl_callbacks yajl_handlers = {
 	handle_end_array
 };
 
+template<class T> bool generic_handle_scalar(JsonSlicer* self, T&& make_scalar) {
+	if (self->mode == MODE_SEEKING) {
+		if (check_pattern(self)) {
+			self->mode = MODE_CONSTRUCTING;
+			// falls through to MODE_CONSTRUCTING block below
+		} else {
+			update_path(self);
+			return true;
+		}
+	}
+	if (self->mode == MODE_CONSTRUCTING) {
+		PyObject* scalar = make_scalar();
+		if (scalar == NULL) {
+			return false;
+		}
+
+		bool res;
+		if (pyobjlist_empty(&self->constructing)) {
+			res = finish_complete_object(self, scalar);
+		} else {
+			res = add_to_parent(self, scalar);
+		}
+		if (!res) {
+			Py_DECREF(scalar);
+		}
+
+		return res;
+	}
+	return true;
+}
+
 // scalars
 int handle_null(void* ctx) {
-	JsonSlicer* self = (JsonSlicer*)ctx;
-	if (self->mode == MODE_CONSTRUCTING) {
-		return construct_handle_null(self);
-	} else {
-		return seek_handle_null(self);
-	}
+	return generic_handle_scalar((JsonSlicer*)ctx, [](){
+		Py_RETURN_NONE;
+	});
 }
 
 int handle_boolean(void* ctx, int val) {
-	JsonSlicer* self = (JsonSlicer*)ctx;
-	if (self->mode == MODE_CONSTRUCTING) {
-		return construct_handle_boolean(self, val);
-	} else {
-		return seek_handle_boolean(self, val);
-	}
+	return generic_handle_scalar((JsonSlicer*)ctx, [val](){
+		if (val) {
+			Py_RETURN_TRUE;
+		} else {
+			Py_RETURN_FALSE;
+		}
+	});
 }
 
 int handle_integer(void* ctx, long long val) {
-	JsonSlicer* self = (JsonSlicer*)ctx;
-	if (self->mode == MODE_CONSTRUCTING) {
-		return construct_handle_integer(self, val);
-	} else {
-		return seek_handle_integer(self, val);
-	}
+	return generic_handle_scalar((JsonSlicer*)ctx, [val](){
+		return PyLong_FromLongLong(val);
+	});
 }
 
 int handle_double(void* ctx, double val) {
-	JsonSlicer* self = (JsonSlicer*)ctx;
-	if (self->mode == MODE_CONSTRUCTING) {
-		return construct_handle_double(self, val);
-	} else {
-		return seek_handle_double(self, val);
-	}
+	return generic_handle_scalar((JsonSlicer*)ctx, [val](){
+		return PyFloat_FromDouble(val);
+	});
 }
 
 int handle_string(void* ctx, const unsigned char* str, size_t len) {
-	JsonSlicer* self = (JsonSlicer*)ctx;
-	if (self->mode == MODE_CONSTRUCTING) {
-		return construct_handle_string(self, (const char*)str, len);
-	} else {
-		return seek_handle_string(self, (const char*)str, len);
-	}
+	return generic_handle_scalar((JsonSlicer*)ctx, [str, len](){
+		return PyBytes_FromStringAndSize(reinterpret_cast<const char*>(str), len);
+	});
 }
 
 // map key

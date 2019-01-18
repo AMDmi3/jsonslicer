@@ -28,6 +28,8 @@
 #include <Python.h>
 
 int finish_complete_object(JsonSlicer* self, PyObject* obj);
+int check_pattern(JsonSlicer* self);
+void update_path(JsonSlicer* self);
 
 int seek_handle_null(JsonSlicer* self);
 int seek_handle_boolean(JsonSlicer* self, int val);
