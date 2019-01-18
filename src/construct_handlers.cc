@@ -55,7 +55,7 @@ int add_to_parent(JsonSlicer* self, PyObject* value) {
 	return 1;
 }
 
-static int push_constructing_object(JsonSlicer* self, PyObject* obj) {
+int push_constructing_object(JsonSlicer* self, PyObject* obj) {
 	if (!pyobjlist_empty(&self->constructing)) {
 		if (!add_to_parent(self, obj)) {
 			return 0;
@@ -65,59 +65,6 @@ static int push_constructing_object(JsonSlicer* self, PyObject* obj) {
 	return pyobjlist_push_back(&self->constructing, obj);
 }
 
-static PyObject* pop_constructing_object(JsonSlicer* self) {
+PyObject* pop_constructing_object(JsonSlicer* self) {
 	return pyobjlist_pop_back(&self->constructing);
-}
-
-// containers
-int construct_handle_start_map(JsonSlicer* self) {
-	PyObject* map = PyDict_New();
-	if (!map) {
-		return 0;
-	}
-
-	if (!push_constructing_object(self, map)) {
-		Py_DECREF(map);
-		return 0;
-	}
-	return 1;
-}
-
-int construct_handle_end_map(JsonSlicer* self) {
-	PyObject* map = pop_constructing_object(self);
-
-	if (pyobjlist_empty(&self->constructing)) {
-		if (!finish_complete_object(self, map)) {
-			Py_DECREF(map);
-			return 0;
-		}
-	}
-
-	return 1;
-}
-
-int construct_handle_start_array(JsonSlicer* self) {
-	PyObject* array = PyList_New(0);
-	if (!array) {
-		return 0;
-	}
-
-	if (!push_constructing_object(self, array)) {
-		Py_DECREF(array);
-		return 0;
-	}
-	return 1;
-}
-
-int construct_handle_end_array(JsonSlicer* self) {
-	PyObject* array = pop_constructing_object(self);
-
-	if (pyobjlist_empty(&self->constructing)) {
-		if (!finish_complete_object(self, array)) {
-			Py_DECREF(array);
-			return 0;
-		}
-	}
-
-	return 1;
 }

@@ -27,15 +27,7 @@
 
 int add_to_parent(JsonSlicer* self, PyObject* value);
 
-int construct_handle_null(JsonSlicer* self);
-int construct_handle_boolean(JsonSlicer* self, int val);
-int construct_handle_integer(JsonSlicer* self, long long val);
-int construct_handle_double(JsonSlicer* self, double val);
-int construct_handle_string(JsonSlicer* self, const char* str, size_t len);
-int construct_handle_map_key(JsonSlicer* self, const char* str, size_t len);
-int construct_handle_start_map(JsonSlicer* self);
-int construct_handle_end_map(JsonSlicer* self);
-int construct_handle_start_array(JsonSlicer* self);
-int construct_handle_end_array(JsonSlicer* self);
+int push_constructing_object(JsonSlicer* self, PyObject* obj);
+PyObject* pop_constructing_object(JsonSlicer* self);
 
 #endif

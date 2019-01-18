@@ -24,22 +24,9 @@
 
 #include "seek_handlers.hh"
 #include "construct_handlers.hh"
+#include "pymutindex.hh"
 
 #include <Python.h>
-
-const yajl_callbacks yajl_handlers = {
-	handle_null,
-	handle_boolean,
-	handle_integer,
-	handle_double,
-	NULL,
-	handle_string,
-	handle_start_map,
-	handle_map_key,
-	handle_end_map,
-	handle_start_array,
-	handle_end_array
-};
 
 template<class T> bool generic_handle_scalar(JsonSlicer* self, T&& make_scalar) {
 	if (self->mode == MODE_SEEKING) {
@@ -72,7 +59,69 @@ template<class T> bool generic_handle_scalar(JsonSlicer* self, T&& make_scalar) 
 	return true;
 }
 
+template<class T, class U>
+bool generic_start_container(JsonSlicer* self, T&& make_container, U&& make_key) {
+	if (self->mode == MODE_SEEKING) {
+	    if (check_pattern(self)) {
+			self->mode = MODE_CONSTRUCTING;
+			// falls through to MODE_CONSTRUCTING block below
+		} else {
+			PyObject* key = make_key();
+			if (key == NULL) {
+				return false;
+			}
+			return pyobjlist_push_back(&self->path, key);
+		}
+	}
+	if (self->mode == MODE_CONSTRUCTING) {
+		PyObject* container = make_container();
+		if (container == NULL) {
+			return false;
+		}
+
+		if (!push_constructing_object(self, container)) {
+			Py_DECREF(container);
+			return false;
+		}
+	}
+	return true;
+}
+
+bool generic_end_container(JsonSlicer* self) {
+	if (self->mode == MODE_SEEKING) {
+		PyObject* container = pyobjlist_pop_back(&self->path);
+		assert(container);
+		Py_DECREF(container);
+		update_path(self);
+	}
+	if (self->mode == MODE_CONSTRUCTING) {
+		PyObject* container = pop_constructing_object(self);
+
+		if (pyobjlist_empty(&self->constructing)) {
+			if (!finish_complete_object(self, container)) {
+				Py_DECREF(container);
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 // scalars
+const yajl_callbacks yajl_handlers = {
+	handle_null,
+	handle_boolean,
+	handle_integer,
+	handle_double,
+	NULL,
+	handle_string,
+	handle_start_map,
+	handle_map_key,
+	handle_end_map,
+	handle_start_array,
+	handle_end_array
+};
+
 int handle_null(void* ctx) {
 	return generic_handle_scalar((JsonSlicer*)ctx, [](){
 		Py_RETURN_NONE;
@@ -131,37 +180,25 @@ int handle_map_key(void* ctx, const unsigned char* str, size_t len) {
 
 // containers
 int handle_start_map(void* ctx) {
-	JsonSlicer* self = (JsonSlicer*)ctx;
-	if (self->mode == MODE_CONSTRUCTING) {
-		return construct_handle_start_map(self);
-	} else {
-		return seek_handle_start_map(self);
-	}
+	return generic_start_container(
+		(JsonSlicer*)ctx,
+		[]{ return PyDict_New(); },
+		[]{ Py_RETURN_NONE; }
+	);
 }
 
 int handle_end_map(void* ctx) {
-	JsonSlicer* self = (JsonSlicer*)ctx;
-	if (self->mode == MODE_CONSTRUCTING) {
-		return construct_handle_end_map(self);
-	} else {
-		return seek_handle_end_map(self);
-	}
+	return generic_end_container((JsonSlicer*)ctx);
 }
 
 int handle_start_array(void* ctx) {
-	JsonSlicer* self = (JsonSlicer*)ctx;
-	if (self->mode == MODE_CONSTRUCTING) {
-		return construct_handle_start_array(self);
-	} else {
-		return seek_handle_start_array(self);
-	}
+	return generic_start_container(
+		(JsonSlicer*)ctx,
+		[]{ return PyList_New(0); },
+		[]{ return PyMutIndex_New(); }
+	);
 }
 
 int handle_end_array(void* ctx) {
-	JsonSlicer* self = (JsonSlicer*)ctx;
-	if (self->mode == MODE_CONSTRUCTING) {
-		return construct_handle_end_array(self);
-	} else {
-		return seek_handle_end_array(self);
-	}
+	return generic_end_container((JsonSlicer*)ctx);
 }

@@ -31,15 +31,4 @@ int finish_complete_object(JsonSlicer* self, PyObject* obj);
 int check_pattern(JsonSlicer* self);
 void update_path(JsonSlicer* self);
 
-int seek_handle_null(JsonSlicer* self);
-int seek_handle_boolean(JsonSlicer* self, int val);
-int seek_handle_integer(JsonSlicer* self, long long val);
-int seek_handle_double(JsonSlicer* self, double val);
-int seek_handle_string(JsonSlicer* self, const char* str, size_t len);
-int seek_handle_map_key(JsonSlicer* self, const char* str, size_t len);
-int seek_handle_start_map(JsonSlicer* self);
-int seek_handle_end_map(JsonSlicer* self);
-int seek_handle_start_array(JsonSlicer* self);
-int seek_handle_end_array(JsonSlicer* self);
-
 #endif
