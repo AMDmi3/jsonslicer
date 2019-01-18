@@ -64,6 +64,7 @@ setup(
         Extension(
             'jsonslicer',
             language='c++',
+            extra_compile_args=["-std=c++11"],
             sources=[
                 'src/construct_handlers.cc',
                 'src/handlers.cc',
