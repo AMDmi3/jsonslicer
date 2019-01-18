@@ -11,7 +11,7 @@ matrix:
     - python: 3.6
       env: ASAN=yes
     - python: 3.6
-      env: TRACEMALLOC=yes
+      env: TRACEMALLOC=yes COVERAGE=yes
     - python: 3.7
 before_script:
   - sudo apt-get update -qq
@@ -21,6 +21,12 @@ before_script:
         pip install ijson
         pip install tabulate
         pip install cffi
+    fi
+  - |-
+    if [ -n "$COVERAGE" ]; then
+        pip install cpp-coveralls
+        export CFLAGS="${CFLAGS} -O0 -g --coverage"
+        export LDFLAGS="${LDFLAGS} --coverage"
     fi
 script:
   - |-
@@ -46,4 +52,9 @@ script:
   - |-
     if [ -n "$BENCHMARK" ]; then
         python benchmark.py
+    fi
+after_success:
+  - |-
+    if [ -n "$COVERAGE" ]; then
+        coveralls -i src
     fi

@@ -5,6 +5,7 @@
 </a>
 
 [![Build Status](https://travis-ci.org/AMDmi3/jsonslicer.svg?branch=master)](https://travis-ci.org/AMDmi3/jsonslicer)
+[![Coverage Status](https://coveralls.io/repos/github/AMDmi3/jsonslicer/badge.svg?branch=master)](https://coveralls.io/github/AMDmi3/jsonslicer?branch=master)
 [![PyPI downloads](https://img.shields.io/pypi/dm/jsonslicer.svg)](https://pypi.org/project/jsonslicer/)
 [![PyPI version](https://img.shields.io/pypi/v/jsonslicer.svg)](https://pypi.org/project/jsonslicer/)
 [![PyPI pythons](https://img.shields.io/pypi/pyversions/jsonslicer.svg)](https://pypi.org/project/jsonslicer/)
