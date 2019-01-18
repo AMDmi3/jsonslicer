@@ -67,11 +67,11 @@ setup(
                 'src/construct_handlers.c',
                 'src/handlers.c',
                 'src/jsonslicer.c',
+                'src/output_formatting.c',
                 'src/py_module.c',
                 'src/pymutindex.c',
                 'src/pyobjlist.c',
                 'src/seek_handlers.c',
-                'src/output_formats.c',
             ],
             **pkgconfig('yajl')
         )

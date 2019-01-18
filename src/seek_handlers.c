@@ -24,7 +24,7 @@
 
 #include "construct_handlers.h"
 
-#include "output_formats.h"
+#include "output_formatting.h"
 
 #include "pyobjlist.h"
 #include "pymutindex.h"
