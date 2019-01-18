@@ -24,6 +24,8 @@
 
 #include "construct_handlers.h"
 
+#include "output_formats.h"
+
 #include "pyobjlist.h"
 #include "pymutindex.h"
 
@@ -49,14 +51,14 @@ int finish_complete_object(JsonSlicer* self, PyObject* obj) {
 	self->mode = MODE_SEEKING;
 
 	// construct tuple with prepended path
-	PyObject* tuple = pyobjlist_as_tuple_prefix(&self->path, obj);
-	if (tuple == NULL) {
+	PyObject* output = generate_output_object(self, obj);
+	if (output == NULL) {
 		return 0;
 	}
 
 	// save in list of complete objects
-	if (!pyobjlist_push_back(&self->complete, tuple)) {
-		Py_DECREF(tuple);
+	if (!pyobjlist_push_back(&self->complete, output)) {
+		Py_DECREF(output);
 		return 0;
 	}
 

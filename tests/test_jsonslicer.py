@@ -104,7 +104,7 @@ class TestJsonSlicer(unittest.TestCase):
 
         for path, expected in cases.items():
             pseudofile = io.BytesIO(json_bytes)
-            slicer = JsonSlicer(pseudofile, deep_encode(path, 'utf-8'))
+            slicer = JsonSlicer(pseudofile, deep_encode(path, 'utf-8'), path_mode='full')
             results = deep_decode(list(slicer), 'utf-8')
 
             self.assertEqual(results, expected)
@@ -143,16 +143,16 @@ class TestJsonSlicer(unittest.TestCase):
         self.assertIsNotNone(next(JsonSlicer(io.BytesIO(b'0'), ())))
 
     def test_root_elems(self):
-        self.assertEqual(*next(JsonSlicer(io.BytesIO(b'0'), ())), 0)
-        self.assertEqual(*next(JsonSlicer(io.BytesIO(b'1000000'), ())), 1000000)
-        self.assertEqual(*next(JsonSlicer(io.BytesIO(b'-1000000'), ())), -1000000)
-        self.assertEqual(*next(JsonSlicer(io.BytesIO(b'0.3'), ())), 0.3)
-        self.assertEqual(*next(JsonSlicer(io.BytesIO(b'"string"'), ())), b'string')
-        self.assertEqual(*next(JsonSlicer(io.BytesIO(b'null'), ())), None)
-        self.assertEqual(*next(JsonSlicer(io.BytesIO(b'true'), ())), True)
-        self.assertEqual(*next(JsonSlicer(io.BytesIO(b'false'), ())), False)
-        self.assertEqual(*next(JsonSlicer(io.BytesIO(b'[]'), ())), [])
-        self.assertEqual(*next(JsonSlicer(io.BytesIO(b'{}'), ())), {})
+        self.assertEqual(next(JsonSlicer(io.BytesIO(b'0'), ())), 0)
+        self.assertEqual(next(JsonSlicer(io.BytesIO(b'1000000'), ())), 1000000)
+        self.assertEqual(next(JsonSlicer(io.BytesIO(b'-1000000'), ())), -1000000)
+        self.assertEqual(next(JsonSlicer(io.BytesIO(b'0.3'), ())), 0.3)
+        self.assertEqual(next(JsonSlicer(io.BytesIO(b'"string"'), ())), b'string')
+        self.assertEqual(next(JsonSlicer(io.BytesIO(b'null'), ())), None)
+        self.assertEqual(next(JsonSlicer(io.BytesIO(b'true'), ())), True)
+        self.assertEqual(next(JsonSlicer(io.BytesIO(b'false'), ())), False)
+        self.assertEqual(next(JsonSlicer(io.BytesIO(b'[]'), ())), [])
+        self.assertEqual(next(JsonSlicer(io.BytesIO(b'{}'), ())), {})
 
     def test_types(self):
         data = [
@@ -313,17 +313,51 @@ class TestJsonSlicer(unittest.TestCase):
             ]
         }"""
 
-        for *_, person in JsonSlicer(io.BytesIO(data), (b'people', None)):
+        for person in JsonSlicer(io.BytesIO(data), (b'people', None)):
             pass
 
         self.assertEqual(person[b'name'], b'Angela')
 
-        *_, person in JsonSlicer(io.BytesIO(data), (b'people', 2))
+        person in JsonSlicer(io.BytesIO(data), (b'people', 2))
         self.assertEqual(person[b'name'], b'Angela')
 
-        max_age = max((age for *_, age in JsonSlicer(io.BytesIO(data), (b'people', None, b'age'))))
+        max_age = max(JsonSlicer(io.BytesIO(data), (b'people', None, b'age')))
         self.assertEqual(max_age, 33)
 
+    def test_output_formats(self):
+        data = b"""
+        {
+            "a":{
+                "b":1
+            },
+            "c":[
+                2
+            ]
+        }"""
+
+        self.assertEqual(
+            list(JsonSlicer(io.BytesIO(data), (None, None), path_mode='drop')),
+            [
+                1,
+                2
+            ]
+        )
+
+        self.assertEqual(
+            list(JsonSlicer(io.BytesIO(data), (None, None), path_mode='map_keys')),
+            [
+                (b'b',1),
+                2
+            ]
+        )
+
+        self.assertEqual(
+            list(JsonSlicer(io.BytesIO(data), (None, None), path_mode='full')),
+            [
+                (b'a', b'b', 1),
+                (b'c', 0, 2)
+            ]
+        )
 
 if __name__ == '__main__':
     unittest.main()

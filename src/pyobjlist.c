@@ -136,31 +136,8 @@ PyObject* pyobjlist_pop_back(PyObjList* list) {
 	return result;
 }
 
-PyObject* pyobjlist_as_tuple_prefix(PyObjList* list, PyObject* obj) {
-	PyObject* tuple = PyTuple_New(pyobjlist_size(list) + 1);
-	if (tuple == NULL) {
-		return NULL;
-	}
-
-	size_t tuple_idx = 0;
-	for (PyObjListNode* node = list->front; node; node = node->next) {
-		if (PyMutIndex_Check(node->obj)) {
-			PyObject* index = PyMutIndex_AsPyLong(node->obj);
-			if (index == NULL) {
-				Py_DECREF(tuple);
-				return NULL;
-			}
-			PyTuple_SET_ITEM(tuple, tuple_idx++, index);
-		} else {
-			Py_INCREF(node->obj);
-			PyTuple_SET_ITEM(tuple, tuple_idx++, node->obj);
-		}
-	}
-
-	Py_INCREF(obj);
-	PyTuple_SET_ITEM(tuple, tuple_idx, obj);
-
-	return tuple;
+PyObject* pyobjlist_back(PyObjList* list) {
+	return list->back ? list->back->obj : NULL;
 }
 
 int pyobjlist_match(PyObjList* lhs, PyObjList* rhs, PyObjListMatchFunc equals) {

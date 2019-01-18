@@ -71,6 +71,7 @@ setup(
                 'src/pymutindex.c',
                 'src/pyobjlist.c',
                 'src/seek_handlers.c',
+                'src/output_formats.c',
             ],
             **pkgconfig('yajl')
         )

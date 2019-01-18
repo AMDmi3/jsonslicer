@@ -20,53 +20,13 @@
  * THE SOFTWARE.
  */
 
-#ifndef JSONSLICER_GENERATOR_H
-#define JSONSLICER_GENERATOR_H
+#ifndef JSONSLICER_OUTPUT_H
+#define JSONSLICER_OUTPUT_H
 
-#include "pyobjlist.h"
+#include "jsonslicer.h"
 
 #include <Python.h>
-#include <yajl/yajl_parse.h>
 
-enum JsonSlicerMode {
-	MODE_SEEKING,
-	MODE_CONSTRUCTING
-};
-
-enum JsonSlicerPathMode {
-	PATHMODE_DROP,
-	PATHMODE_MAP_KEYS,
-	PATHMODE_FULL,
-};
-
-typedef struct {
-	PyObject_HEAD
-
-	// arguments
-	PyObject* io;
-	Py_ssize_t read_size;
-	int path_mode;
-
-	// YAJL handle
-	yajl_handle yajl;
-
-	// parser state
-	PyObject* last_map_key;
-	int mode;
-
-	// pattern argument
-	PyObjList pattern;
-
-	// current path in json
-	PyObjList path;
-
-	// stack of objects being currently constructed
-	PyObjList constructing;
-
-	// complete python objects ready to be returned to caller
-	PyObjList complete;
-} JsonSlicer;
-
-PyTypeObject JsonSlicerType;
+PyObject* generate_output_object(JsonSlicer* self, PyObject* obj);
 
 #endif
