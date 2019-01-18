@@ -69,18 +69,6 @@ static PyObject* pop_constructing_object(JsonSlicer* self) {
 	return pyobjlist_pop_back(&self->constructing);
 }
 
-// map key
-int construct_handle_map_key(JsonSlicer* self, const char* str, size_t len) {
-	PyObject* new_map_key = PyBytes_FromStringAndSize(str, len);
-	if (!new_map_key) {
-		return 0;
-	}
-	PyObject* old_map_key = self->last_map_key;
-	self->last_map_key = new_map_key;
-	Py_XDECREF(old_map_key);
-	return 1;
-}
-
 // containers
 int construct_handle_start_map(JsonSlicer* self) {
 	PyObject* map = PyDict_New();

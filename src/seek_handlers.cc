@@ -66,19 +66,6 @@ int finish_complete_object(JsonSlicer* self, PyObject* obj) {
 	return 1;
 }
 
-// map key
-int seek_handle_map_key(JsonSlicer* self, const char* str, size_t len) {
-	assert(self->path.back && self->path.back->obj);
-
-	Py_DECREF(self->path.back->obj);
-
-	self->path.back->obj = PyBytes_FromStringAndSize(str, len);
-	if (self->path.back->obj == NULL) {
-		return 0;
-	}
-	return 1;
-}
-
 // containers
 int seek_handle_start_map(JsonSlicer* self) {
 	if (check_pattern(self)) {

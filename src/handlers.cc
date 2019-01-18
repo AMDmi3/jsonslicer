@@ -110,11 +110,23 @@ int handle_string(void* ctx, const unsigned char* str, size_t len) {
 // map key
 int handle_map_key(void* ctx, const unsigned char* str, size_t len) {
 	JsonSlicer* self = (JsonSlicer*)ctx;
-	if (self->mode == MODE_CONSTRUCTING) {
-		return construct_handle_map_key(self, (const char*)str, len);
-	} else {
-		return seek_handle_map_key(self, (const char*)str, len);
+
+	PyObject* new_map_key = PyBytes_FromStringAndSize(reinterpret_cast<const char*>(str), len);
+	if (new_map_key == NULL) {
+		return false;
 	}
+	if (self->mode == MODE_CONSTRUCTING) {
+		PyObject* old_map_key = self->last_map_key;
+		self->last_map_key = new_map_key;
+		Py_XDECREF(old_map_key);
+	} else {
+		assert(self->path.back && self->path.back->obj);
+
+		PyObject* old_path_tail = self->path.back->obj;
+		self->path.back->obj = new_map_key;
+		Py_DECREF(old_path_tail);
+	}
+	return true;
 }
 
 // containers
