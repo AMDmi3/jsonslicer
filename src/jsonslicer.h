@@ -34,7 +34,7 @@ enum JsonSlicerMode {
 };
 
 enum JsonSlicerPathMode {
-	PATHMODE_DROP,
+	PATHMODE_IGNORE,
 	PATHMODE_MAP_KEYS,
 	PATHMODE_FULL,
 };

@@ -32,7 +32,7 @@ static PyObject* JsonSlicer_new(PyTypeObject *type, PyObject *args, PyObject *kw
 	if (self != NULL) {
 		self->io = NULL;
 		self->read_size = 1024;  // XXX: bump somewhat for production use
-		self->path_mode = PATHMODE_DROP;
+		self->path_mode = PATHMODE_IGNORE;
 
 		self->yajl = NULL;
 
@@ -80,8 +80,8 @@ static int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	}
 
 	if (path_mode_arg) {
-		if (strcmp(path_mode_arg, "drop") == 0) {
-			path_mode = PATHMODE_DROP;
+		if (strcmp(path_mode_arg, "ignore") == 0) {
+			path_mode = PATHMODE_IGNORE;
 		} else if (strcmp(path_mode_arg, "map_keys") == 0) {
 			path_mode = PATHMODE_MAP_KEYS;
 		} else if (strcmp(path_mode_arg, "full") == 0) {

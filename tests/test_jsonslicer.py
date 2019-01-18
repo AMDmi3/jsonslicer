@@ -336,7 +336,7 @@ class TestJsonSlicer(unittest.TestCase):
         }"""
 
         self.assertEqual(
-            list(JsonSlicer(io.BytesIO(data), (None, None), path_mode='drop')),
+            list(JsonSlicer(io.BytesIO(data), (None, None), path_mode='ignore')),
             [
                 1,
                 2

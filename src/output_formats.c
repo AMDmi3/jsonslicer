@@ -26,7 +26,7 @@
 #include "pymutindex.h"
 
 PyObject* generate_output_object(JsonSlicer* self, PyObject* obj) {
-	if (self->path_mode == PATHMODE_DROP) {
+	if (self->path_mode == PATHMODE_IGNORE) {
 		Py_INCREF(obj);
 		return obj;
 	} else if (self->path_mode == PATHMODE_MAP_KEYS) {
