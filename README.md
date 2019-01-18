@@ -18,22 +18,22 @@ to parse **very large** JSON files or streams. The module is written
 in C and uses [YAJL](https://lloyd.github.io/yajl/) JSON parsing
 library, so it's also quite **fast**.
 
-JsonSlicer takes a path of JSON map keys or array indexes, and provides
-iterator interface which yields JSON data matching given path as complete
+JsonSlicer takes a **path** of JSON map keys or array indexes, and provides
+**iterator interface** which yields JSON data matching given path as complete
 Python objects.
 
 ## Example
 
 ```json
 {
-	"friends": [
-		{"name": "John", "age": 31},
-		{"name": "Ivan", "age": 26}
-	],
+    "friends": [
+        {"name": "John", "age": 31},
+        {"name": "Ivan", "age": 26}
+    ],
     "colleagues": {
-		"manager": {"name": "Jack", "age": 33},
-		"subordinate": {"name": "Lucy", "age": 21}
-	}
+        "manager": {"name": "Jack", "age": 33},
+        "subordinate": {"name": "Lucy", "age": 21}
+    }
 }
 ```
 
@@ -42,47 +42,47 @@ from jsonslicer import JsonSlicer
 
 # Extract specific elements:
 with open('people.json', 'b') as data:
-	ivans_age = next(JsonSlicer(data, (b'friends', 1, b'age')))
+    ivans_age = next(JsonSlicer(data, (b'friends', 1, b'age')))
 
 with open('people.json', 'b') as data:
-	managers_name = next(JsonSlicer(data, (b'collegues', b'manager', b'name')))
+    managers_name = next(JsonSlicer(data, (b'collegues', b'manager', b'name')))
 
 # Iterate over collection(s) by using wildcards in the path:
 with open('people.json', 'b') as data:
-	for person in JsonSlicer(data, (b"friends", None)):
-		print(person)
-		# {b'name': b'John', b'age': 31}
-		# {b'name': b'Ivan', b'age': 26}
+    for person in JsonSlicer(data, (b"friends", None)):
+        print(person)
+        # {b'name': b'John', b'age': 31}
+        # {b'name': b'Ivan', b'age': 26}
 
 # Uniform iteration is possible
 with open('people.json', 'b') as data:
-	for person in JsonSlicer(data, (None, None)):
-		print(person)
-		# {b'name': b'John', b'age': 31}
-		# {b'name': b'Ivan', b'age': 26}
-		# {b'name': b'Jack', b'age': 33}
-		# {b'name': b'Lucy', b'age': 21}
+    for person in JsonSlicer(data, (None, None)):
+        print(person)
+        # {b'name': b'John', b'age': 31}
+        # {b'name': b'Ivan', b'age': 26}
+        # {b'name': b'Jack', b'age': 33}
+        # {b'name': b'Lucy', b'age': 21}
 
 # Map key of returned objects is available on demand...
 with open('people.json', 'b') as data:
-	for position, person in JsonSlicer(data, ('colleagues', None), path_format='map_keys'):
-		print(position, person)
-		# b'manager' {b'name': b'Jack', b'age': 33}
-		# b'subordinate' {b'name': b'Lucy', b'age': 21}
+    for position, person in JsonSlicer(data, ('colleagues', None), path_format='map_keys'):
+        print(position, person)
+        # b'manager' {b'name': b'Jack', b'age': 33}
+        # b'subordinate' {b'name': b'Lucy', b'age': 21}
 
 # ...as well as complete path information
 with open('people.json', 'b') as data:
-	for person in JsonSlicer(data, (None, None), path_format='full'):
-		print(person)
-		# (b'friends', 0, {b'name': b'John', b'age': 31})
-		# (b'friends', 1, {b'name': b'Ivan', b'age': 26})
-		# (b'colleagues', b'manager', {b'name': b'Jack', b'age': 33})
-		# (b'colleagues', b'subordinate', {b'name': b'Lucy', b'age': 21})
+    for person in JsonSlicer(data, (None, None), path_format='full'):
+        print(person)
+        # (b'friends', 0, {b'name': b'John', b'age': 31})
+        # (b'friends', 1, {b'name': b'Ivan', b'age': 26})
+        # (b'colleagues', b'manager', {b'name': b'Jack', b'age': 33})
+        # (b'colleagues', b'subordinate', {b'name': b'Lucy', b'age': 21})
 
 # Extract all instances of deep nested field
 with open('people.json', 'b') as data:
-	max_age = max(JsonSlicer(data, (b'people', None, b'age')))
-	# 33
+    max_age = max(JsonSlicer(data, (b'people', None, b'age')))
+    # 33
 ```
 
 ## API
@@ -116,7 +116,7 @@ _path_mode_ is a string which specifies how a parser should
 return path information along with objects. The following modes are
 supported:
 
-* _ignore_ (the default) - do not output any path information, just
+* _'ignore'_ (the default) - do not output any path information, just
 objects as is (`b'friends'`).
 
   ```python
@@ -126,9 +126,13 @@ objects as is (`b'friends'`).
   {b'name': b'Lucy', b'age': 21}
   ```
 
-  Common usage pattern for this mode is `for object in JsonWriter(...)`
+  Common usage pattern for this mode is
 
-* _map_keys_ - output objects as is when traversing arrays and tuples
+  ```python
+  for object in JsonWriter(...)
+  ```
+
+* _'map_keys'_ - output objects as is when traversing arrays and tuples
 consisting of map key and object when traversing maps.
 
   ```python
@@ -141,13 +145,16 @@ consisting of map key and object when traversing maps.
   This format may seem inconsistent (and therefore it's not the default),
   however in practice only collection of a single type is iterated at
   a time and this type is known, so this format is likely the most useful
-  as in most cases you do need dictionary keys. Common
+  as in most cases you do need dictionary keys.
 
-  Common usage pattern for this mode is `for object in JsonSlicer(...)`
-  when iterating arrays and `for key object in JsonSlicer(...)`
-  when iterating maps.
+  Common usage pattern for this mode is
 
-* _full_paths_ - output tuples consisting of all path components
+  ```python
+  for object in JsonSlicer(...)  # when iterating arrays
+  for key object in JsonSlicer(...)  # when iterating maps
+  ```
+
+* _'full_paths'_ - output tuples consisting of all path components
 (both map keys and array indexes) and an object as the last element.
 
   ```python
@@ -157,7 +164,11 @@ consisting of map key and object when traversing maps.
   (b'colleagues', b'subordinate', {b'name': b'Lucy', b'age': 21})
   ```
 
-  Common usage pattern for this mode is `for *path, object in JsonWriter(...)`.
+  Common usage pattern for this mode is
+
+  ```python
+  for *path, object in JsonWriter(...)
+  ```
 
 The constructed object is as iterator. You may call `next()` to extract
 single element from it, iterate it via `for` loop, or use it in generator
