@@ -67,7 +67,6 @@ if __name__ == '__main__':
         for n, item in enumerate(json.loads(jsondata)['level1']['level2']):
             assert(item['id'] == n)
 
-
     with TestCase('json.load(StringIO())', 'str', args.json_size, results):
         gen = io.StringIO(jsondata)
         for n, item in enumerate(json.load(gen)['level1']['level2']):
@@ -76,7 +75,7 @@ if __name__ == '__main__':
     with TestCase('JsonSlicer', 'bytes', args.json_size, results):
         gen = io.BytesIO(jsondata.encode('utf-8'))
         parser = JsonSlicer(gen, (b'level1', b'level2', None))
-        for n, (*_, item) in enumerate(parser):
+        for n, item in enumerate(parser):
             assert(item[b'id'] == n)
 
     with TestCase('ijson.yajl2_cffi', 'bytes', args.json_size, results):
