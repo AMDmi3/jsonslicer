@@ -79,7 +79,14 @@ bool generic_start_container(JsonSlicer* self, T&& make_container, U&& make_key)
 			return false;
 		}
 
-		if (!push_constructing_object(self, container)) {
+		if (!pyobjlist_empty(&self->constructing)) {
+			if (!add_to_parent(self, container)) {
+				Py_DECREF(container);
+				return false;
+			}
+		}
+
+		if (!pyobjlist_push_back(&self->constructing, container)) {
 			Py_DECREF(container);
 			return false;
 		}
@@ -95,7 +102,7 @@ bool generic_end_container(JsonSlicer* self) {
 		update_path(self);
 	}
 	if (self->mode == MODE_CONSTRUCTING) {
-		PyObject* container = pop_constructing_object(self);
+		PyObject* container = pyobjlist_pop_back(&self->constructing);
 
 		if (pyobjlist_empty(&self->constructing)) {
 			if (!finish_complete_object(self, container)) {
@@ -164,6 +171,7 @@ int handle_map_key(void* ctx, const unsigned char* str, size_t len) {
 	if (new_map_key == NULL) {
 		return false;
 	}
+
 	if (self->mode == MODE_CONSTRUCTING) {
 		PyObject* old_map_key = self->last_map_key;
 		self->last_map_key = new_map_key;

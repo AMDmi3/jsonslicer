@@ -27,7 +27,4 @@
 
 int add_to_parent(JsonSlicer* self, PyObject* value);
 
-int push_constructing_object(JsonSlicer* self, PyObject* obj);
-PyObject* pop_constructing_object(JsonSlicer* self);
-
 #endif

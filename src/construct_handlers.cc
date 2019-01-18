@@ -54,17 +54,3 @@ int add_to_parent(JsonSlicer* self, PyObject* value) {
 
 	return 1;
 }
-
-int push_constructing_object(JsonSlicer* self, PyObject* obj) {
-	if (!pyobjlist_empty(&self->constructing)) {
-		if (!add_to_parent(self, obj)) {
-			return 0;
-		}
-	}
-
-	return pyobjlist_push_back(&self->constructing, obj);
-}
-
-PyObject* pop_constructing_object(JsonSlicer* self) {
-	return pyobjlist_pop_back(&self->constructing);
-}
