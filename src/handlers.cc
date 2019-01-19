@@ -29,16 +29,16 @@
 #include <Python.h>
 
 template<class T> bool generic_handle_scalar(JsonSlicer* self, T&& make_scalar) {
-	if (self->mode == MODE_SEEKING) {
+	if (self->state == JsonSlicer::State::SEEKING) {
 		if (check_pattern(self)) {
-			self->mode = MODE_CONSTRUCTING;
-			// falls through to MODE_CONSTRUCTING block below
+			self->state = JsonSlicer::State::CONSTRUCTING;
+			// falls through to JsonSlicer::State::CONSTRUCTING block below
 		} else {
 			update_path(self);
 			return true;
 		}
 	}
-	if (self->mode == MODE_CONSTRUCTING) {
+	if (self->state == JsonSlicer::State::CONSTRUCTING) {
 		PyObject* scalar = make_scalar();
 		if (scalar == nullptr) {
 			return false;
@@ -61,10 +61,10 @@ template<class T> bool generic_handle_scalar(JsonSlicer* self, T&& make_scalar) 
 
 template<class T, class U>
 bool generic_start_container(JsonSlicer* self, T&& make_container, U&& make_key) {
-	if (self->mode == MODE_SEEKING) {
+	if (self->state == JsonSlicer::State::SEEKING) {
 	    if (check_pattern(self)) {
-			self->mode = MODE_CONSTRUCTING;
-			// falls through to MODE_CONSTRUCTING block below
+			self->state = JsonSlicer::State::CONSTRUCTING;
+			// falls through to JsonSlicer::State::CONSTRUCTING block below
 		} else {
 			PyObject* key = make_key();
 			if (key == nullptr) {
@@ -73,7 +73,7 @@ bool generic_start_container(JsonSlicer* self, T&& make_container, U&& make_key)
 			return pyobjlist_push_back(&self->path, key);
 		}
 	}
-	if (self->mode == MODE_CONSTRUCTING) {
+	if (self->state == JsonSlicer::State::CONSTRUCTING) {
 		PyObject* container = make_container();
 		if (container == nullptr) {
 			return false;
@@ -95,13 +95,13 @@ bool generic_start_container(JsonSlicer* self, T&& make_container, U&& make_key)
 }
 
 bool generic_end_container(JsonSlicer* self) {
-	if (self->mode == MODE_SEEKING) {
+	if (self->state == JsonSlicer::State::SEEKING) {
 		PyObject* container = pyobjlist_pop_back(&self->path);
 		assert(container);
 		Py_DECREF(container);
 		update_path(self);
 	}
-	if (self->mode == MODE_CONSTRUCTING) {
+	if (self->state == JsonSlicer::State::CONSTRUCTING) {
 		PyObject* container = pyobjlist_pop_back(&self->constructing);
 
 		if (pyobjlist_empty(&self->constructing)) {
@@ -172,7 +172,7 @@ int handle_map_key(void* ctx, const unsigned char* str, size_t len) {
 		return false;
 	}
 
-	if (self->mode == MODE_CONSTRUCTING) {
+	if (self->state == JsonSlicer::State::CONSTRUCTING) {
 		PyObject* old_map_key = self->last_map_key;
 		self->last_map_key = new_map_key;
 		Py_XDECREF(old_map_key);

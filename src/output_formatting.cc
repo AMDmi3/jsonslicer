@@ -26,10 +26,10 @@
 #include "pymutindex.hh"
 
 PyObject* generate_output_object(JsonSlicer* self, PyObject* obj) {
-	if (self->path_mode == PATHMODE_IGNORE) {
+	if (self->path_mode == JsonSlicer::PathMode::IGNORE) {
 		Py_INCREF(obj);
 		return obj;
-	} else if (self->path_mode == PATHMODE_MAP_KEYS) {
+	} else if (self->path_mode == JsonSlicer::PathMode::MAP_KEYS) {
 		PyObject* path_last = pyobjlist_back(&self->path);
 		if (PyBytes_Check(path_last)) {
 			PyObject* tuple = PyTuple_New(2);
@@ -45,7 +45,7 @@ PyObject* generate_output_object(JsonSlicer* self, PyObject* obj) {
 			Py_INCREF(obj);
 			return obj;
 		}
-	} else if (self->path_mode == PATHMODE_FULL) {
+	} else if (self->path_mode == JsonSlicer::PathMode::FULL) {
 		PyObject* tuple = PyTuple_New(pyobjlist_size(&self->path) + 1);
 		if (tuple == nullptr) {
 			return nullptr;

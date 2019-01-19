@@ -48,7 +48,7 @@ void update_path(JsonSlicer* self) {
 
 int finish_complete_object(JsonSlicer* self, PyObject* obj) {
 	// regardless of result, we've finished parsing an object
-	self->mode = MODE_SEEKING;
+	self->state = JsonSlicer::State::SEEKING;
 
 	// construct tuple with prepended path
 	PyObject* output = generate_output_object(self, obj);

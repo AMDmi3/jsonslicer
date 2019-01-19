@@ -28,31 +28,31 @@
 #include <Python.h>
 #include <yajl/yajl_parse.h>
 
-enum JsonSlicerMode {
-	MODE_SEEKING,
-	MODE_CONSTRUCTING
-};
-
-enum JsonSlicerPathMode {
-	PATHMODE_IGNORE,
-	PATHMODE_MAP_KEYS,
-	PATHMODE_FULL,
-};
-
 struct JsonSlicer {
+	enum class State {
+		SEEKING,
+		CONSTRUCTING
+	};
+
+	enum class PathMode {
+		IGNORE,
+		MAP_KEYS,
+		FULL,
+	};
+
 	PyObject_HEAD
 
 	// arguments
 	PyObject* io;
 	Py_ssize_t read_size;
-	int path_mode;
+	PathMode path_mode;
 
 	// YAJL handle
 	yajl_handle yajl;
 
 	// parser state
 	PyObject* last_map_key;
-	int mode;
+	State state;
 
 	// pattern argument
 	PyObjList pattern;

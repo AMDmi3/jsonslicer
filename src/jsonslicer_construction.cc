@@ -32,12 +32,12 @@ PyObject* JsonSlicer_new(PyTypeObject* type, PyObject*, PyObject*) {
 	if (self != nullptr) {
 		self->io = nullptr;
 		self->read_size = 1024;  // XXX: bump somewhat for production use
-		self->path_mode = PATHMODE_IGNORE;
+		self->path_mode = JsonSlicer::PathMode::IGNORE;
 
 		self->yajl = nullptr;
 
 		self->last_map_key = nullptr;
-		self->mode = MODE_SEEKING;
+		self->state = JsonSlicer::State::SEEKING;
 
 		pyobjlist_init(&self->pattern);
 		pyobjlist_init(&self->path);
@@ -70,7 +70,7 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	PyObject* io = nullptr;
 	PyObject* pattern = nullptr;
 	Py_ssize_t read_size = self->read_size;
-	int path_mode = self->path_mode;
+	JsonSlicer::PathMode path_mode = self->path_mode;
 
 	static const char* keywords[] = {"file", "path_prefix", "read_size", "path_mode", nullptr};
 
@@ -81,11 +81,11 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 
 	if (path_mode_arg) {
 		if (strcmp(path_mode_arg, "ignore") == 0) {
-			path_mode = PATHMODE_IGNORE;
+			path_mode = JsonSlicer::PathMode::IGNORE;
 		} else if (strcmp(path_mode_arg, "map_keys") == 0) {
-			path_mode = PATHMODE_MAP_KEYS;
+			path_mode = JsonSlicer::PathMode::MAP_KEYS;
 		} else if (strcmp(path_mode_arg, "full") == 0) {
-			path_mode = PATHMODE_FULL;
+			path_mode = JsonSlicer::PathMode::FULL;
 		} else {
 			PyErr_SetString(PyExc_ValueError, "Bad value for path_mode argument");
 			return -1;
@@ -133,7 +133,7 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 		pyobjlist_clear(&tmp);
 	}
 
-	self->mode = MODE_SEEKING;
+	self->state = JsonSlicer::State::SEEKING;
 
 	Py_CLEAR(self->last_map_key);
 
