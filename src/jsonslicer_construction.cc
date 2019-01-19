@@ -29,14 +29,14 @@
 
 PyObject* JsonSlicer_new(PyTypeObject* type, PyObject*, PyObject*) {
 	JsonSlicer* self = (JsonSlicer*)type->tp_alloc(type, 0);
-	if (self != NULL) {
-		self->io = NULL;
+	if (self != nullptr) {
+		self->io = nullptr;
 		self->read_size = 1024;  // XXX: bump somewhat for production use
 		self->path_mode = PATHMODE_IGNORE;
 
-		self->yajl = NULL;
+		self->yajl = nullptr;
 
-		self->last_map_key = NULL;
+		self->last_map_key = nullptr;
 		self->mode = MODE_SEEKING;
 
 		pyobjlist_init(&self->pattern);
@@ -55,9 +55,9 @@ void JsonSlicer_dealloc(JsonSlicer* self) {
 
 	Py_CLEAR(self->last_map_key);
 
-	if (self->yajl != NULL) {
+	if (self->yajl != nullptr) {
 		yajl_handle tmp = self->yajl;
-		self->yajl = NULL;
+		self->yajl = nullptr;
 		yajl_free(tmp);
 	}
 	Py_CLEAR(self->io);
@@ -67,14 +67,14 @@ void JsonSlicer_dealloc(JsonSlicer* self) {
 
 int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	// parse args
-	PyObject* io = NULL;
-	PyObject* pattern = NULL;
+	PyObject* io = nullptr;
+	PyObject* pattern = nullptr;
 	Py_ssize_t read_size = self->read_size;
 	int path_mode = self->path_mode;
 
-	static const char* keywords[] = {"file", "path_prefix", "read_size", "path_mode", NULL};
+	static const char* keywords[] = {"file", "path_prefix", "read_size", "path_mode", nullptr};
 
-	const char* path_mode_arg = NULL;
+	const char* path_mode_arg = nullptr;
 	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|$ns", const_cast<char**>(keywords), &io, &pattern, &read_size, &path_mode_arg)) {
 		return -1;
 	}
@@ -92,8 +92,8 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 		}
 	}
 
-	assert(io != NULL);
-	assert(pattern != NULL);
+	assert(io != nullptr);
+	assert(pattern != nullptr);
 
 	// prepare all new data members
 	PyObjList new_pattern;
@@ -101,7 +101,7 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 
 	for (Py_ssize_t i = 0; i < PySequence_Size(pattern); i++) {
 		PyObject* item = PySequence_GetItem(pattern, i);
-		if (item == NULL) {
+		if (item == nullptr) {
 			pyobjlist_clear(&new_pattern);
 			return -1;
 		}
@@ -112,8 +112,8 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 		}
 	}
 
-	yajl_handle new_yajl = yajl_alloc(&yajl_handlers, NULL, (void*)self);
-	if (new_yajl == NULL) {
+	yajl_handle new_yajl = yajl_alloc(&yajl_handlers, nullptr, (void*)self);
+	if (new_yajl == nullptr) {
 		pyobjlist_clear(&new_pattern);
 		return -1;
 	}
@@ -140,7 +140,7 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	{
 		yajl_handle tmp = self->yajl;
 		self->yajl = new_yajl;
-		if (tmp != NULL) {
+		if (tmp != nullptr) {
 			yajl_free(tmp);
 		}
 	}

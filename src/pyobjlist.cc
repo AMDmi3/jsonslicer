@@ -26,17 +26,17 @@
 #include <stdlib.h>
 
 void pyobjlist_init(PyObjList* list) {
-	list->front = NULL;
-	list->back = NULL;
+	list->front = nullptr;
+	list->back = nullptr;
 }
 
 void pyobjlist_clear(PyObjList* list) {
 	PyObjListNode* cur = list->back;
 
-	list->front = NULL;
-	list->back = NULL;
+	list->front = nullptr;
+	list->back = nullptr;
 
-	while (cur != NULL) {
+	while (cur != nullptr) {
 		Py_DECREF(cur->obj);
 		PyObjListNode* tmp = cur;
 		cur = cur->prev;
@@ -55,16 +55,16 @@ size_t pyobjlist_size(PyObjList* list) {
 }
 
 int pyobjlist_empty(PyObjList* list) {
-	return list->front == NULL;
+	return list->front == nullptr;
 }
 
 int pyobjlist_push_front(PyObjList* list, PyObject* obj) {
 	PyObjListNode* node = (PyObjListNode*)malloc(sizeof(PyObjListNode));
-	if (node == NULL)
+	if (node == nullptr)
 		return 0;
 
 	node->obj = obj;
-	node->prev = NULL;
+	node->prev = nullptr;
 	node->next = list->front;
 
 	if (node->next) {
@@ -80,12 +80,12 @@ int pyobjlist_push_front(PyObjList* list, PyObject* obj) {
 
 int pyobjlist_push_back(PyObjList* list, PyObject* obj) {
 	PyObjListNode* node = (PyObjListNode*)malloc(sizeof(PyObjListNode));
-	if (node == NULL)
+	if (node == nullptr)
 		return 0;
 
 	node->obj = obj;
 	node->prev = list->back;
-	node->next = NULL;
+	node->next = nullptr;
 
 	if (node->prev) {
 		node->prev->next = node;
@@ -101,12 +101,12 @@ int pyobjlist_push_back(PyObjList* list, PyObject* obj) {
 PyObject* pyobjlist_pop_front(PyObjList* list) {
 	PyObjListNode* node = list->front;
 	if (!node)
-		return NULL;
+		return nullptr;
 
 	if (node->next) {
-		node->next->prev = NULL;
+		node->next->prev = nullptr;
 	} else {
-		list->back = NULL;
+		list->back = nullptr;
 	}
 
 	list->front = node->next;
@@ -120,12 +120,12 @@ PyObject* pyobjlist_pop_front(PyObjList* list) {
 PyObject* pyobjlist_pop_back(PyObjList* list) {
 	PyObjListNode* node = list->back;
 	if (!node)
-		return NULL;
+		return nullptr;
 
 	if (node->prev) {
-		node->prev->next = NULL;
+		node->prev->next = nullptr;
 	} else {
-		list->front = NULL;
+		list->front = nullptr;
 	}
 
 	list->back = node->prev;
@@ -137,18 +137,18 @@ PyObject* pyobjlist_pop_back(PyObjList* list) {
 }
 
 PyObject* pyobjlist_back(PyObjList* list) {
-	return list->back ? list->back->obj : NULL;
+	return list->back ? list->back->obj : nullptr;
 }
 
 int pyobjlist_match(PyObjList* lhs, PyObjList* rhs, PyObjListMatchFunc equals) {
 	PyObjListNode* lnode = lhs->front;
 	PyObjListNode* rnode = rhs->front;
 
-	for (; lnode != NULL && rnode != NULL; lnode = lnode->next, rnode = rnode->next) {
+	for (; lnode != nullptr && rnode != nullptr; lnode = lnode->next, rnode = rnode->next) {
 		if (!equals(lnode->obj, rnode->obj)) {
 			return 0;
 		}
 	}
 
-	return lnode == NULL && rnode == NULL;
+	return lnode == nullptr && rnode == nullptr;
 }

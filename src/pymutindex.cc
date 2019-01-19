@@ -43,7 +43,7 @@ PyObject* PyMutIndex_AsPyLong(PyObject* index) {
 static PyObject* PyMutIndex_RichCompare(PyObject* index, PyObject* other, int opid) {
 	if (opid != Py_EQ && opid != Py_NE) {
 		PyErr_SetString(PyExc_TypeError, "PyMytIndex only supports EQ/NE comparison with integers");
-		return NULL;
+		return nullptr;
 	}
 
 	int equals = 0;
@@ -51,7 +51,7 @@ static PyObject* PyMutIndex_RichCompare(PyObject* index, PyObject* other, int op
 		size_t other_value = PyLong_AsSize_t(other);
 
 		if (other_value == (size_t)-1 && PyErr_Occurred()) {
-			return NULL;
+			return nullptr;
 		}
 
 		equals = ((PyMutIndex*)index)->value == other_value;
@@ -65,7 +65,7 @@ static PyObject* PyMutIndex_RichCompare(PyObject* index, PyObject* other, int op
 }
 
 PyTypeObject PyMutIndex_type = {
-	PyVarObject_HEAD_INIT(NULL, 0)
+	PyVarObject_HEAD_INIT(nullptr, 0)
 	"jsonslicer.PyMutIndex",   // tp_name
 	sizeof(PyMutIndex),        // tp_basicsize
 	0,                         // tp_itemsize

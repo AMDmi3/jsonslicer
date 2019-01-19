@@ -40,7 +40,7 @@ template<class T> bool generic_handle_scalar(JsonSlicer* self, T&& make_scalar) 
 	}
 	if (self->mode == MODE_CONSTRUCTING) {
 		PyObject* scalar = make_scalar();
-		if (scalar == NULL) {
+		if (scalar == nullptr) {
 			return false;
 		}
 
@@ -67,7 +67,7 @@ bool generic_start_container(JsonSlicer* self, T&& make_container, U&& make_key)
 			// falls through to MODE_CONSTRUCTING block below
 		} else {
 			PyObject* key = make_key();
-			if (key == NULL) {
+			if (key == nullptr) {
 				return false;
 			}
 			return pyobjlist_push_back(&self->path, key);
@@ -75,7 +75,7 @@ bool generic_start_container(JsonSlicer* self, T&& make_container, U&& make_key)
 	}
 	if (self->mode == MODE_CONSTRUCTING) {
 		PyObject* container = make_container();
-		if (container == NULL) {
+		if (container == nullptr) {
 			return false;
 		}
 
@@ -120,7 +120,7 @@ const yajl_callbacks yajl_handlers = {
 	handle_boolean,
 	handle_integer,
 	handle_double,
-	NULL,
+	nullptr,
 	handle_string,
 	handle_start_map,
 	handle_map_key,
@@ -168,7 +168,7 @@ int handle_map_key(void* ctx, const unsigned char* str, size_t len) {
 	JsonSlicer* self = (JsonSlicer*)ctx;
 
 	PyObject* new_map_key = PyBytes_FromStringAndSize(reinterpret_cast<const char*>(str), len);
-	if (new_map_key == NULL) {
+	if (new_map_key == nullptr) {
 		return false;
 	}
 

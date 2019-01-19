@@ -39,13 +39,13 @@ static struct PyModuleDef jsonslicer_module_def = {
 
 PyMODINIT_FUNC PyInit_jsonslicer(void) {
 	if (PyType_Ready(&JsonSlicerType) < 0)
-		return NULL;
+		return nullptr;
 	if (PyType_Ready(&PyMutIndex_type) < 0)
-		return NULL;
+		return nullptr;
 
 	PyObject* m = PyModule_Create(&jsonslicer_module_def);
-	if (m == NULL)
-		return NULL;
+	if (m == nullptr)
+		return nullptr;
 
 	Py_INCREF(&JsonSlicerType);
 	PyModule_AddObject(m, "JsonSlicer", (PyObject*)&JsonSlicerType);

@@ -33,8 +33,8 @@ PyObject* generate_output_object(JsonSlicer* self, PyObject* obj) {
 		PyObject* path_last = pyobjlist_back(&self->path);
 		if (PyBytes_Check(path_last)) {
 			PyObject* tuple = PyTuple_New(2);
-			if (tuple == NULL) {
-				return NULL;
+			if (tuple == nullptr) {
+				return nullptr;
 			}
 			Py_INCREF(path_last);
 			PyTuple_SET_ITEM(tuple, 0, path_last);
@@ -47,17 +47,17 @@ PyObject* generate_output_object(JsonSlicer* self, PyObject* obj) {
 		}
 	} else if (self->path_mode == PATHMODE_FULL) {
 		PyObject* tuple = PyTuple_New(pyobjlist_size(&self->path) + 1);
-		if (tuple == NULL) {
-			return NULL;
+		if (tuple == nullptr) {
+			return nullptr;
 		}
 
 		size_t tuple_idx = 0;
 		for (PyObjListNode* node = self->path.front; node; node = node->next) {
 			if (PyMutIndex_Check(node->obj)) {
 				PyObject* index = PyMutIndex_AsPyLong(node->obj);
-				if (index == NULL) {
+				if (index == nullptr) {
 					Py_DECREF(tuple);
-					return NULL;
+					return nullptr;
 				}
 				PyTuple_SET_ITEM(tuple, tuple_idx++, index);
 			} else {
@@ -72,6 +72,6 @@ PyObject* generate_output_object(JsonSlicer* self, PyObject* obj) {
 		return tuple;
 	} else {
 		PyErr_SetString(PyExc_RuntimeError, "Unexpected path mode");
-		return NULL;
+		return nullptr;
 	}
 }

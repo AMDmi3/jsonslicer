@@ -45,12 +45,12 @@ PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 
 		// handle i/o errors
 		if (!buffer) {
-			return NULL;
+			return nullptr;
 		}
 		if (!PyBytes_Check(buffer)) {
 			PyErr_Format(PyExc_RuntimeError, "Unexpected read result type %s, expected bytes", buffer->ob_type->tp_name);
 			Py_XDECREF(buffer);
-			return NULL;
+			return nullptr;
 		}
 
 		// advance or finalize parser
@@ -70,7 +70,7 @@ PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 			} // else it's interrupted parsing and PyErr is already set
 			yajl_free_error(self->yajl, error);
 			Py_XDECREF(buffer);
-			return NULL;
+			return nullptr;
 		}
 
 		// free buffer
@@ -83,5 +83,5 @@ PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 		}
 	} while (!eof);
 
-	return NULL;
+	return nullptr;
 }

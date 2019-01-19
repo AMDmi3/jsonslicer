@@ -25,7 +25,7 @@
 #include <Python.h>
 
 PyTypeObject JsonSlicerType = {
-	PyVarObject_HEAD_INIT(NULL, 0)
+	PyVarObject_HEAD_INIT(nullptr, 0)
 	"jsonslicer.JsonSlicer",   // tp_name
 	sizeof(JsonSlicer),        // tp_basicsize
 	0,                         // tp_itemsize

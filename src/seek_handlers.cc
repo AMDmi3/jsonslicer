@@ -52,7 +52,7 @@ int finish_complete_object(JsonSlicer* self, PyObject* obj) {
 
 	// construct tuple with prepended path
 	PyObject* output = generate_output_object(self, obj);
-	if (output == NULL) {
+	if (output == nullptr) {
 		return 0;
 	}
 
