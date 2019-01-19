@@ -27,8 +27,8 @@
 
 #include <Python.h>
 
-int finish_complete_object(JsonSlicer* self, PyObject* obj);
-int check_pattern(JsonSlicer* self);
+bool finish_complete_object(JsonSlicer* self, PyObject* obj);
+bool check_pattern(JsonSlicer* self);
 void update_path(JsonSlicer* self);
 
 #endif

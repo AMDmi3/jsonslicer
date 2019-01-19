@@ -40,18 +40,18 @@ void pyobjlist_init(PyObjList* list);
 void pyobjlist_clear(PyObjList* list);
 
 size_t pyobjlist_size(PyObjList* list);
-int pyobjlist_empty(PyObjList* list);
+bool pyobjlist_empty(PyObjList* list);
 
-int pyobjlist_push_front(PyObjList* list, PyObject* obj);
-int pyobjlist_push_back(PyObjList* list, PyObject* obj);
+bool pyobjlist_push_front(PyObjList* list, PyObject* obj);
+bool pyobjlist_push_back(PyObjList* list, PyObject* obj);
 
 PyObject* pyobjlist_pop_front(PyObjList* list);
 PyObject* pyobjlist_pop_back(PyObjList* list);
 
 PyObject* pyobjlist_back(PyObjList* list);
 
-typedef int (*PyObjListMatchFunc)(PyObject*, PyObject*);
+typedef bool (*PyObjListMatchFunc)(PyObject*, PyObject*);
 
-int pyobjlist_match(PyObjList* lhs, PyObjList* rhs, PyObjListMatchFunc compare);
+bool pyobjlist_match(PyObjList* lhs, PyObjList* rhs, PyObjListMatchFunc compare);
 
 #endif

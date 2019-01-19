@@ -30,7 +30,7 @@ struct PyMutIndex {
 	size_t value;
 };
 
-int PyMutIndex_Check(PyObject* object);
+bool PyMutIndex_Check(PyObject* object);
 PyObject* PyMutIndex_New();
 void PyMutIndex_Increment(PyObject* self);
 PyObject* PyMutIndex_AsPyLong(PyObject* self);

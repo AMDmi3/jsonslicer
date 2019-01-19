@@ -25,6 +25,6 @@
 
 #include "jsonslicer.hh"
 
-int add_to_parent(JsonSlicer* self, PyObject* value);
+bool add_to_parent(JsonSlicer* self, PyObject* value);
 
 #endif

@@ -37,7 +37,7 @@ PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 		return complete;
 	}
 
-	int eof = 0;
+	bool eof = false;
 
 	do {
 		// read chunk of data from IO
@@ -56,7 +56,7 @@ PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 		// advance or finalize parser
 		yajl_status status;
 		if (PyBytes_GET_SIZE(buffer) == 0) {
-			eof = 1;
+			eof = true;
 			status = yajl_complete_parse(self->yajl);
 		} else {
 			status = yajl_parse(self->yajl, (const unsigned char*)PyBytes_AS_STRING(buffer), PyBytes_GET_SIZE(buffer));

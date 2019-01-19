@@ -32,11 +32,11 @@
 #include <Python.h>
 
 // helpers
-static int path_matches_pattern(PyObject* path, PyObject* pattern) {
+static bool path_matches_pattern(PyObject* path, PyObject* pattern) {
 	return pattern == Py_None || PyObject_RichCompareBool(path, pattern, Py_EQ);
 }
 
-int check_pattern(JsonSlicer* self) {
+bool check_pattern(JsonSlicer* self) {
 	return pyobjlist_match(&self->path, &self->pattern, &path_matches_pattern);
 }
 
@@ -46,22 +46,22 @@ void update_path(JsonSlicer* self) {
 	}
 }
 
-int finish_complete_object(JsonSlicer* self, PyObject* obj) {
+bool finish_complete_object(JsonSlicer* self, PyObject* obj) {
 	// regardless of result, we've finished parsing an object
 	self->state = JsonSlicer::State::SEEKING;
 
 	// construct tuple with prepended path
 	PyObject* output = generate_output_object(self, obj);
 	if (output == nullptr) {
-		return 0;
+		return false;
 	}
 
 	// save in list of complete objects
 	if (!pyobjlist_push_back(&self->complete, output)) {
 		Py_DECREF(output);
-		return 0;
+		return false;
 	}
 
 	update_path(self);
-	return 1;
+	return true;
 }

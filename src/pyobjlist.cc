@@ -54,14 +54,14 @@ size_t pyobjlist_size(PyObjList* list) {
 	return count;
 }
 
-int pyobjlist_empty(PyObjList* list) {
+bool pyobjlist_empty(PyObjList* list) {
 	return list->front == nullptr;
 }
 
-int pyobjlist_push_front(PyObjList* list, PyObject* obj) {
+bool pyobjlist_push_front(PyObjList* list, PyObject* obj) {
 	PyObjListNode* node = (PyObjListNode*)malloc(sizeof(PyObjListNode));
 	if (node == nullptr)
-		return 0;
+		return false;
 
 	node->obj = obj;
 	node->prev = nullptr;
@@ -75,13 +75,13 @@ int pyobjlist_push_front(PyObjList* list, PyObject* obj) {
 
 	list->front = node;
 
-	return 1;
+	return true;
 }
 
-int pyobjlist_push_back(PyObjList* list, PyObject* obj) {
+bool pyobjlist_push_back(PyObjList* list, PyObject* obj) {
 	PyObjListNode* node = (PyObjListNode*)malloc(sizeof(PyObjListNode));
 	if (node == nullptr)
-		return 0;
+		return false;
 
 	node->obj = obj;
 	node->prev = list->back;
@@ -95,7 +95,7 @@ int pyobjlist_push_back(PyObjList* list, PyObject* obj) {
 
 	list->back = node;
 
-	return 1;
+	return true;
 }
 
 PyObject* pyobjlist_pop_front(PyObjList* list) {
@@ -140,13 +140,13 @@ PyObject* pyobjlist_back(PyObjList* list) {
 	return list->back ? list->back->obj : nullptr;
 }
 
-int pyobjlist_match(PyObjList* lhs, PyObjList* rhs, PyObjListMatchFunc equals) {
+bool pyobjlist_match(PyObjList* lhs, PyObjList* rhs, PyObjListMatchFunc equals) {
 	PyObjListNode* lnode = lhs->front;
 	PyObjListNode* rnode = rhs->front;
 
 	for (; lnode != nullptr && rnode != nullptr; lnode = lnode->next, rnode = rnode->next) {
 		if (!equals(lnode->obj, rnode->obj)) {
-			return 0;
+			return false;
 		}
 	}
 

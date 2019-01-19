@@ -22,7 +22,7 @@
 
 #include "pymutindex.hh"
 
-int PyMutIndex_Check(PyObject* p) {
+bool PyMutIndex_Check(PyObject* p) {
 	return Py_TYPE(p) == &PyMutIndex_type;
 }
 
@@ -46,7 +46,7 @@ static PyObject* PyMutIndex_RichCompare(PyObject* index, PyObject* other, int op
 		return nullptr;
 	}
 
-	int equals = 0;
+	bool equals = false;
 	if (PyLong_Check(other)) {
 		size_t other_value = PyLong_AsSize_t(other);
 
