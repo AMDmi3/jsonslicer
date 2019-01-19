@@ -39,7 +39,7 @@ enum JsonSlicerPathMode {
 	PATHMODE_FULL,
 };
 
-typedef struct {
+struct JsonSlicer {
 	PyObject_HEAD
 
 	// arguments
@@ -65,7 +65,7 @@ typedef struct {
 
 	// complete python objects ready to be returned to caller
 	PyObjList complete;
-} JsonSlicer;
+};
 
 PyObject* JsonSlicer_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 void JsonSlicer_dealloc(JsonSlicer* self);

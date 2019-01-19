@@ -25,16 +25,16 @@
 
 #include <Python.h>
 
-typedef struct PyObjListNode {
+struct PyObjListNode {
 	PyObject* obj;
 	struct PyObjListNode* next;
 	struct PyObjListNode* prev;
-} PyObjListNode;
+};
 
-typedef struct PyObjList {
+struct PyObjList {
 	PyObjListNode* front;
 	PyObjListNode* back;
-} PyObjList;
+};
 
 void pyobjlist_init(PyObjList* list);
 void pyobjlist_clear(PyObjList* list);

@@ -25,10 +25,10 @@
 
 #include <Python.h>
 
-typedef struct {
+struct PyMutIndex {
 	PyObject_HEAD
 	size_t value;
-} PyMutIndex;
+};
 
 int PyMutIndex_Check(PyObject* object);
 PyObject* PyMutIndex_New();
