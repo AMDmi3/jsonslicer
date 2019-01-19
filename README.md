@@ -185,14 +185,15 @@ and JsonSlicer was written to be better. Namely,
 
 The results of bundled benchmark on Python 3.7 / clang 6.0.1 / FreeBSD 12.0 amd64 / Core i7-6600U CPU @ 2.60GHz.
 
-| Facility              | Type   | Objects/sec   |
-|-----------------------|:------:|--------------:|
-| json.loads()          |    str |       1115.5K |
-| json.load(StringIO()) |    str |       1042.9K |
-| **JsonSlicer**        |  bytes |        822.5K |
-| ijson.yajl2_cffi      |  bytes |         72.0K |
-| ijson.yajl2           |  bytes |         44.7K |
-| ijson.python          |    str |         28.4K |
+| Facility                | Type   | Objects/sec   |
+|:------------------------|-------:|--------------:|
+| json.loads()            |    str |       1095.4K |
+| json.load(StringIO())   |    str |       1025.1K |
+| JsonSlicer (no paths)   |  bytes |        944.3K |
+| JsonSlicer (full paths) |  bytes |        656.9K |
+| ijson.yajl2_cffi        |  bytes |         69.1K |
+| ijson.yajl2             |  bytes |         50.5K |
+| ijson.python            |    str |         32.4K |
 
 ## Status/TODO
 
