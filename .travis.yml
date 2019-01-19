@@ -28,6 +28,7 @@ before_script:
         export CFLAGS="${CFLAGS} -O0 -g --coverage"
         export LDFLAGS="${LDFLAGS} --coverage"
     fi
+  - export CFLAGS="${CFLAGS} -Wall -Wextra -Werror"
 script:
   - |-
     if [ -z "$ASAN" ]; then
