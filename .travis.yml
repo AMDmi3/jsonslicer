@@ -4,18 +4,22 @@ sudo: required
 matrix:
   include:
     - python: 3.6
-      env: BENCHMARK=yes
+      env: CXX=g++ BENCHMARK=yes
+    - python: 3.6
+      env: CXX=g++-7 PACKAGES=g++-7
     - python: 3.6
       compiler: clang
-      env: CC="clang" LDSHARED="clang -shared"
+      env: CXX=clang
     - python: 3.6
-      env: ASAN=yes
+      env: CXX=g++ ASAN=yes
     - python: 3.6
-      env: TRACEMALLOC=yes COVERAGE=yes
+      env: CXX=g++ TRACEMALLOC=yes COVERAGE=yes
     - python: 3.7
+      env: CXX=g++
 before_script:
+  - sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -qq
-  - sudo apt-get install libyajl-dev
+  - sudo apt-get install libyajl-dev $PACKAGES
   - |-
     if [ -n "$BENCHMARK" ]; then
         pip install ijson
@@ -25,10 +29,11 @@ before_script:
   - |-
     if [ -n "$COVERAGE" ]; then
         pip install cpp-coveralls
-        export CFLAGS="${CFLAGS} -O0 -g --coverage"
-        export LDFLAGS="${LDFLAGS} --coverage"
+        export CFLAGS="$CFLAGS -O0 -g --coverage"
+        export LDFLAGS="$LDFLAGS --coverage"
     fi
-  - export CFLAGS="${CFLAGS} -Wall -Wextra -Werror"
+  - export CFLAGS="$CFLAGS -Wall -Wextra -Werror"
+  - export CC="$CXX"  # pydistutils brokenness
 script:
   - |-
     if [ -z "$ASAN" ]; then
