@@ -50,5 +50,7 @@ PyMODINIT_FUNC PyInit_jsonslicer(void) {
 	Py_INCREF(&JsonSlicerType);
 	PyModule_AddObject(m, "JsonSlicer", (PyObject*)&JsonSlicerType);
 
+	PyModule_AddStringConstant(m, "__version__", JSONSLICER_VERSION);
+
 	return m;
 }

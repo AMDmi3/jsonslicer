@@ -8,6 +8,8 @@ from setuptools import Extension, setup
 
 here = path.abspath(path.dirname(__file__))
 
+version = '0.0.1'
+
 
 def pkgconfig(package):
     result = {}
@@ -21,18 +23,6 @@ def pkgconfig(package):
     return result
 
 
-def get_version():
-    # XXX: implement __version__ in the module and read it here
-    # with open(path.join(here, 'jsonslicer', '__init__.py')) as source:
-    #    for line in source:
-    #        if line.startswith('__version__'):
-    #            return line.strip().split(' = ')[-1].strip('\'')
-
-    return '0.0.1'
-
-    raise RuntimeError('Cannot determine package version from package source')
-
-
 def get_long_description():
     try:
         return open(path.join(here, 'README.md')).read()
@@ -42,7 +32,7 @@ def get_long_description():
 
 setup(
     name='jsonslicer',
-    version=get_version(),
+    version=version,
     description='Stream JSON parser with iterator interface',
     long_description=get_long_description(),
     long_description_content_type='text/markdown',
@@ -64,7 +54,7 @@ setup(
         Extension(
             'jsonslicer',
             language='c++',
-            extra_compile_args=["-std=c++11"],
+            extra_compile_args=['-std=c++11', '-DJSONSLICER_VERSION=\"{}\"'.format(version)],
             sources=[
                 'src/construct_handlers.cc',
                 'src/handlers.cc',
