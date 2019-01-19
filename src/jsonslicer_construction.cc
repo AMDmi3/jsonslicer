@@ -27,7 +27,7 @@
 #include <Python.h>
 #include <yajl/yajl_parse.h>
 
-PyObject* JsonSlicer_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
+PyObject* JsonSlicer_new(PyTypeObject* type, PyObject*, PyObject*) {
 	JsonSlicer* self = (JsonSlicer*)type->tp_alloc(type, 0);
 	if (self != NULL) {
 		self->io = NULL;
