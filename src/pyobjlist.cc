@@ -110,8 +110,7 @@ bool PyObjList::push_back(PyObject* obj) {
 
 PyObject* PyObjList::pop_front() {
 	Node* node = front_;
-	if (!node)
-		return nullptr;
+	assert(node);
 
 	if (node->next) {
 		node->next->prev = nullptr;
@@ -129,8 +128,7 @@ PyObject* PyObjList::pop_front() {
 
 PyObject* PyObjList::pop_back() {
 	Node* node = back_;
-	if (!node)
-		return nullptr;
+	assert(node);
 
 	if (node->prev) {
 		node->prev->next = nullptr;
