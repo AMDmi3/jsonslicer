@@ -71,11 +71,37 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	PyObject* pattern = nullptr;
 	Py_ssize_t read_size = self->read_size;
 	JsonSlicer::PathMode path_mode = self->path_mode;
+	bool enable_yajl_allow_comments = false;
+	bool enable_yajl_dont_validate_strings = false;
+	bool enable_yajl_allow_trailing_garbage = false;
+	bool enable_yajl_allow_multiple_values = false;
+	bool enable_yajl_allow_partial_values = false;
 
-	static const char* keywords[] = {"file", "path_prefix", "read_size", "path_mode", nullptr};
+	static const char* keywords[] = {
+		"file",
+		"path_prefix",
+		"read_size",
+		"path_mode",
+		"yajl_allow_comments",
+		"yajl_dont_validate_strings",
+		"yajl_allow_trailing_garbage",
+		"yajl_allow_multiple_values",
+		"yajl_allow_partial_values",
+		nullptr
+	};
 
 	const char* path_mode_arg = nullptr;
-	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|$ns", const_cast<char**>(keywords), &io, &pattern, &read_size, &path_mode_arg)) {
+	if (!PyArg_ParseTupleAndKeywords(
+				args, kwargs, "OO|$nsppppp", const_cast<char**>(keywords),
+				&io,
+				&pattern,
+				&read_size,
+				&path_mode_arg,
+				&enable_yajl_allow_comments,
+				&enable_yajl_dont_validate_strings,
+				&enable_yajl_allow_trailing_garbage,
+				&enable_yajl_allow_multiple_values,
+				&enable_yajl_allow_partial_values)) {
 		return -1;
 	}
 
@@ -115,6 +141,37 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	yajl_handle new_yajl = yajl_alloc(&yajl_handlers, nullptr, (void*)self);
 	if (new_yajl == nullptr) {
 		pyobjlist_clear(&new_pattern);
+		return -1;
+	}
+
+	if (enable_yajl_allow_comments && yajl_config(new_yajl, yajl_allow_comments, 1) == 0) {
+		yajl_free(new_yajl);
+		pyobjlist_clear(&new_pattern);
+		PyErr_SetString(PyExc_RuntimeError, "Cannot set yajl_allow_comments");
+		return -1;
+	}
+	if (enable_yajl_dont_validate_strings && yajl_config(new_yajl, yajl_dont_validate_strings, 1) == 0) {
+		yajl_free(new_yajl);
+		pyobjlist_clear(&new_pattern);
+		PyErr_SetString(PyExc_RuntimeError, "Cannot set yajl_dont_validate_strings");
+		return -1;
+	}
+	if (enable_yajl_allow_trailing_garbage && yajl_config(new_yajl, yajl_allow_trailing_garbage, 1) == 0) {
+		yajl_free(new_yajl);
+		pyobjlist_clear(&new_pattern);
+		PyErr_SetString(PyExc_RuntimeError, "Cannot set yajl_allow_trailing_garbage");
+		return -1;
+	}
+	if (enable_yajl_allow_multiple_values && yajl_config(new_yajl, yajl_allow_multiple_values, 1) == 0) {
+		yajl_free(new_yajl);
+		pyobjlist_clear(&new_pattern);
+		PyErr_SetString(PyExc_RuntimeError, "Cannot set yajl_allow_multiple_values");
+		return -1;
+	}
+	if (enable_yajl_allow_partial_values && yajl_config(new_yajl, yajl_allow_partial_values, 1) == 0) {
+		yajl_free(new_yajl);
+		pyobjlist_clear(&new_pattern);
+		PyErr_SetString(PyExc_RuntimeError, "Cannot set yajl_allow_partial_values");
 		return -1;
 	}
 

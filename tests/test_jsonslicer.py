@@ -359,5 +359,14 @@ class TestJsonSlicer(unittest.TestCase):
             ]
         )
 
+    def test_yajl_allow_comments(self):
+        with self.assertRaises(RuntimeError):
+            next(JsonSlicer(io.BytesIO(b'1 // comment'), ()))
+
+        self.assertEqual(
+            next(JsonSlicer(io.BytesIO(b'1 // comment'), (), yajl_allow_comments=True)),
+            1
+        )
+
 if __name__ == '__main__':
     unittest.main()
