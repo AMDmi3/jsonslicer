@@ -361,11 +361,47 @@ class TestJsonSlicer(unittest.TestCase):
 
     def test_yajl_allow_comments(self):
         with self.assertRaises(RuntimeError):
-            next(JsonSlicer(io.BytesIO(b'1 // comment'), ()))
+            list(JsonSlicer(io.BytesIO(b'1 // comment'), ()))
 
         self.assertEqual(
-            next(JsonSlicer(io.BytesIO(b'1 // comment'), (), yajl_allow_comments=True)),
-            1
+            list(JsonSlicer(io.BytesIO(b'1 // comment'), (), yajl_allow_comments=True)),
+            [1]
+        )
+
+    def test_yajl_dont_validate_strings(self):
+        with self.assertRaises(RuntimeError):
+            list(JsonSlicer(io.BytesIO(b'"\xff"'), ()))
+
+        self.assertEqual(
+            list(JsonSlicer(io.BytesIO(b'"\xff"'), (), yajl_dont_validate_strings=True)),
+            [b'\xff']
+        )
+
+    def test_yajl_allow_trailing_garbage(self):
+        with self.assertRaises(RuntimeError):
+            list(JsonSlicer(io.BytesIO(b'{}{}'), ()))
+
+        self.assertEqual(
+            list(JsonSlicer(io.BytesIO(b'{}{}'), (), yajl_allow_trailing_garbage=True)),
+            [{}]
+        )
+
+    def test_yajl_allow_multiple_values(self):
+        with self.assertRaises(RuntimeError):
+            list(JsonSlicer(io.BytesIO(b'{}{}'), ()))
+
+        self.assertEqual(
+            list(JsonSlicer(io.BytesIO(b'{}{}'), (), yajl_allow_multiple_values=True)),
+            [{}, {}]
+        )
+
+    def test_yajl_allow_partial_values(self):
+        with self.assertRaises(RuntimeError):
+            list(JsonSlicer(io.BytesIO(b'[1'), (None,)))
+
+        self.assertEqual(
+            list(JsonSlicer(io.BytesIO(b'[1'), (None,), yajl_allow_partial_values=True)),
+            [1]
         )
 
 if __name__ == '__main__':
