@@ -32,17 +32,15 @@
 #include <Python.h>
 
 // helpers
-static bool path_matches_pattern(PyObject* path, PyObject* pattern) {
-	return pattern == Py_None || PyObject_RichCompareBool(path, pattern, Py_EQ);
-}
-
 bool check_pattern(JsonSlicer* self) {
-	return pyobjlist_match(&self->path, &self->pattern, &path_matches_pattern);
+	return self->path.match(self->pattern, [](PyObject* path, PyObject* pattern) {
+		return pattern == Py_None || PyObject_RichCompareBool(path, pattern, Py_EQ);
+	});
 }
 
 void update_path(JsonSlicer* self) {
-	if (self->path.back && PyMutIndex_Check(self->path.back->obj)) {
-		PyMutIndex_Increment(self->path.back->obj);
+	if (!self->path.empty() && PyMutIndex_Check(self->path.back())) {
+		PyMutIndex_Increment(self->path.back());
 	}
 }
 
@@ -57,7 +55,7 @@ bool finish_complete_object(JsonSlicer* self, PyObject* obj) {
 	}
 
 	// save in list of complete objects
-	if (!pyobjlist_push_back(&self->complete, output)) {
+	if (!self->complete.push_back(output)) {
 		Py_DECREF(output);
 		return false;
 	}

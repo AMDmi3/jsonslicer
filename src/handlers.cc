@@ -45,7 +45,7 @@ template<class T> bool generic_handle_scalar(JsonSlicer* self, T&& make_scalar) 
 		}
 
 		bool res;
-		if (pyobjlist_empty(&self->constructing)) {
+		if (self->constructing.empty()) {
 			res = finish_complete_object(self, scalar);
 		} else {
 			res = add_to_parent(self, scalar);
@@ -70,7 +70,7 @@ bool generic_start_container(JsonSlicer* self, T&& make_container, U&& make_key)
 			if (key == nullptr) {
 				return false;
 			}
-			return pyobjlist_push_back(&self->path, key);
+			return self->path.push_back(key);
 		}
 	}
 	if (self->state == JsonSlicer::State::CONSTRUCTING) {
@@ -79,14 +79,14 @@ bool generic_start_container(JsonSlicer* self, T&& make_container, U&& make_key)
 			return false;
 		}
 
-		if (!pyobjlist_empty(&self->constructing)) {
+		if (!self->constructing.empty()) {
 			if (!add_to_parent(self, container)) {
 				Py_DECREF(container);
 				return false;
 			}
 		}
 
-		if (!pyobjlist_push_back(&self->constructing, container)) {
+		if (!self->constructing.push_back(container)) {
 			Py_DECREF(container);
 			return false;
 		}
@@ -96,15 +96,15 @@ bool generic_start_container(JsonSlicer* self, T&& make_container, U&& make_key)
 
 bool generic_end_container(JsonSlicer* self) {
 	if (self->state == JsonSlicer::State::SEEKING) {
-		PyObject* container = pyobjlist_pop_back(&self->path);
+		PyObject* container = self->path.pop_back();
 		assert(container);
 		Py_DECREF(container);
 		update_path(self);
 	}
 	if (self->state == JsonSlicer::State::CONSTRUCTING) {
-		PyObject* container = pyobjlist_pop_back(&self->constructing);
+		PyObject* container = self->constructing.pop_back();
 
-		if (pyobjlist_empty(&self->constructing)) {
+		if (self->constructing.empty()) {
 			if (!finish_complete_object(self, container)) {
 				Py_DECREF(container);
 				return false;
@@ -177,10 +177,8 @@ int handle_map_key(void* ctx, const unsigned char* str, size_t len) {
 		self->last_map_key = new_map_key;
 		Py_XDECREF(old_map_key);
 	} else {
-		assert(self->path.back && self->path.back->obj);
-
-		PyObject* old_path_tail = self->path.back->obj;
-		self->path.back->obj = new_map_key;
+		PyObject* old_path_tail = self->path.back();
+		self->path.back() = new_map_key;
 		Py_DECREF(old_path_tail);
 	}
 	return true;

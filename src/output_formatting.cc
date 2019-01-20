@@ -30,7 +30,7 @@ PyObject* generate_output_object(JsonSlicer* self, PyObject* obj) {
 		Py_INCREF(obj);
 		return obj;
 	} else if (self->path_mode == JsonSlicer::PathMode::MAP_KEYS) {
-		PyObject* path_last = pyobjlist_back(&self->path);
+		PyObject* path_last = self->path.empty() ? nullptr : self->path.back();
 		if (PyBytes_Check(path_last)) {
 			PyObject* tuple = PyTuple_New(2);
 			if (tuple == nullptr) {
@@ -46,23 +46,23 @@ PyObject* generate_output_object(JsonSlicer* self, PyObject* obj) {
 			return obj;
 		}
 	} else if (self->path_mode == JsonSlicer::PathMode::FULL) {
-		PyObject* tuple = PyTuple_New(pyobjlist_size(&self->path) + 1);
+		PyObject* tuple = PyTuple_New(self->path.size() + 1);
 		if (tuple == nullptr) {
 			return nullptr;
 		}
 
 		size_t tuple_idx = 0;
-		for (PyObjListNode* node = self->path.front; node; node = node->next) {
-			if (PyMutIndex_Check(node->obj)) {
-				PyObject* index = PyMutIndex_AsPyLong(node->obj);
+		for (auto obj: self->path) {
+			if (PyMutIndex_Check(obj)) {
+				PyObject* index = PyMutIndex_AsPyLong(obj);
 				if (index == nullptr) {
 					Py_DECREF(tuple);
 					return nullptr;
 				}
 				PyTuple_SET_ITEM(tuple, tuple_idx++, index);
 			} else {
-				Py_INCREF(node->obj);
-				PyTuple_SET_ITEM(tuple, tuple_idx++, node->obj);
+				Py_INCREF(obj);
+				PyTuple_SET_ITEM(tuple, tuple_idx++, obj);
 			}
 		}
 

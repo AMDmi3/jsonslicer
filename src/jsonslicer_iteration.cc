@@ -32,7 +32,7 @@ JsonSlicer* JsonSlicer_iter(JsonSlicer* self) {
 
 PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 	// return complete objects from previous runs, if any
-	PyObject* complete = pyobjlist_pop_front(&self->complete);
+	PyObject* complete = self->complete.pop_front();
 	if (complete) {
 		return complete;
 	}
@@ -77,7 +77,7 @@ PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 		Py_XDECREF(buffer);
 
 		// return complete object, if any
-		PyObject* complete = pyobjlist_pop_front(&self->complete);
+		PyObject* complete = self->complete.pop_front();
 		if (complete) {
 			return complete;
 		}

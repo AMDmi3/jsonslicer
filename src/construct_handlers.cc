@@ -32,7 +32,7 @@
 
 // helpers
 bool add_to_parent(JsonSlicer* self, PyObject* value) {
-	PyObject* container = self->constructing.back->obj;
+	PyObject* container = self->constructing.back();
 
 	if (PyDict_Check(container)) {
 		if (!PyBytes_Check(self->last_map_key)) {

@@ -25,33 +25,87 @@
 
 #include <Python.h>
 
-struct PyObjListNode {
-	PyObject* obj;
-	struct PyObjListNode* next;
-	struct PyObjListNode* prev;
-};
-
 struct PyObjList {
-	PyObjListNode* front;
-	PyObjListNode* back;
+private:
+	struct Node {
+		PyObject* obj;
+		Node* next;
+		Node* prev;
+	};
+
+public:
+	class iterator {
+	private:
+		Node* node_;
+
+	public:
+		iterator(Node* node) : node_(node) {
+		}
+
+		PyObject* operator*() {
+			return node_->obj;
+		}
+
+		bool operator!=(iterator& other) {
+			return node_ != other.node_;
+		}
+
+		iterator& operator++() {
+			node_ = node_->next;
+			return *this;
+		}
+
+		iterator operator++(int) {
+			iterator tmp(node_);
+			node_ = node_->next;
+			return tmp;
+		}
+	};
+
+private:
+	Node* front_;
+	Node* back_;
+
+public:
+	void init();
+	void clear();
+
+	iterator begin();
+	iterator end();
+
+	size_t size() const;
+	bool empty() const;
+
+	bool push_front(PyObject* obj);
+	bool push_back(PyObject* obj);
+
+	PyObject* pop_front();
+	PyObject* pop_back();
+
+	PyObject*& back() const;
+
+	void swap(PyObjList& other);
+
+	template <class T>
+	bool match(const PyObjList& other, T&& equals) {
+		Node* lnode = front_;
+		Node* rnode = other.front_;
+
+		for (; lnode != nullptr && rnode != nullptr; lnode = lnode->next, rnode = rnode->next) {
+			if (!equals(lnode->obj, rnode->obj)) {
+				return false;
+			}
+		}
+
+		return lnode == nullptr && rnode == nullptr;
+	}
+
+	template <class T>
+	void foreach(T&& func) {
+		for (Node* node = front_; node != nullptr; node = node->next) {
+			func(node->obj);
+		}
+	}
 };
-
-void pyobjlist_init(PyObjList* list);
-void pyobjlist_clear(PyObjList* list);
-
-size_t pyobjlist_size(PyObjList* list);
-bool pyobjlist_empty(PyObjList* list);
-
-bool pyobjlist_push_front(PyObjList* list, PyObject* obj);
-bool pyobjlist_push_back(PyObjList* list, PyObject* obj);
-
-PyObject* pyobjlist_pop_front(PyObjList* list);
-PyObject* pyobjlist_pop_back(PyObjList* list);
-
-PyObject* pyobjlist_back(PyObjList* list);
-
-typedef bool (*PyObjListMatchFunc)(PyObject*, PyObject*);
-
-bool pyobjlist_match(PyObjList* lhs, PyObjList* rhs, PyObjListMatchFunc compare);
 
 #endif
