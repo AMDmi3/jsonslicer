@@ -141,6 +141,7 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	yajl_handle new_yajl = yajl_alloc(&yajl_handlers, nullptr, (void*)self);
 	if (new_yajl == nullptr) {
 		pyobjlist_clear(&new_pattern);
+		PyErr_SetString(PyExc_RuntimeError, "Cannot allocate YAJL handle");
 		return -1;
 	}
 
