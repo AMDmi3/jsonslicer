@@ -154,7 +154,7 @@ class TestJsonSlicer(unittest.TestCase):
         self.assertEqual(next(JsonSlicer(io.BytesIO(b'[]'), ())), [])
         self.assertEqual(next(JsonSlicer(io.BytesIO(b'{}'), ())), {})
 
-    def test_types(self):
+    def test_types_outer(self):
         data = [
             0,
             10000000,
@@ -166,6 +166,24 @@ class TestJsonSlicer(unittest.TestCase):
             False,
             [],
             {},
+        ]
+
+        cases = {(idx,): [(idx, value)] for idx, value in enumerate(data)}
+
+        self.run_checks(data, cases)
+
+    def test_types_inner(self):
+        data = [
+            [0],
+            [10000000],
+            [-10000000],
+            [0.3],
+            ['string'],
+            [None],
+            [True],
+            [False],
+            [[]],
+            [{}],
         ]
 
         cases = {(idx,): [(idx, value)] for idx, value in enumerate(data)}
