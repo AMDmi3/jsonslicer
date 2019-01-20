@@ -32,7 +32,7 @@ before_script:
         export CFLAGS="$CFLAGS -O0 -g --coverage"
         export LDFLAGS="$LDFLAGS --coverage"
     fi
-  - export CFLAGS="$CFLAGS -Wall -Wextra -Werror"
+  - export CFLAGS="$CFLAGS -UNDEBUG -Wall -Wextra -Werror"
   - export CC="$CXX"  # pydistutils brokenness
 script:
   - |-
