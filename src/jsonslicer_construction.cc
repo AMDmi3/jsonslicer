@@ -35,6 +35,8 @@ PyObject* JsonSlicer_new(PyTypeObject* type, PyObject*, PyObject*) {
 		new(&self->io) PyObjPtr();
 		self->read_size = 1024;  // XXX: bump somewhat for production use
 		self->path_mode = JsonSlicer::PathMode::IGNORE;
+		new(&self->input_encoding) PyObjPtr();
+		new(&self->input_errors) PyObjPtr();
 
 		self->yajl = nullptr;
 
@@ -62,6 +64,10 @@ void JsonSlicer_dealloc(JsonSlicer* self) {
 		self->yajl = nullptr;
 		yajl_free(tmp);
 	}
+
+	self->input_errors.~PyObjPtr();
+	self->input_encoding.~PyObjPtr();
+
 	self->io.~PyObjPtr();
 
 	Py_TYPE(self)->tp_free((PyObject*)self);
@@ -177,6 +183,37 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 		return -1;
 	}
 
+	// get input encodings
+	PyObjPtr input_encoding;
+	if (PyObject_HasAttrString(io, "encoding")) {
+		input_encoding = PyObjPtr::Take(PyObject_GetAttrString(io, "encoding"));
+		if (!input_encoding) {
+			return -1;
+		}
+	}
+	if (!input_encoding || input_encoding.get() == Py_None) {
+		// XXX: should actually call locale.getpreferredencoding() here!
+		// however for now go with utf-8
+		input_encoding = PyObjPtr::Take(PyUnicode_FromString("UTF-8"));
+	}
+	if (!input_encoding) {
+		return -1;
+	}
+
+	PyObjPtr input_errors;
+	if (PyObject_HasAttrString(io, "errors")) {
+		input_errors = PyObjPtr::Take(PyObject_GetAttrString(io, "errors"));
+		if (!input_errors) {
+			return -1;
+		}
+	}
+	if (!input_errors || input_errors.get() == Py_None) {
+		input_errors = PyObjPtr::Take(PyUnicode_FromString("strict"));
+	}
+	if (!input_encoding) {
+		return -1;
+	}
+
 	// swap initialized members with new ones, clearing the rest
 	self->complete.clear();
 
@@ -201,6 +238,8 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 		}
 	}
 
+	self->input_errors = input_errors;
+	self->input_encoding = input_encoding;
 	self->path_mode = path_mode;
 	self->read_size = read_size;
 

@@ -46,6 +46,19 @@ PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 		if (!buffer) {
 			return nullptr;
 		}
+		if (PyUnicode_Check(buffer.get())) {
+			PyObjPtr encoded = PyObjPtr::Take(
+				PyUnicode_AsEncodedString(
+					buffer.get(),
+					PyUnicode_AsUTF8(self->input_encoding.get()),
+					PyUnicode_AsUTF8(self->input_errors.get())
+				)
+			);
+			if (!encoded) {
+				return nullptr;
+			}
+			buffer = encoded;
+		}
 		if (!PyBytes_Check(buffer.get())) {
 			PyErr_Format(PyExc_RuntimeError, "Unexpected read result type %s, expected bytes", buffer.get()->ob_type->tp_name);
 			return nullptr;

@@ -47,6 +47,8 @@ struct JsonSlicer {
 	PyObjPtr io;
 	Py_ssize_t read_size;
 	PathMode path_mode;
+	PyObjPtr input_encoding;
+	PyObjPtr input_errors;
 
 	// YAJL handle
 	yajl_handle yajl;
