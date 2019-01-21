@@ -56,29 +56,35 @@ def deep_decode(obj, encoding):
 
 class TestJsonSlicer(unittest.TestCase):
     def run_checks(self, data, cases):
-        json_bytes = json.dumps(data).encode('utf-8')
+        json_bytes = json.dumps(data)
 
         for path, expected in cases.items():
-            pseudofile = io.BytesIO(json_bytes)
+            pseudofile = io.StringIO(json_bytes)
             slicer = JsonSlicer(pseudofile, deep_encode(path, 'utf-8'), path_mode='full')
             results = deep_decode(list(slicer), 'utf-8')
 
             self.assertEqual(results, expected)
 
+    def test_accepts_bytes(self):
+        self.assertEqual(next(JsonSlicer(io.BytesIO(b'0'), ())), 0)
+
+    def test_accepts_unicode(self):
+        self.assertEqual(next(JsonSlicer(io.StringIO('0'), ())), 0)
+
     def test_just_next(self):
-        self.assertIsNotNone(next(JsonSlicer(io.BytesIO(b'0'), ())))
+        self.assertIsNotNone(next(JsonSlicer(io.StringIO('0'), ())))
 
     def test_root_elems(self):
-        self.assertEqual(next(JsonSlicer(io.BytesIO(b'0'), ())), 0)
-        self.assertEqual(next(JsonSlicer(io.BytesIO(b'1000000'), ())), 1000000)
-        self.assertEqual(next(JsonSlicer(io.BytesIO(b'-1000000'), ())), -1000000)
-        self.assertEqual(next(JsonSlicer(io.BytesIO(b'0.3'), ())), 0.3)
-        self.assertEqual(next(JsonSlicer(io.BytesIO(b'"string"'), ())), b'string')
-        self.assertEqual(next(JsonSlicer(io.BytesIO(b'null'), ())), None)
-        self.assertEqual(next(JsonSlicer(io.BytesIO(b'true'), ())), True)
-        self.assertEqual(next(JsonSlicer(io.BytesIO(b'false'), ())), False)
-        self.assertEqual(next(JsonSlicer(io.BytesIO(b'[]'), ())), [])
-        self.assertEqual(next(JsonSlicer(io.BytesIO(b'{}'), ())), {})
+        self.assertEqual(next(JsonSlicer(io.StringIO('0'), ())), 0)
+        self.assertEqual(next(JsonSlicer(io.StringIO('1000000'), ())), 1000000)
+        self.assertEqual(next(JsonSlicer(io.StringIO('-1000000'), ())), -1000000)
+        self.assertEqual(next(JsonSlicer(io.StringIO('0.3'), ())), 0.3)
+        self.assertEqual(next(JsonSlicer(io.StringIO('"string"'), ())), b'string')
+        self.assertEqual(next(JsonSlicer(io.StringIO('null'), ())), None)
+        self.assertEqual(next(JsonSlicer(io.StringIO('true'), ())), True)
+        self.assertEqual(next(JsonSlicer(io.StringIO('false'), ())), False)
+        self.assertEqual(next(JsonSlicer(io.StringIO('[]'), ())), [])
+        self.assertEqual(next(JsonSlicer(io.StringIO('{}'), ())), {})
 
     def test_types_outer(self):
         data = [
@@ -305,10 +311,10 @@ class TestJsonSlicer(unittest.TestCase):
 
     def test_yajl_allow_comments(self):
         with self.assertRaises(RuntimeError):
-            list(JsonSlicer(io.BytesIO(b'1 // comment'), ()))
+            list(JsonSlicer(io.StringIO('1 // comment'), ()))
 
         self.assertEqual(
-            list(JsonSlicer(io.BytesIO(b'1 // comment'), (), yajl_allow_comments=True)),
+            list(JsonSlicer(io.StringIO('1 // comment'), (), yajl_allow_comments=True)),
             [1]
         )
 
@@ -323,28 +329,28 @@ class TestJsonSlicer(unittest.TestCase):
 
     def test_yajl_allow_trailing_garbage(self):
         with self.assertRaises(RuntimeError):
-            list(JsonSlicer(io.BytesIO(b'{}{}'), ()))
+            list(JsonSlicer(io.StringIO('{}{}'), ()))
 
         self.assertEqual(
-            list(JsonSlicer(io.BytesIO(b'{}{}'), (), yajl_allow_trailing_garbage=True)),
+            list(JsonSlicer(io.StringIO('{}{}'), (), yajl_allow_trailing_garbage=True)),
             [{}]
         )
 
     def test_yajl_allow_multiple_values(self):
         with self.assertRaises(RuntimeError):
-            list(JsonSlicer(io.BytesIO(b'{}{}'), ()))
+            list(JsonSlicer(io.StringIO('{}{}'), ()))
 
         self.assertEqual(
-            list(JsonSlicer(io.BytesIO(b'{}{}'), (), yajl_allow_multiple_values=True)),
+            list(JsonSlicer(io.StringIO('{}{}'), (), yajl_allow_multiple_values=True)),
             [{}, {}]
         )
 
     def test_yajl_allow_partial_values(self):
         with self.assertRaises(RuntimeError):
-            list(JsonSlicer(io.BytesIO(b'[1'), (None,)))
+            list(JsonSlicer(io.StringIO('[1'), (None,)))
 
         self.assertEqual(
-            list(JsonSlicer(io.BytesIO(b'[1'), (None,), yajl_allow_partial_values=True)),
+            list(JsonSlicer(io.StringIO('[1'), (None,), yajl_allow_partial_values=True)),
             [1]
         )
 
