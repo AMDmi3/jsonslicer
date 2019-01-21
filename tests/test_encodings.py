@@ -23,6 +23,9 @@ import unittest
 from .common import runJS
 
 
+SKIP_MISMATCHING_PATH_ENCODING = False
+
+
 class TestJsonSlicerEncodings(unittest.TestCase):
     def test_encodings_bytes_unicode_default(self):
         self.assertEqual(
@@ -36,9 +39,10 @@ class TestJsonSlicerEncodings(unittest.TestCase):
             ['bar']
         )
 
+    @unittest.skipIf(SKIP_MISMATCHING_PATH_ENCODING, 'Tests for mismatching path encoding skipped')
     def test_encodings_bytes_unicode_binary(self):
         self.assertEqual(
-            runJS(b'{"foo":"bar"}', (b'foo',), binary=True),
+            runJS(b'{"foo":"bar"}', ('foo',), binary=True),
             [b'bar']
         )
 
@@ -54,21 +58,24 @@ class TestJsonSlicerEncodings(unittest.TestCase):
             ['bar']
         )
 
+    @unittest.skipIf(SKIP_MISMATCHING_PATH_ENCODING, 'Tests for mismatching path encoding skipped')
     def test_encodings_unicode_unicode_binary(self):
         self.assertEqual(
-            runJS('{"foo":"bar"}', (b'foo',), binary=True),
+            runJS('{"foo":"bar"}', ('foo',), binary=True),
             [b'bar']
         )
 
+    @unittest.skipIf(SKIP_MISMATCHING_PATH_ENCODING, 'Tests for mismatching path encoding skipped')
     def test_encodings_bytes_bytes_default(self):
         self.assertEqual(
-            runJS(b'{"foo":"bar"}', ('foo',)),
+            runJS(b'{"foo":"bar"}', (b'foo',)),
             ['bar']
         )
 
+    @unittest.skipIf(SKIP_MISMATCHING_PATH_ENCODING, 'Tests for mismatching path encoding skipped')
     def test_encodings_bytes_bytes_unicode(self):
         self.assertEqual(
-            runJS(b'{"foo":"bar"}', ('foo',), encoding='utf-8'),
+            runJS(b'{"foo":"bar"}', (b'foo',), encoding='utf-8'),
             ['bar']
         )
 
@@ -78,15 +85,17 @@ class TestJsonSlicerEncodings(unittest.TestCase):
             [b'bar']
         )
 
+    @unittest.skipIf(SKIP_MISMATCHING_PATH_ENCODING, 'Tests for mismatching path encoding skipped')
     def test_encodings_unicode_bytes_default(self):
         self.assertEqual(
-            runJS('{"foo":"bar"}', ('foo',)),
+            runJS('{"foo":"bar"}', (b'foo',)),
             ['bar']
         )
 
+    @unittest.skipIf(SKIP_MISMATCHING_PATH_ENCODING, 'Tests for mismatching path encoding skipped')
     def test_encodings_unicode_bytes_unicode(self):
         self.assertEqual(
-            runJS('{"foo":"bar"}', ('foo',), encoding='utf-8'),
+            runJS('{"foo":"bar"}', (b'foo',), encoding='utf-8'),
             ['bar']
         )
 

@@ -23,6 +23,7 @@
 #include "jsonslicer.hh"
 
 #include "handlers.hh"
+#include "encoding.hh"
 
 #include <Python.h>
 #include <yajl/yajl_parse.h>
@@ -177,18 +178,16 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	PyObjPtr output_encoding;
 	PyObjPtr output_errors;
 
-	if (!binary) {
-		if (encoding && PyUnicode_Check(encoding)) {
-			output_encoding = PyObjPtr::Borrow(encoding);
-		} else {
-			output_encoding = input_encoding;
-		}
+	if (encoding && PyUnicode_Check(encoding)) {
+		output_encoding = PyObjPtr::Borrow(encoding);
+	} else {
+		output_encoding = input_encoding;
+	}
 
-		if (errors && PyUnicode_Check(errors)) {
-			output_errors = PyObjPtr::Borrow(errors);
-		} else {
-			output_errors = input_errors;
-		}
+	if (errors && PyUnicode_Check(errors)) {
+		output_errors = PyObjPtr::Borrow(errors);
+	} else {
+		output_errors = input_errors;
 	}
 
 	// prepare all new data members
@@ -197,7 +196,14 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 
 	for (Py_ssize_t i = 0; i < PySequence_Size(pattern); i++) {
 		PyObjPtr item = PyObjPtr::Take(PySequence_GetItem(pattern, i));
-		if (!item.valid()) {
+		if (item) {
+			if (binary) {
+				item = encode(item, output_encoding, output_errors);
+			} else {
+				item = decode(item, output_encoding, output_errors);
+			}
+		}
+		if (!item) {
 			new_pattern.clear();
 			return -1;
 		}
@@ -269,8 +275,13 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 		}
 	}
 
-	self->output_errors = output_errors;
-	self->output_encoding = output_encoding;
+	if (binary) {
+		self->output_errors = {};
+		self->output_encoding = {};
+	} else {
+		self->output_errors = output_errors;
+		self->output_encoding = output_encoding;
+	}
 	self->input_errors = input_errors;
 	self->input_encoding = input_encoding;
 	self->path_mode = path_mode;
