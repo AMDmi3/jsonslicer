@@ -32,7 +32,7 @@
 PyObject* JsonSlicer_new(PyTypeObject* type, PyObject*, PyObject*) {
 	JsonSlicer* self = (JsonSlicer*)type->tp_alloc(type, 0);
 	if (self != nullptr) {
-		self->io = nullptr;
+		new(&self->io) PyObjPtr();
 		self->read_size = 1024;  // XXX: bump somewhat for production use
 		self->path_mode = JsonSlicer::PathMode::IGNORE;
 
@@ -62,7 +62,7 @@ void JsonSlicer_dealloc(JsonSlicer* self) {
 		self->yajl = nullptr;
 		yajl_free(tmp);
 	}
-	Py_CLEAR(self->io);
+	self->io.~PyObjPtr();
 
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
@@ -177,8 +177,6 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 		return -1;
 	}
 
-	Py_INCREF(io);
-
 	// swap initialized members with new ones, clearing the rest
 	self->complete.clear();
 
@@ -206,11 +204,7 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	self->path_mode = path_mode;
 	self->read_size = read_size;
 
-	{
-		PyObject* tmp = self->io;
-		self->io = io;
-		Py_XDECREF(tmp);
-	}
+	self->io = PyObjPtr::Borrow(io);
 
 	return 0;
 }

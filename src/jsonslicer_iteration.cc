@@ -40,7 +40,7 @@ PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 
 	do {
 		// read chunk of data from IO
-		PyObjPtr buffer = PyObjPtr::Take(PyObject_CallMethod(self->io, "read", "n", self->read_size));
+		PyObjPtr buffer = PyObjPtr::Take(PyObject_CallMethod(self->io.get(), "read", "n", self->read_size));
 
 		// handle i/o errors
 		if (!buffer) {

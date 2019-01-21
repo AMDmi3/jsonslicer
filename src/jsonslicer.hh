@@ -44,7 +44,7 @@ struct JsonSlicer {
 	PyObject_HEAD
 
 	// arguments
-	PyObject* io;
+	PyObjPtr io;
 	Py_ssize_t read_size;
 	PathMode path_mode;
 
