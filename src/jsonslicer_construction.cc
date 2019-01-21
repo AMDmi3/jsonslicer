@@ -71,11 +71,11 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	PyObject* pattern = nullptr;
 	Py_ssize_t read_size = self->read_size;
 	JsonSlicer::PathMode path_mode = self->path_mode;
-	bool enable_yajl_allow_comments = false;
-	bool enable_yajl_dont_validate_strings = false;
-	bool enable_yajl_allow_trailing_garbage = false;
-	bool enable_yajl_allow_multiple_values = false;
-	bool enable_yajl_allow_partial_values = false;
+	int enable_yajl_allow_comments = false;
+	int enable_yajl_dont_validate_strings = false;
+	int enable_yajl_allow_trailing_garbage = false;
+	int enable_yajl_allow_multiple_values = false;
+	int enable_yajl_allow_partial_values = false;
 
 	static const char* keywords[] = {
 		"file",
