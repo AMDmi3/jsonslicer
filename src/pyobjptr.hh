@@ -96,7 +96,9 @@ public:
 
 public:
 	static PyObjPtr Borrow(PyObject* obj) noexcept {
-		Py_INCREF(obj);
+		if (obj != nullptr) {
+			Py_INCREF(obj);
+		}
 		return PyObjPtr(obj);
 	}
 
