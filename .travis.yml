@@ -8,8 +8,7 @@ matrix:
     - python: 3.6
       env: CXX=g++-7 PACKAGES=g++-7
     - python: 3.6
-      compiler: clang
-      env: CXX=clang
+      env: CXX=clang++
     - python: 3.6
       env: CXX=g++ ASAN=yes
     - python: 3.6
