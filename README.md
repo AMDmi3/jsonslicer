@@ -179,11 +179,11 @@ comprehensions or in any place where iterator is accepted.
 The closest competitor is [ijson](https://github.com/isagalaev/ijson),
 and JsonSlicer was written to be better. Namely,
 
-* It's about 10x faster, pretty close to Python's native `json` module
+* It's about 15x faster, similar in performance to Python's native `json` module
 * It allows iterating over dictionaries and allows more flexibility when
   specifying paths/patterns of objects to iterate over
 
-The results of bundled benchmark on Python 3.7 / clang 6.0.1 / -O2 -DNODEBUG / FreeBSD 12.0 amd64 / Core i7-6600U CPU @ 2.60GHz.
+The results of bundled benchmark on Python 3.7 / clang 6.0.1 / `-O2 -DNODEBUG` / FreeBSD 12.0 amd64 / Core i7-6600U CPU @ 2.60GHz.
 
 | Facility                    | Type   | Objects/sec   |
 |:----------------------------|:------:|--------------:|
