@@ -56,6 +56,18 @@ public:
 		return *this;
 	}
 
+	PyObjPtr(PyObjPtr&& other) noexcept: obj_(other.obj_) {
+		other.obj_ = nullptr;
+	}
+
+	PyObjPtr& operator=(PyObjPtr&& other) noexcept {
+		PyObject* tmp = obj_;
+		obj_ = other.obj_;
+		other.obj_ = nullptr;
+		Py_XDECREF(tmp);
+		return *this;
+	}
+
 	PyObject* release() noexcept {
 		assert(obj_);
 		PyObject* tmp = obj_;
