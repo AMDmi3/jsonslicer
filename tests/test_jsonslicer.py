@@ -60,8 +60,8 @@ class TestJsonSlicer(unittest.TestCase):
 
         for path, expected in cases.items():
             pseudofile = io.StringIO(json_bytes)
-            slicer = JsonSlicer(pseudofile, deep_encode(path, 'utf-8'), path_mode='full')
-            results = deep_decode(list(slicer), 'utf-8')
+            slicer = JsonSlicer(pseudofile, path, path_mode='full')
+            results = list(slicer)
 
             self.assertEqual(results, expected)
 
@@ -254,7 +254,7 @@ class TestJsonSlicer(unittest.TestCase):
         self.run_checks(data, cases)
 
     def test_examples(self):
-        data = b"""
+        data = """
         {
             "people": [
                 {"name": "John", "age": 31},
@@ -263,19 +263,19 @@ class TestJsonSlicer(unittest.TestCase):
             ]
         }"""
 
-        for person in JsonSlicer(io.BytesIO(data), (b'people', None)):
+        for person in JsonSlicer(io.StringIO(data), ('people', None)):
             pass
 
         self.assertEqual(person['name'], 'Angela')
 
-        person in JsonSlicer(io.BytesIO(data), (b'people', 2))
+        person in JsonSlicer(io.StringIO(data), ('people', 2))
         self.assertEqual(person['name'], 'Angela')
 
-        max_age = max(JsonSlicer(io.BytesIO(data), (b'people', None, b'age')))
+        max_age = max(JsonSlicer(io.StringIO(data), ('people', None, 'age')))
         self.assertEqual(max_age, 33)
 
     def test_output_formats(self):
-        data = b"""
+        data = """
         {
             "a":{
                 "b":1
@@ -286,7 +286,7 @@ class TestJsonSlicer(unittest.TestCase):
         }"""
 
         self.assertEqual(
-            list(JsonSlicer(io.BytesIO(data), (None, None), path_mode='ignore')),
+            list(JsonSlicer(io.StringIO(data), (None, None), path_mode='ignore')),
             [
                 1,
                 2
@@ -294,7 +294,7 @@ class TestJsonSlicer(unittest.TestCase):
         )
 
         self.assertEqual(
-            list(JsonSlicer(io.BytesIO(data), (None, None), path_mode='map_keys')),
+            list(JsonSlicer(io.StringIO(data), (None, None), path_mode='map_keys')),
             [
                 ('b',1),
                 2
@@ -302,7 +302,7 @@ class TestJsonSlicer(unittest.TestCase):
         )
 
         self.assertEqual(
-            list(JsonSlicer(io.BytesIO(data), (None, None), path_mode='full')),
+            list(JsonSlicer(io.StringIO(data), (None, None), path_mode='full')),
             [
                 ('a', 'b', 1),
                 ('c', 0, 2)
@@ -320,10 +320,10 @@ class TestJsonSlicer(unittest.TestCase):
 
     def test_yajl_dont_validate_strings(self):
         with self.assertRaises(RuntimeError):
-            list(JsonSlicer(io.BytesIO(b'"\xff"'), (), encoding=None))
+            list(JsonSlicer(io.BytesIO(b'"\xff"'), (), binary=True))
 
         self.assertEqual(
-            list(JsonSlicer(io.BytesIO(b'"\xff"'), (), encoding=None, yajl_dont_validate_strings=True)),
+            list(JsonSlicer(io.BytesIO(b'"\xff"'), (), binary=True, yajl_dont_validate_strings=True)),
             [b'\xff']
         )
 

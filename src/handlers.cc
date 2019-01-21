@@ -158,15 +158,14 @@ int handle_map_key(void* ctx, const unsigned char* str, size_t len) {
 	JsonSlicer* self = (JsonSlicer*)ctx;
 
 	PyObjPtr key = PyObjPtr::Take(PyBytes_FromStringAndSize(reinterpret_cast<const char*>(str), len));
+	if (key) {
+		key = convert_to_output_encoding(self, key);
+	}
 	if (!key.valid()) {
 		return false;
 	}
 
 	if (self->state == JsonSlicer::State::CONSTRUCTING) {
-		key = convert_to_output_encoding(self, key);
-		if (!key) {
-			return false;
-		}
 		self->last_map_key = key;
 	} else {
 		self->path.back() = key;

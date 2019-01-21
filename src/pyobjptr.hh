@@ -45,12 +45,16 @@ public:
 	}
 
 	PyObjPtr(const PyObjPtr& other) noexcept: obj_(other.obj_) {
-		Py_INCREF(obj_);
+		if (other.obj_ != nullptr) {
+			Py_INCREF(obj_);
+		}
 	}
 
 	PyObjPtr& operator=(const PyObjPtr& other) noexcept {
 		PyObject* tmp = obj_;
-		Py_INCREF(other.obj_);
+		if (other.obj_ != nullptr) {
+			Py_INCREF(other.obj_);
+		}
 		obj_ = other.obj_;
 		Py_XDECREF(tmp);
 		return *this;

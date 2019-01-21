@@ -90,6 +90,7 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	int enable_yajl_allow_partial_values = false;
 	PyObject* encoding = nullptr;
 	PyObject* errors = nullptr;
+	int binary = false;
 
 	static const char* keywords[] = {
 		"file",
@@ -103,12 +104,13 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 		"yajl_allow_partial_values",
 		"encoding",
 		"errors",
+		"binary",
 		nullptr
 	};
 
 	const char* path_mode_arg = nullptr;
 	if (!PyArg_ParseTupleAndKeywords(
-			args, kwargs, "OO|$nspppppOO", const_cast<char**>(keywords),
+			args, kwargs, "OO|$nspppppOOp", const_cast<char**>(keywords),
 			&io,
 			&pattern,
 			&read_size,
@@ -119,7 +121,8 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 			&enable_yajl_allow_multiple_values,
 			&enable_yajl_allow_partial_values,
 			&encoding,
-			&errors
+			&errors,
+			&binary
 		)) {
 		return -1;
 	}
@@ -139,6 +142,54 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 
 	assert(io != nullptr);
 	assert(pattern != nullptr);
+
+	// set up encodings
+	PyObjPtr input_encoding;
+	if (PyObject_HasAttrString(io, "encoding")) {
+		input_encoding = PyObjPtr::Take(PyObject_GetAttrString(io, "encoding"));
+		if (!input_encoding) {
+			return -1;
+		}
+	}
+	if (!input_encoding || input_encoding.get() == Py_None) {
+		// XXX: should actually call locale.getpreferredencoding() here!
+		// however for now go with utf-8
+		input_encoding = PyObjPtr::Take(PyUnicode_FromString("UTF-8"));
+	}
+	if (!input_encoding) {
+		return -1;
+	}
+
+	PyObjPtr input_errors;
+	if (PyObject_HasAttrString(io, "errors")) {
+		input_errors = PyObjPtr::Take(PyObject_GetAttrString(io, "errors"));
+		if (!input_errors) {
+			return -1;
+		}
+	}
+	if (!input_errors || input_errors.get() == Py_None) {
+		input_errors = PyObjPtr::Take(PyUnicode_FromString("strict"));
+	}
+	if (!input_encoding) {
+		return -1;
+	}
+
+	PyObjPtr output_encoding;
+	PyObjPtr output_errors;
+
+	if (!binary) {
+		if (encoding && PyUnicode_Check(encoding)) {
+			output_encoding = PyObjPtr::Borrow(encoding);
+		} else {
+			output_encoding = input_encoding;
+		}
+
+		if (errors && PyUnicode_Check(errors)) {
+			output_errors = PyObjPtr::Borrow(errors);
+		} else {
+			output_errors = input_errors;
+		}
+	}
 
 	// prepare all new data members
 	PyObjList new_pattern;
@@ -194,37 +245,6 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 		return -1;
 	}
 
-	// get input encodings
-	PyObjPtr input_encoding;
-	if (PyObject_HasAttrString(io, "encoding")) {
-		input_encoding = PyObjPtr::Take(PyObject_GetAttrString(io, "encoding"));
-		if (!input_encoding) {
-			return -1;
-		}
-	}
-	if (!input_encoding || input_encoding.get() == Py_None) {
-		// XXX: should actually call locale.getpreferredencoding() here!
-		// however for now go with utf-8
-		input_encoding = PyObjPtr::Take(PyUnicode_FromString("UTF-8"));
-	}
-	if (!input_encoding) {
-		return -1;
-	}
-
-	PyObjPtr input_errors;
-	if (PyObject_HasAttrString(io, "errors")) {
-		input_errors = PyObjPtr::Take(PyObject_GetAttrString(io, "errors"));
-		if (!input_errors) {
-			return -1;
-		}
-	}
-	if (!input_errors || input_errors.get() == Py_None) {
-		input_errors = PyObjPtr::Take(PyUnicode_FromString("strict"));
-	}
-	if (!input_encoding) {
-		return -1;
-	}
-
 	// swap initialized members with new ones, clearing the rest
 	self->complete.clear();
 
@@ -249,18 +269,8 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 		}
 	}
 
-	if (encoding && PyUnicode_Check(encoding)) {
-		self->output_encoding = PyObjPtr::Borrow(encoding);
-	} else if (encoding != Py_None) {
-		self->output_encoding = input_encoding;
-	}
-
-	if (errors && PyUnicode_Check(errors)) {
-		self->output_errors = PyObjPtr::Borrow(errors);
-	} else {
-		self->output_errors = input_errors;  // always set
-	}
-
+	self->output_errors = output_errors;
+	self->output_encoding = output_encoding;
 	self->input_errors = input_errors;
 	self->input_encoding = input_encoding;
 	self->path_mode = path_mode;

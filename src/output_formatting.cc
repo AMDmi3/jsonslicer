@@ -43,7 +43,7 @@ PyObjPtr generate_output_object(JsonSlicer* self, PyObjPtr obj) {
 	if (self->path_mode == JsonSlicer::PathMode::IGNORE) {
 		return obj;
 	} else if (self->path_mode == JsonSlicer::PathMode::MAP_KEYS) {
-		if (self->path.empty() || !PyBytes_Check(self->path.back().get())) {
+		if (self->path.empty() || (!PyBytes_Check(self->path.back().get()) && !PyUnicode_Check(self->path.back().get()))) {
 			return obj;
 		} else {
 			PyObjPtr tuple = PyObjPtr::Take(PyTuple_New(2));
