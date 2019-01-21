@@ -41,54 +41,69 @@ Python objects.
 from jsonslicer import JsonSlicer
 
 # Extract specific elements:
-with open('people.json', 'b') as data:
-    ivans_age = next(JsonSlicer(data, (b'friends', 1, b'age')))
+with open('people.json') as data:
+    ivans_age = next(JsonSlicer(data, ('friends', 1, 'age')))
+	# 26
 
-with open('people.json', 'b') as data:
-    managers_name = next(JsonSlicer(data, (b'collegues', b'manager', b'name')))
+with open('people.json') as data:
+    managers_name = next(JsonSlicer(data, ('colleagues', 'manager', 'name')))
+	# 'Jack'
 
 # Iterate over collection(s) by using wildcards in the path:
-with open('people.json', 'b') as data:
-    for person in JsonSlicer(data, (b"friends", None)):
+with open('people.json') as data:
+    for person in JsonSlicer(data, ('friends', None)):
         print(person)
-        # {b'name': b'John', b'age': 31}
-        # {b'name': b'Ivan', b'age': 26}
+        # {'name': 'John', 'age': 31}
+        # {'name': 'Ivan', 'age': 26}
 
-# Uniform iteration is possible
-with open('people.json', 'b') as data:
+# Iteration over both arrays and dicts is possible, even at the same time
+with open('people.json') as data:
     for person in JsonSlicer(data, (None, None)):
         print(person)
-        # {b'name': b'John', b'age': 31}
-        # {b'name': b'Ivan', b'age': 26}
-        # {b'name': b'Jack', b'age': 33}
-        # {b'name': b'Lucy', b'age': 21}
+        # {'name': 'John', 'age': 31}
+        # {'name': 'Ivan', 'age': 26}
+        # {'name': 'Jack', 'age': 33}
+        # {'name': 'Lucy', 'age': 21}
 
 # Map key of returned objects is available on demand...
-with open('people.json', 'b') as data:
-    for position, person in JsonSlicer(data, ('colleagues', None), path_format='map_keys'):
+with open('people.json') as data:
+    for position, person in JsonSlicer(data, ('colleagues', None), path_mode='map_keys'):
         print(position, person)
-        # b'manager' {b'name': b'Jack', b'age': 33}
-        # b'subordinate' {b'name': b'Lucy', b'age': 21}
+        # 'manager' {'name': 'Jack', 'age': 33}
+        # 'subordinate' {'name': 'Lucy', 'age': 21}
 
 # ...as well as complete path information
-with open('people.json', 'b') as data:
+with open('people.json') as data:
     for person in JsonSlicer(data, (None, None), path_format='full'):
         print(person)
-        # (b'friends', 0, {b'name': b'John', b'age': 31})
-        # (b'friends', 1, {b'name': b'Ivan', b'age': 26})
-        # (b'colleagues', b'manager', {b'name': b'Jack', b'age': 33})
-        # (b'colleagues', b'subordinate', {b'name': b'Lucy', b'age': 21})
+        # ('friends', 0, {'name': 'John', 'age': 31})
+        # ('friends', 1, {'name': 'Ivan', 'age': 26})
+        # ('colleagues', 'manager', {'name': 'Jack', 'age': 33})
+        # ('colleagues', 'subordinate', {'name': 'Lucy', 'age': 21})
 
 # Extract all instances of deep nested field
-with open('people.json', 'b') as data:
-    max_age = max(JsonSlicer(data, (b'people', None, b'age')))
-    # 33
+with open('people.json') as data:
+    age_sum = sum(JsonSlicer(data, (None, None, 'age')))
+    # 111
 ```
 
 ## API
 
 ```
-jsonslicer.JsonSlicer(file, path_prefix, read_size=1024, path_mode=None)
+jsonslicer.JsonSlicer(
+	file,
+	path_prefix,
+	read_size=1024,
+	path_mode=None,
+	yajl_allow_comments=False,
+	yajl_dont_validate_strings=False,
+	yajl_allow_trailing_garbage=False,
+	yajl_allow_multiple_values=False,
+	yajl_allow_partial_values=False,
+	encoding=None,
+	errors=None,
+	binary=False,
+)
 ```
 
 Constructs iterative JSON parser which reads JSON data from _file_ (a `.read()`-supporting [file-like object](https://docs.python.org/3/glossary.html#term-file-like-object) containing a JSON document).
@@ -97,7 +112,7 @@ _path_prefix_ is an iterable (usually a list or a tuple) specifying
 a path or a path pattern of objects which the parser should extract
 from JSON.
 
-For instance, in the example above a path `(b'friends', 0, b'name')`
+For instance, in the example above a path `('friends', 0, 'name')`
 will yield string `'John'`, by descending from the root element
 into the dictionary element by key `'friends'`, then into the array
 element by index `0`, then into the dictionary element by key
@@ -117,13 +132,13 @@ return path information along with objects. The following modes are
 supported:
 
 * _'ignore'_ (the default) - do not output any path information, just
-objects as is (`b'friends'`).
+objects as is (`'friends'`).
 
   ```python
-  {b'name': b'John', b'age': 31}
-  {b'name': b'Ivan', b'age': 26}
-  {b'name': b'Jack', b'age': 33}
-  {b'name': b'Lucy', b'age': 21}
+  {'name': 'John', 'age': 31}
+  {'name': 'Ivan', 'age': 26}
+  {'name': 'Jack', 'age': 33}
+  {'name': 'Lucy', 'age': 21}
   ```
 
   Common usage pattern for this mode is
@@ -136,10 +151,10 @@ objects as is (`b'friends'`).
 consisting of map key and object when traversing maps.
 
   ```python
-  {b'name': b'John', b'age': 31}
-  {b'name': b'Ivan', b'age': 26}
-  (b'manager', {b'name': b'Jack', b'age': 33})
-  (b'subordinate', {b'name': b'Lucy', b'age': 21})
+  {'name': 'John', 'age': 31}
+  {'name': 'Ivan', 'age': 26}
+  ('manager', {'name': 'Jack', 'age': 33})
+  ('subordinate', {'name': 'Lucy', 'age': 21})
   ```
 
   This format may seem inconsistent (and therefore it's not the default),
@@ -158,10 +173,10 @@ consisting of map key and object when traversing maps.
 (both map keys and array indexes) and an object as the last element.
 
   ```python
-  (b'friends', 0, {b'name': b'John', b'age': 31})
-  (b'friends', 1, {b'name': b'Ivan', b'age': 26})
-  (b'colleagues', b'manager', {b'name': b'Jack', b'age': 33})
-  (b'colleagues', b'subordinate', {b'name': b'Lucy', b'age': 21})
+  ('friends', 0, {'name': 'John', 'age': 31})
+  ('friends', 1, {'name': 'Ivan', 'age': 26})
+  ('colleagues', 'manager', {'name': 'Jack', 'age': 33})
+  ('colleagues', 'subordinate', {'name': 'Lucy', 'age': 21})
   ```
 
   Common usage pattern for this mode is
@@ -169,6 +184,57 @@ consisting of map key and object when traversing maps.
   ```python
   for *path, object in JsonWriter(...)
   ```
+
+_yajl_allow_comments_ enables corresponding YAJL flag, which is
+documented as follows:
+
+> Ignore javascript style comments present in JSON input.  Non-standard,
+> but rather fun
+
+_yajl_dont_validate_strings_ enables corresponding YAJL flag, which
+is documented as follows:
+
+> When set the parser will verify that all strings in JSON input
+> are valid UTF8 and will emit a parse error if this is not so.  When
+> set, this option makes parsing slightly more expensive (~7% depending
+> on processor and compiler in use)
+
+_yajl_allow_trailing_garbage_ enables corresponding YAJL flag, which
+is documented as follows:
+
+> By default, yajl will ensure the entire input text was consumed
+> and will raise an error otherwise.  Enabling this flag will cause
+> yajl to disable this check.  This can be useful when parsing json
+> out of a that contains more than a single JSON document.
+
+_yajl_allow_multiple_values_ enables corresponding YAJL flag, which
+is documented as follows:
+
+> Allow multiple values to be parsed by a single handle.  The entire
+> text must be valid JSON, and values can be seperated by any kind
+> of whitespace.  This flag will change the behavior of the parser,
+> and cause it continue parsing after a value is parsed, rather than
+> transitioning into a complete state.  This option can be useful
+> when parsing multiple values from an input stream.
+
+_yajl_allow_partial_values_ enables corresponding YAJL flag, which
+is documented as follows:
+
+> When yajl_complete_parse() is called the parser will check that the
+> top level value was completely consumed.  I.E., if called whilst
+> in the middle of parsing a value yajl will enter an error state
+> (premature EOF).  Setting this flag suppresses that check and the
+> corresponding error.
+
+_encoding_ may be used to override output encoding, which is derived
+from the input file handle if possible, or otherwise set to the
+default one as Python builttn `open()` would use (usually `'UTF-8'`).
+
+_errors_ is an optional string that specifies how encoding and
+decoding errors are to be handled. Defaults to `'strict'`
+
+_binary_ forces the output to be in form of `bytes` objects instead
+of `str` unicode strings.
 
 The constructed object is as iterator. You may call `next()` to extract
 single element from it, iterate it via `for` loop, or use it in generator
