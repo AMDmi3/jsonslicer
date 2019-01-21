@@ -22,22 +22,9 @@
 
 #include "output_formatting.hh"
 
+#include "encoding.hh"
 #include "pyobjlist.hh"
 #include "pymutindex.hh"
-
-PyObjPtr convert_to_output_encoding(JsonSlicer* self, PyObjPtr obj) {
-	if (self->output_encoding && PyBytes_Check(obj.get())) {
-		return PyObjPtr::Take(
-			PyUnicode_FromEncodedObject(
-				obj.get(),
-				PyUnicode_AsUTF8(self->output_encoding.get()),
-				PyUnicode_AsUTF8(self->output_errors.get())
-			)
-		);
-	} else {
-		return obj;
-	}
-}
 
 PyObjPtr generate_output_object(JsonSlicer* self, PyObjPtr obj) {
 	if (self->path_mode == JsonSlicer::PathMode::IGNORE) {
@@ -50,7 +37,7 @@ PyObjPtr generate_output_object(JsonSlicer* self, PyObjPtr obj) {
 			if (!tuple.valid()) {
 				return {};
 			}
-			PyObjPtr pathel = convert_to_output_encoding(self, self->path.back());
+			PyObjPtr pathel = decode(self->path.back(), self->output_encoding, self->output_errors);
 			if (!pathel) {
 				return {};
 			}
@@ -73,7 +60,7 @@ PyObjPtr generate_output_object(JsonSlicer* self, PyObjPtr obj) {
 				}
 				PyTuple_SET_ITEM(tuple.get(), tuple_idx++, index.getref());
 			} else {
-				pathel = convert_to_output_encoding(self, pathel);
+				pathel = decode(pathel, self->output_encoding, self->output_errors);
 				if (!pathel) {
 					return {};
 				}

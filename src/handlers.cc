@@ -23,6 +23,7 @@
 #include "handlers.hh"
 
 #include "output_formatting.hh"
+#include "encoding.hh"
 #include "seek_handlers.hh"
 #include "construct_handlers.hh"
 #include "pymutindex.hh"
@@ -42,7 +43,7 @@ template<class T> bool generic_handle_scalar(JsonSlicer* self, T&& make_scalar) 
 	if (self->state == JsonSlicer::State::CONSTRUCTING) {
 		PyObjPtr scalar = make_scalar();
 		if (scalar) {
-			scalar = convert_to_output_encoding(self, scalar);
+			scalar = decode(scalar, self->output_encoding, self->output_errors);
 		}
 		if (!scalar) {
 			return false;
@@ -159,7 +160,7 @@ int handle_map_key(void* ctx, const unsigned char* str, size_t len) {
 
 	PyObjPtr key = PyObjPtr::Take(PyBytes_FromStringAndSize(reinterpret_cast<const char*>(str), len));
 	if (key) {
-		key = convert_to_output_encoding(self, key);
+		key = decode(key, self->output_encoding, self->output_errors);
 	}
 	if (!key.valid()) {
 		return false;

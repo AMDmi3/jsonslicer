@@ -62,6 +62,7 @@ setup(
             ],
             sources=[
                 'src/construct_handlers.cc',
+                'src/encoding.cc',
                 'src/handlers.cc',
                 'src/jsonslicer_construction.cc',
                 'src/jsonslicer_iteration.cc',

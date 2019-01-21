@@ -20,13 +20,12 @@
  * THE SOFTWARE.
  */
 
-#ifndef JSONSLICER_OUTPUT_H
-#define JSONSLICER_OUTPUT_H
+#ifndef JSONSLICER_ENCODING_HH
+#define JSONSLICER_ENCODING_HH
 
-#include "jsonslicer.hh"
+#include "pyobjptr.hh"
 
-#include <Python.h>
-
-PyObjPtr generate_output_object(JsonSlicer* self, PyObjPtr obj);
+PyObjPtr encode(PyObjPtr obj, PyObjPtr encoding, PyObjPtr errors);
+PyObjPtr decode(PyObjPtr obj, PyObjPtr encoding, PyObjPtr errors);
 
 #endif

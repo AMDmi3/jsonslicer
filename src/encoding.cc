@@ -20,13 +20,34 @@
  * THE SOFTWARE.
  */
 
-#ifndef JSONSLICER_OUTPUT_H
-#define JSONSLICER_OUTPUT_H
-
-#include "jsonslicer.hh"
+#include "encoding.hh"
 
 #include <Python.h>
 
-PyObjPtr generate_output_object(JsonSlicer* self, PyObjPtr obj);
+PyObjPtr encode(PyObjPtr obj, PyObjPtr encoding, PyObjPtr errors) {
+	if (encoding && PyUnicode_Check(obj.get())) {
+		return PyObjPtr::Take(
+			PyUnicode_AsEncodedString(
+				obj.get(),
+				PyUnicode_AsUTF8(encoding.get()),
+				PyUnicode_AsUTF8(errors.get())
+			)
+		);
+	} else {
+		return obj;
+	}
+}
 
-#endif
+PyObjPtr decode(PyObjPtr obj, PyObjPtr encoding, PyObjPtr errors) {
+	if (encoding && PyBytes_Check(obj.get())) {
+		return PyObjPtr::Take(
+			PyUnicode_FromEncodedObject(
+				obj.get(),
+				PyUnicode_AsUTF8(encoding.get()),
+				PyUnicode_AsUTF8(errors.get())
+			)
+		);
+	} else {
+		return obj;
+	}
+}

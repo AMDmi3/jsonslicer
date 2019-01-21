@@ -22,6 +22,8 @@
 
 #include "jsonslicer.hh"
 
+#include "encoding.hh"
+
 #include <Python.h>
 #include <yajl/yajl_parse.h>
 
@@ -47,13 +49,7 @@ PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 			return nullptr;
 		}
 		if (PyUnicode_Check(buffer.get())) {
-			PyObjPtr encoded = PyObjPtr::Take(
-				PyUnicode_AsEncodedString(
-					buffer.get(),
-					PyUnicode_AsUTF8(self->input_encoding.get()),
-					PyUnicode_AsUTF8(self->input_errors.get())
-				)
-			);
+			PyObjPtr encoded = encode(buffer, self->input_encoding, self->input_errors);
 			if (!encoded) {
 				return nullptr;
 			}
