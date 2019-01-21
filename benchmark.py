@@ -72,13 +72,13 @@ if __name__ == '__main__':
         for n, item in enumerate(json.load(gen)['level1']['level2']):
             assert(item['id'] == n)
 
-    with TestCase('JsonSlicer (no paths)', 'bytes', args.json_size, results):
+    with TestCase('**JsonSlicer (no paths)**', 'bytes', args.json_size, results):
         gen = io.BytesIO(jsondata.encode('utf-8'))
         parser = JsonSlicer(gen, (b'level1', b'level2', None))
         for n, item in enumerate(parser):
             assert(item[b'id'] == n)
 
-    with TestCase('JsonSlicer (full paths)', 'bytes', args.json_size, results):
+    with TestCase('**JsonSlicer (full paths)**', 'bytes', args.json_size, results):
         gen = io.BytesIO(jsondata.encode('utf-8'))
         parser = JsonSlicer(gen, (b'level1', b'level2', None), path_mode='full')
         for n, (*path, item) in enumerate(parser):
