@@ -35,7 +35,7 @@ bool add_to_parent(JsonSlicer* self, PyObjPtr value) {
 	PyObjPtr container = self->constructing.back();
 
 	if (PyDict_Check(container.get())) {
-		if (!PyBytes_Check(self->last_map_key.get())) {
+		if (!PyBytes_Check(self->last_map_key.get()) && !PyUnicode_Check(self->last_map_key.get())) {
 			PyErr_SetString(PyExc_RuntimeError, "No map key available");
 			return false;
 		}

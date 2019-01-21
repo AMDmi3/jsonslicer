@@ -25,6 +25,20 @@
 #include "pyobjlist.hh"
 #include "pymutindex.hh"
 
+PyObjPtr convert_to_output_encoding(JsonSlicer* self, PyObjPtr obj) {
+	if (self->output_encoding && PyBytes_Check(obj.get())) {
+		return PyObjPtr::Take(
+			PyUnicode_FromEncodedObject(
+				obj.get(),
+				PyUnicode_AsUTF8(self->output_encoding.get()),
+				PyUnicode_AsUTF8(self->output_errors.get())
+			)
+		);
+	} else {
+		return obj;
+	}
+}
+
 PyObjPtr generate_output_object(JsonSlicer* self, PyObjPtr obj) {
 	if (self->path_mode == JsonSlicer::PathMode::IGNORE) {
 		return obj;
@@ -36,7 +50,11 @@ PyObjPtr generate_output_object(JsonSlicer* self, PyObjPtr obj) {
 			if (!tuple.valid()) {
 				return {};
 			}
-			PyTuple_SET_ITEM(tuple.get(), 0, self->path.back().getref());
+			PyObjPtr pathel = convert_to_output_encoding(self, self->path.back());
+			if (!pathel) {
+				return {};
+			}
+			PyTuple_SET_ITEM(tuple.get(), 0, pathel.getref());
 			PyTuple_SET_ITEM(tuple.get(), 1, obj.getref());
 			return tuple;
 		}
@@ -47,15 +65,19 @@ PyObjPtr generate_output_object(JsonSlicer* self, PyObjPtr obj) {
 		}
 
 		size_t tuple_idx = 0;
-		for (auto obj: self->path) {
-			if (PyMutIndex_Check(obj.get())) {
-				PyObjPtr index = PyObjPtr::Take(PyMutIndex_AsPyLong(obj.get()));
+		for (auto pathel: self->path) {
+			if (PyMutIndex_Check(pathel.get())) {
+				PyObjPtr index = PyObjPtr::Take(PyMutIndex_AsPyLong(pathel.get()));
 				if (!index.valid()) {
 					return {};
 				}
 				PyTuple_SET_ITEM(tuple.get(), tuple_idx++, index.getref());
 			} else {
-				PyTuple_SET_ITEM(tuple.get(), tuple_idx++, obj.getref());
+				pathel = convert_to_output_encoding(self, pathel);
+				if (!pathel) {
+					return {};
+				}
+				PyTuple_SET_ITEM(tuple.get(), tuple_idx++, pathel.getref());
 			}
 		}
 

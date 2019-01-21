@@ -37,6 +37,8 @@ PyObject* JsonSlicer_new(PyTypeObject* type, PyObject*, PyObject*) {
 		self->path_mode = JsonSlicer::PathMode::IGNORE;
 		new(&self->input_encoding) PyObjPtr();
 		new(&self->input_errors) PyObjPtr();
+		new(&self->output_encoding) PyObjPtr();
+		new(&self->output_errors) PyObjPtr();
 
 		self->yajl = nullptr;
 
@@ -65,6 +67,8 @@ void JsonSlicer_dealloc(JsonSlicer* self) {
 		yajl_free(tmp);
 	}
 
+	self->output_errors.~PyObjPtr();
+	self->output_encoding.~PyObjPtr();
 	self->input_errors.~PyObjPtr();
 	self->input_encoding.~PyObjPtr();
 
@@ -84,6 +88,8 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	int enable_yajl_allow_trailing_garbage = false;
 	int enable_yajl_allow_multiple_values = false;
 	int enable_yajl_allow_partial_values = false;
+	PyObject* encoding = nullptr;
+	PyObject* errors = nullptr;
 
 	static const char* keywords[] = {
 		"file",
@@ -95,21 +101,26 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 		"yajl_allow_trailing_garbage",
 		"yajl_allow_multiple_values",
 		"yajl_allow_partial_values",
+		"encoding",
+		"errors",
 		nullptr
 	};
 
 	const char* path_mode_arg = nullptr;
 	if (!PyArg_ParseTupleAndKeywords(
-				args, kwargs, "OO|$nsppppp", const_cast<char**>(keywords),
-				&io,
-				&pattern,
-				&read_size,
-				&path_mode_arg,
-				&enable_yajl_allow_comments,
-				&enable_yajl_dont_validate_strings,
-				&enable_yajl_allow_trailing_garbage,
-				&enable_yajl_allow_multiple_values,
-				&enable_yajl_allow_partial_values)) {
+			args, kwargs, "OO|$nspppppOO", const_cast<char**>(keywords),
+			&io,
+			&pattern,
+			&read_size,
+			&path_mode_arg,
+			&enable_yajl_allow_comments,
+			&enable_yajl_dont_validate_strings,
+			&enable_yajl_allow_trailing_garbage,
+			&enable_yajl_allow_multiple_values,
+			&enable_yajl_allow_partial_values,
+			&encoding,
+			&errors
+		)) {
 		return -1;
 	}
 
@@ -236,6 +247,18 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 		if (tmp != nullptr) {
 			yajl_free(tmp);
 		}
+	}
+
+	if (encoding && PyUnicode_Check(encoding)) {
+		self->output_encoding = PyObjPtr::Borrow(encoding);
+	} else if (encoding != Py_None) {
+		self->output_encoding = input_encoding;
+	}
+
+	if (errors && PyUnicode_Check(errors)) {
+		self->output_errors = PyObjPtr::Borrow(errors);
+	} else {
+		self->output_errors = input_errors;  // always set
 	}
 
 	self->input_errors = input_errors;

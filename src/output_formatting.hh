@@ -27,6 +27,7 @@
 
 #include <Python.h>
 
+PyObjPtr convert_to_output_encoding(JsonSlicer* self, PyObjPtr obj);
 PyObjPtr generate_output_object(JsonSlicer* self, PyObjPtr obj);
 
 #endif
