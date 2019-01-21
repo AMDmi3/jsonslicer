@@ -25,12 +25,14 @@
 
 #include <Python.h>
 
+#include "pyobjptr.hh"
+
 struct PyObjList {
 private:
 	struct Node {
-		PyObject* obj;
-		Node* next;
-		Node* prev;
+		PyObjPtr obj;
+		Node* next = nullptr;
+		Node* prev = nullptr;
 	};
 
 public:
@@ -42,7 +44,7 @@ public:
 		iterator(Node* node) : node_(node) {
 		}
 
-		PyObject* operator*() {
+		PyObjPtr operator*() {
 			return node_->obj;
 		}
 
@@ -76,13 +78,13 @@ public:
 	size_t size() const;
 	bool empty() const;
 
-	bool push_front(PyObject* obj);
-	bool push_back(PyObject* obj);
+	bool push_front(PyObjPtr obj);
+	bool push_back(PyObjPtr obj);
 
-	PyObject* pop_front();
-	PyObject* pop_back();
+	PyObjPtr pop_front();
+	PyObjPtr pop_back();
 
-	PyObject*& back() const;
+	PyObjPtr& back() const;
 
 	void swap(PyObjList& other);
 

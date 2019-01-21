@@ -24,6 +24,7 @@
 #define JSONSLICER_JSONSLICER_H
 
 #include "pyobjlist.hh"
+#include "pyobjptr.hh"
 
 #include <Python.h>
 #include <yajl/yajl_parse.h>
@@ -51,7 +52,7 @@ struct JsonSlicer {
 	yajl_handle yajl;
 
 	// parser state
-	PyObject* last_map_key;
+	PyObjPtr last_map_key;
 	State state;
 
 	// pattern argument

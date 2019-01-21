@@ -33,30 +33,29 @@
 
 // helpers
 bool check_pattern(JsonSlicer* self) {
-	return self->path.match(self->pattern, [](PyObject* path, PyObject* pattern) {
-		return pattern == Py_None || PyObject_RichCompareBool(path, pattern, Py_EQ);
+	return self->path.match(self->pattern, [](const PyObjPtr& path, const PyObjPtr& pattern) {
+		return pattern.get() == Py_None || PyObject_RichCompareBool(path.get(), pattern.get(), Py_EQ);
 	});
 }
 
 void update_path(JsonSlicer* self) {
-	if (!self->path.empty() && PyMutIndex_Check(self->path.back())) {
-		PyMutIndex_Increment(self->path.back());
+	if (!self->path.empty() && PyMutIndex_Check(self->path.back().get())) {
+		PyMutIndex_Increment(self->path.back().get());
 	}
 }
 
-bool finish_complete_object(JsonSlicer* self, PyObject* obj) {
+bool finish_complete_object(JsonSlicer* self, PyObjPtr obj) {
 	// regardless of result, we've finished parsing an object
 	self->state = JsonSlicer::State::SEEKING;
 
 	// construct tuple with prepended path
-	PyObject* output = generate_output_object(self, obj);
-	if (output == nullptr) {
+	PyObjPtr output = generate_output_object(self, obj);
+	if (!output.valid()) {
 		return false;
 	}
 
 	// save in list of complete objects
 	if (!self->complete.push_back(output)) {
-		Py_DECREF(output);
 		return false;
 	}
 

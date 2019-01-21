@@ -39,22 +39,16 @@ template<class T> bool generic_handle_scalar(JsonSlicer* self, T&& make_scalar) 
 		}
 	}
 	if (self->state == JsonSlicer::State::CONSTRUCTING) {
-		PyObject* scalar = make_scalar();
-		if (scalar == nullptr) {
+		PyObjPtr scalar = make_scalar();
+		if (!scalar.valid()) {
 			return false;
 		}
 
-		bool res;
 		if (self->constructing.empty()) {
-			res = finish_complete_object(self, scalar);
+			return finish_complete_object(self, scalar);
 		} else {
-			res = add_to_parent(self, scalar);
+			return add_to_parent(self, scalar);
 		}
-		if (!res) {
-			Py_DECREF(scalar);
-		}
-
-		return res;
 	}
 	return true;
 }
@@ -66,28 +60,26 @@ bool generic_start_container(JsonSlicer* self, T&& make_container, U&& make_key)
 			self->state = JsonSlicer::State::CONSTRUCTING;
 			// falls through to JsonSlicer::State::CONSTRUCTING block below
 		} else {
-			PyObject* key = make_key();
-			if (key == nullptr) {
+			PyObjPtr key = make_key();
+			if (!key.valid()) {
 				return false;
 			}
 			return self->path.push_back(key);
 		}
 	}
 	if (self->state == JsonSlicer::State::CONSTRUCTING) {
-		PyObject* container = make_container();
-		if (container == nullptr) {
+		PyObjPtr container = make_container();
+		if (!container.valid()) {
 			return false;
 		}
 
 		if (!self->constructing.empty()) {
 			if (!add_to_parent(self, container)) {
-				Py_DECREF(container);
 				return false;
 			}
 		}
 
 		if (!self->constructing.push_back(container)) {
-			Py_DECREF(container);
 			return false;
 		}
 	}
@@ -96,17 +88,15 @@ bool generic_start_container(JsonSlicer* self, T&& make_container, U&& make_key)
 
 bool generic_end_container(JsonSlicer* self) {
 	if (self->state == JsonSlicer::State::SEEKING) {
-		PyObject* container = self->path.pop_back();
+		PyObjPtr container = self->path.pop_back();
 		assert(container);
-		Py_DECREF(container);
 		update_path(self);
 	}
 	if (self->state == JsonSlicer::State::CONSTRUCTING) {
-		PyObject* container = self->constructing.pop_back();
+		PyObjPtr container = self->constructing.pop_back();
 
 		if (self->constructing.empty()) {
 			if (!finish_complete_object(self, container)) {
-				Py_DECREF(container);
 				return false;
 			}
 		}
@@ -131,35 +121,31 @@ const yajl_callbacks yajl_handlers = {
 
 int handle_null(void* ctx) {
 	return generic_handle_scalar((JsonSlicer*)ctx, [](){
-		Py_RETURN_NONE;
+		return PyObjPtr::Borrow(Py_None);
 	});
 }
 
 int handle_boolean(void* ctx, int val) {
 	return generic_handle_scalar((JsonSlicer*)ctx, [val](){
-		if (val) {
-			Py_RETURN_TRUE;
-		} else {
-			Py_RETURN_FALSE;
-		}
+		return PyObjPtr::Borrow(val ? Py_True : Py_False);
 	});
 }
 
 int handle_integer(void* ctx, long long val) {
 	return generic_handle_scalar((JsonSlicer*)ctx, [val](){
-		return PyLong_FromLongLong(val);
+		return PyObjPtr::Take(PyLong_FromLongLong(val));
 	});
 }
 
 int handle_double(void* ctx, double val) {
 	return generic_handle_scalar((JsonSlicer*)ctx, [val](){
-		return PyFloat_FromDouble(val);
+		return PyObjPtr::Take(PyFloat_FromDouble(val));
 	});
 }
 
 int handle_string(void* ctx, const unsigned char* str, size_t len) {
 	return generic_handle_scalar((JsonSlicer*)ctx, [str, len](){
-		return PyBytes_FromStringAndSize(reinterpret_cast<const char*>(str), len);
+		return PyObjPtr::Take(PyBytes_FromStringAndSize(reinterpret_cast<const char*>(str), len));
 	});
 }
 
@@ -167,19 +153,15 @@ int handle_string(void* ctx, const unsigned char* str, size_t len) {
 int handle_map_key(void* ctx, const unsigned char* str, size_t len) {
 	JsonSlicer* self = (JsonSlicer*)ctx;
 
-	PyObject* new_map_key = PyBytes_FromStringAndSize(reinterpret_cast<const char*>(str), len);
-	if (new_map_key == nullptr) {
+	PyObjPtr key = PyObjPtr::Take(PyBytes_FromStringAndSize(reinterpret_cast<const char*>(str), len));
+	if (!key.valid()) {
 		return false;
 	}
 
 	if (self->state == JsonSlicer::State::CONSTRUCTING) {
-		PyObject* old_map_key = self->last_map_key;
-		self->last_map_key = new_map_key;
-		Py_XDECREF(old_map_key);
+		self->last_map_key = key;
 	} else {
-		PyObject* old_path_tail = self->path.back();
-		self->path.back() = new_map_key;
-		Py_DECREF(old_path_tail);
+		self->path.back() = key;
 	}
 	return true;
 }
@@ -188,8 +170,8 @@ int handle_map_key(void* ctx, const unsigned char* str, size_t len) {
 int handle_start_map(void* ctx) {
 	return generic_start_container(
 		(JsonSlicer*)ctx,
-		[]{ return PyDict_New(); },
-		[]{ Py_RETURN_NONE; }
+		[]{ return PyObjPtr::Take(PyDict_New()); },
+		[]{ return PyObjPtr::Borrow(Py_None); }
 	);
 }
 
@@ -200,8 +182,8 @@ int handle_end_map(void* ctx) {
 int handle_start_array(void* ctx) {
 	return generic_start_container(
 		(JsonSlicer*)ctx,
-		[]{ return PyList_New(0); },
-		[]{ return PyMutIndex_New(); }
+		[]{ return PyObjPtr::Take(PyList_New(0)); },
+		[]{ return PyObjPtr::Take(PyMutIndex_New()); }
 	);
 }
 

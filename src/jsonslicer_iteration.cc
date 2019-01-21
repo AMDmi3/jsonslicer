@@ -33,51 +33,46 @@ JsonSlicer* JsonSlicer_iter(JsonSlicer* self) {
 PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 	// return complete objects from previous runs, if any
 	if (!self->complete.empty()) {
-		return self->complete.pop_front();
+		return self->complete.pop_front().release();
 	}
 
 	bool eof = false;
 
 	do {
 		// read chunk of data from IO
-		PyObject* buffer = PyObject_CallMethod(self->io, "read", "n", self->read_size);
+		PyObjPtr buffer = PyObjPtr::Take(PyObject_CallMethod(self->io, "read", "n", self->read_size));
 
 		// handle i/o errors
 		if (!buffer) {
 			return nullptr;
 		}
-		if (!PyBytes_Check(buffer)) {
-			PyErr_Format(PyExc_RuntimeError, "Unexpected read result type %s, expected bytes", buffer->ob_type->tp_name);
-			Py_XDECREF(buffer);
+		if (!PyBytes_Check(buffer.get())) {
+			PyErr_Format(PyExc_RuntimeError, "Unexpected read result type %s, expected bytes", buffer.get()->ob_type->tp_name);
 			return nullptr;
 		}
 
 		// advance or finalize parser
 		yajl_status status;
-		if (PyBytes_GET_SIZE(buffer) == 0) {
+		if (PyBytes_GET_SIZE(buffer.get()) == 0) {
 			eof = true;
 			status = yajl_complete_parse(self->yajl);
 		} else {
-			status = yajl_parse(self->yajl, (const unsigned char*)PyBytes_AS_STRING(buffer), PyBytes_GET_SIZE(buffer));
+			status = yajl_parse(self->yajl, (const unsigned char*)PyBytes_AS_STRING(buffer.get()), PyBytes_GET_SIZE(buffer.get()));
 		}
 
 		// handle parser errors
 		if (status != yajl_status_ok) {
 			if (status == yajl_status_error) {
-				unsigned char* error = yajl_get_error(self->yajl, 1, (const unsigned char*)PyBytes_AS_STRING(buffer), PyBytes_GET_SIZE(buffer));
+				unsigned char* error = yajl_get_error(self->yajl, 1, (const unsigned char*)PyBytes_AS_STRING(buffer.get()), PyBytes_GET_SIZE(buffer.get()));
 				PyErr_Format(PyExc_RuntimeError, "YAJL error: %s", error);
 				yajl_free_error(self->yajl, error);
 			} // else it's interrupted parsing and PyErr is already set
-			Py_XDECREF(buffer);
 			return nullptr;
 		}
 
-		// free buffer
-		Py_XDECREF(buffer);
-
 		// return complete object, if any
 		if (!self->complete.empty()) {
-			return self->complete.pop_front();
+			return self->complete.pop_front().release();
 		}
 	} while (!eof);
 

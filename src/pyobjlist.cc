@@ -26,6 +26,7 @@
 #include <stdlib.h>
 
 #include <algorithm>
+#include <cassert>
 
 void PyObjList::init() {
 	front_ = nullptr;
@@ -39,10 +40,9 @@ void PyObjList::clear() {
 	back_ = nullptr;
 
 	while (cur != nullptr) {
-		Py_DECREF(cur->obj);
 		Node* tmp = cur;
 		cur = cur->prev;
-		free(tmp);
+		delete tmp;
 	}
 }
 
@@ -68,8 +68,8 @@ bool PyObjList::empty() const {
 	return front_ == nullptr;
 }
 
-bool PyObjList::push_front(PyObject* obj) {
-	Node* node = (Node*)malloc(sizeof(Node));
+bool PyObjList::push_front(PyObjPtr obj) {
+	Node* node = new(std::nothrow) Node;
 	if (node == nullptr)
 		return false;
 
@@ -88,8 +88,8 @@ bool PyObjList::push_front(PyObject* obj) {
 	return true;
 }
 
-bool PyObjList::push_back(PyObject* obj) {
-	Node* node = (Node*)malloc(sizeof(Node));
+bool PyObjList::push_back(PyObjPtr obj) {
+	Node* node = new(std::nothrow) Node;
 	if (node == nullptr)
 		return false;
 
@@ -108,7 +108,7 @@ bool PyObjList::push_back(PyObject* obj) {
 	return true;
 }
 
-PyObject* PyObjList::pop_front() {
+PyObjPtr PyObjList::pop_front() {
 	Node* node = front_;
 	assert(node);
 
@@ -120,31 +120,31 @@ PyObject* PyObjList::pop_front() {
 
 	front_ = node->next;
 
-	PyObject* result = node->obj;
-	free(node);
+	PyObjPtr result = node->obj;
+	delete node;
 
 	return result;
 }
 
-PyObject* PyObjList::pop_back() {
+PyObjPtr PyObjList::pop_back() {
 	Node* node = back_;
 	assert(node);
 
 	if (node->prev) {
-		node->prev->next = nullptr;
+		back_->prev->next = nullptr;
 	} else {
 		front_ = nullptr;
 	}
 
 	back_ = node->prev;
 
-	PyObject* result = node->obj;
-	free(node);
+	PyObjPtr result = node->obj;
+	delete node;
 
 	return result;
 }
 
-PyObject*& PyObjList::back() const {
+PyObjPtr& PyObjList::back() const {
 	assert(back_);
 	return back_->obj;
 }

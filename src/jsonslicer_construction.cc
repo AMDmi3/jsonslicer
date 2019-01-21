@@ -27,6 +27,8 @@
 #include <Python.h>
 #include <yajl/yajl_parse.h>
 
+#include <new>
+
 PyObject* JsonSlicer_new(PyTypeObject* type, PyObject*, PyObject*) {
 	JsonSlicer* self = (JsonSlicer*)type->tp_alloc(type, 0);
 	if (self != nullptr) {
@@ -36,7 +38,7 @@ PyObject* JsonSlicer_new(PyTypeObject* type, PyObject*, PyObject*) {
 
 		self->yajl = nullptr;
 
-		self->last_map_key = nullptr;
+		new(&self->last_map_key) PyObjPtr();
 		self->state = JsonSlicer::State::SEEKING;
 
 		self->pattern.init();
@@ -53,7 +55,7 @@ void JsonSlicer_dealloc(JsonSlicer* self) {
 	self->path.clear();
 	self->pattern.clear();
 
-	Py_CLEAR(self->last_map_key);
+	self->last_map_key.~PyObjPtr();
 
 	if (self->yajl != nullptr) {
 		yajl_handle tmp = self->yajl;
@@ -126,14 +128,13 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	new_pattern.init();
 
 	for (Py_ssize_t i = 0; i < PySequence_Size(pattern); i++) {
-		PyObject* item = PySequence_GetItem(pattern, i);
-		if (item == nullptr) {
+		PyObjPtr item = PyObjPtr::Take(PySequence_GetItem(pattern, i));
+		if (!item.valid()) {
 			new_pattern.clear();
 			return -1;
 		}
 		if (!new_pattern.push_back(item)) {
 			new_pattern.clear();
-			Py_DECREF(item);
 			return -1;
 		}
 	}
@@ -192,7 +193,7 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 
 	self->state = JsonSlicer::State::SEEKING;
 
-	Py_CLEAR(self->last_map_key);
+	self->last_map_key.~PyObjPtr();
 
 	{
 		yajl_handle tmp = self->yajl;

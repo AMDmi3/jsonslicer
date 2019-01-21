@@ -25,53 +25,45 @@
 #include "pyobjlist.hh"
 #include "pymutindex.hh"
 
-PyObject* generate_output_object(JsonSlicer* self, PyObject* obj) {
+PyObjPtr generate_output_object(JsonSlicer* self, PyObjPtr obj) {
 	if (self->path_mode == JsonSlicer::PathMode::IGNORE) {
-		Py_INCREF(obj);
 		return obj;
 	} else if (self->path_mode == JsonSlicer::PathMode::MAP_KEYS) {
-		PyObject* path_last = self->path.empty() ? nullptr : self->path.back();
-		if (PyBytes_Check(path_last)) {
-			PyObject* tuple = PyTuple_New(2);
-			if (tuple == nullptr) {
-				return nullptr;
-			}
-			Py_INCREF(path_last);
-			PyTuple_SET_ITEM(tuple, 0, path_last);
-			Py_INCREF(obj);
-			PyTuple_SET_ITEM(tuple, 1, obj);
-			return tuple;
-		} else {
-			Py_INCREF(obj);
+		if (self->path.empty() || !PyBytes_Check(self->path.back().get())) {
 			return obj;
+		} else {
+			PyObjPtr tuple = PyObjPtr::Take(PyTuple_New(2));
+			if (!tuple.valid()) {
+				return {};
+			}
+			PyTuple_SET_ITEM(tuple.get(), 0, self->path.back().getref());
+			PyTuple_SET_ITEM(tuple.get(), 1, obj.getref());
+			return tuple;
 		}
 	} else if (self->path_mode == JsonSlicer::PathMode::FULL) {
-		PyObject* tuple = PyTuple_New(self->path.size() + 1);
-		if (tuple == nullptr) {
-			return nullptr;
+		PyObjPtr tuple = PyObjPtr::Take(PyTuple_New(self->path.size() + 1));
+		if (!tuple.valid()) {
+			return {};
 		}
 
 		size_t tuple_idx = 0;
 		for (auto obj: self->path) {
-			if (PyMutIndex_Check(obj)) {
-				PyObject* index = PyMutIndex_AsPyLong(obj);
-				if (index == nullptr) {
-					Py_DECREF(tuple);
-					return nullptr;
+			if (PyMutIndex_Check(obj.get())) {
+				PyObjPtr index = PyObjPtr::Take(PyMutIndex_AsPyLong(obj.get()));
+				if (!index.valid()) {
+					return {};
 				}
-				PyTuple_SET_ITEM(tuple, tuple_idx++, index);
+				PyTuple_SET_ITEM(tuple.get(), tuple_idx++, index.getref());
 			} else {
-				Py_INCREF(obj);
-				PyTuple_SET_ITEM(tuple, tuple_idx++, obj);
+				PyTuple_SET_ITEM(tuple.get(), tuple_idx++, obj.getref());
 			}
 		}
 
-		Py_INCREF(obj);
-		PyTuple_SET_ITEM(tuple, tuple_idx, obj);
+		PyTuple_SET_ITEM(tuple.get(), tuple_idx, obj.getref());
 
 		return tuple;
 	} else {
 		PyErr_SetString(PyExc_RuntimeError, "Unexpected path mode");
-		return nullptr;
+		return {};
 	}
 }

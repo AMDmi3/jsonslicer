@@ -27,6 +27,6 @@
 
 #include <Python.h>
 
-PyObject* generate_output_object(JsonSlicer* self, PyObject* obj);
+PyObjPtr generate_output_object(JsonSlicer* self, PyObjPtr obj);
 
 #endif

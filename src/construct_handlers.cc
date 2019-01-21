@@ -31,22 +31,22 @@
 #include <assert.h>
 
 // helpers
-bool add_to_parent(JsonSlicer* self, PyObject* value) {
-	PyObject* container = self->constructing.back();
+bool add_to_parent(JsonSlicer* self, PyObjPtr value) {
+	PyObjPtr container = self->constructing.back();
 
-	if (PyDict_Check(container)) {
-		if (!PyBytes_Check(self->last_map_key)) {
+	if (PyDict_Check(container.get())) {
+		if (!PyBytes_Check(self->last_map_key.get())) {
 			PyErr_SetString(PyExc_RuntimeError, "No map key available");
 			return false;
 		}
 
 		// adds references
-		if (PyDict_SetItem(container, self->last_map_key, value) != 0) {
+		if (PyDict_SetItem(container.get(), self->last_map_key.get(), value.get()) != 0) {
 			return false;
 		}
-	} else if (PyList_Check(container)) {
+	} else if (PyList_Check(container.get())) {
 		// adds reference
-		return PyList_Append(container, value) == 0;
+		return PyList_Append(container.get(), value.get()) == 0;
 	} else {
 		PyErr_SetString(PyExc_RuntimeError, "Unexpected container type on the stack");
 		return false;
