@@ -183,17 +183,17 @@ and JsonSlicer was written to be better. Namely,
 * It allows iterating over dictionaries and allows more flexibility when
   specifying paths/patterns of objects to iterate over
 
-The results of bundled benchmark on Python 3.7 / clang 6.0.1 / FreeBSD 12.0 amd64 / Core i7-6600U CPU @ 2.60GHz.
+The results of bundled benchmark on Python 3.7 / clang 6.0.1 / -O2 -DNODEBUG / FreeBSD 12.0 amd64 / Core i7-6600U CPU @ 2.60GHz.
 
 | Facility                    | Type   | Objects/sec   |
 |:----------------------------|:------:|--------------:|
-| json.loads()                |    str |       1095.4K |
-| json.load(StringIO())       |    str |       1025.1K |
-| **JsonSlicer (no paths)**   |  bytes |        944.3K |
-| **JsonSlicer (full paths)** |  bytes |        656.9K |
-| ijson.yajl2_cffi            |  bytes |         69.1K |
-| ijson.yajl2                 |  bytes |         50.5K |
-| ijson.python                |    str |         32.4K |
+| json.loads()                | str    | 1198.7K       |
+| json.load(StringIO())       | str    | 1126.7K       |
+| **JsonSlicer (no paths)**   | bytes  | 1195.2K       |
+| **JsonSlicer (full paths)** | bytes  | 817.9K        |
+| ijson.yajl2_cffi            | bytes  | 75.1K         |
+| ijson.yajl2                 | bytes  | 52.4K         |
+| ijson.python                | str    | 32.9K         |
 
 ## Status/TODO
 
@@ -202,7 +202,6 @@ code safety checks and improvements. Also, the following mandatory
 features are planned to be implemented to consider the module ready
 to use:
 
-- Allow to pass YAJL flags the constuctor
 - Allow to transparently operate on text I/O handles (in addition
   to bytes I/O) and return text data (instead of bytes) with specified
   encoding
