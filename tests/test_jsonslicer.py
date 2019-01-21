@@ -79,7 +79,7 @@ class TestJsonSlicer(unittest.TestCase):
         self.assertEqual(next(JsonSlicer(io.StringIO('1000000'), ())), 1000000)
         self.assertEqual(next(JsonSlicer(io.StringIO('-1000000'), ())), -1000000)
         self.assertEqual(next(JsonSlicer(io.StringIO('0.3'), ())), 0.3)
-        self.assertEqual(next(JsonSlicer(io.StringIO('"string"'), ())), b'string')
+        self.assertEqual(next(JsonSlicer(io.StringIO('"string"'), ())), 'string')
         self.assertEqual(next(JsonSlicer(io.StringIO('null'), ())), None)
         self.assertEqual(next(JsonSlicer(io.StringIO('true'), ())), True)
         self.assertEqual(next(JsonSlicer(io.StringIO('false'), ())), False)
@@ -266,10 +266,10 @@ class TestJsonSlicer(unittest.TestCase):
         for person in JsonSlicer(io.BytesIO(data), (b'people', None)):
             pass
 
-        self.assertEqual(person[b'name'], b'Angela')
+        self.assertEqual(person['name'], 'Angela')
 
         person in JsonSlicer(io.BytesIO(data), (b'people', 2))
-        self.assertEqual(person[b'name'], b'Angela')
+        self.assertEqual(person['name'], 'Angela')
 
         max_age = max(JsonSlicer(io.BytesIO(data), (b'people', None, b'age')))
         self.assertEqual(max_age, 33)
@@ -296,7 +296,7 @@ class TestJsonSlicer(unittest.TestCase):
         self.assertEqual(
             list(JsonSlicer(io.BytesIO(data), (None, None), path_mode='map_keys')),
             [
-                (b'b',1),
+                ('b',1),
                 2
             ]
         )
@@ -304,8 +304,8 @@ class TestJsonSlicer(unittest.TestCase):
         self.assertEqual(
             list(JsonSlicer(io.BytesIO(data), (None, None), path_mode='full')),
             [
-                (b'a', b'b', 1),
-                (b'c', 0, 2)
+                ('a', 'b', 1),
+                ('c', 0, 2)
             ]
         )
 
@@ -320,10 +320,10 @@ class TestJsonSlicer(unittest.TestCase):
 
     def test_yajl_dont_validate_strings(self):
         with self.assertRaises(RuntimeError):
-            list(JsonSlicer(io.BytesIO(b'"\xff"'), ()))
+            list(JsonSlicer(io.BytesIO(b'"\xff"'), (), encoding=None))
 
         self.assertEqual(
-            list(JsonSlicer(io.BytesIO(b'"\xff"'), (), yajl_dont_validate_strings=True)),
+            list(JsonSlicer(io.BytesIO(b'"\xff"'), (), encoding=None, yajl_dont_validate_strings=True)),
             [b'\xff']
         )
 
