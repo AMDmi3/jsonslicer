@@ -63,11 +63,11 @@ PyObject* JsonSlicer_iternext(JsonSlicer* self) {
 
 		// handle parser errors
 		if (status != yajl_status_ok) {
-			unsigned char* error = yajl_get_error(self->yajl, 1, (const unsigned char*)PyBytes_AS_STRING(buffer), PyBytes_GET_SIZE(buffer));
 			if (status == yajl_status_error) {
+				unsigned char* error = yajl_get_error(self->yajl, 1, (const unsigned char*)PyBytes_AS_STRING(buffer), PyBytes_GET_SIZE(buffer));
 				PyErr_Format(PyExc_RuntimeError, "YAJL error: %s", error);
+				yajl_free_error(self->yajl, error);
 			} // else it's interrupted parsing and PyErr is already set
-			yajl_free_error(self->yajl, error);
 			Py_XDECREF(buffer);
 			return nullptr;
 		}
