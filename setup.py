@@ -54,7 +54,12 @@ setup(
         Extension(
             'jsonslicer',
             language='c++',
-            extra_compile_args=['-std=c++11', '-DJSONSLICER_VERSION=\"{}\"'.format(version)],
+            extra_compile_args=[
+                '-std=c++11',
+                '-DJSONSLICER_VERSION=\"{}\"'.format(version),
+                '-fno-exceptions',
+                '-fno-rtti',
+            ],
             sources=[
                 'src/construct_handlers.cc',
                 'src/handlers.cc',
