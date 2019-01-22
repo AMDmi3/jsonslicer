@@ -41,7 +41,7 @@ public:
 		Node* node_;
 
 	public:
-		iterator(Node* node) : node_(node) {
+		explicit iterator(Node* node) : node_(node) {
 		}
 
 		PyObjPtr operator*() {
@@ -69,7 +69,14 @@ private:
 	Node* back_;
 
 public:
-	void init();
+	PyObjList();
+	~PyObjList();
+
+	PyObjList(const PyObjList&) = delete;
+	PyObjList& operator=(const PyObjList&) = delete;
+	PyObjList(PyObjList&&) = delete;
+	PyObjList& operator=(PyObjList&&) = delete;
+
 	void clear();
 
 	iterator begin();

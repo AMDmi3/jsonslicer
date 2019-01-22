@@ -46,19 +46,19 @@ PyObject* JsonSlicer_new(PyTypeObject* type, PyObject*, PyObject*) {
 		new(&self->last_map_key) PyObjPtr();
 		self->state = JsonSlicer::State::SEEKING;
 
-		self->pattern.init();
-		self->path.init();
-		self->constructing.init();
-		self->complete.init();
+		new(&self->pattern) PyObjList();
+		new(&self->path) PyObjList();
+		new(&self->constructing) PyObjList();
+		new(&self->complete) PyObjList();
 	}
 	return (PyObject*)self;
 }
 
 void JsonSlicer_dealloc(JsonSlicer* self) {
-	self->complete.clear();
-	self->constructing.clear();
-	self->path.clear();
-	self->pattern.clear();
+	self->complete.~PyObjList();
+	self->constructing.~PyObjList();
+	self->path.~PyObjList();
+	self->pattern.~PyObjList();
 
 	self->last_map_key.~PyObjPtr();
 
@@ -192,7 +192,6 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 
 	// prepare all new data members
 	PyObjList new_pattern;
-	new_pattern.init();
 
 	for (Py_ssize_t i = 0; i < PySequence_Size(pattern); i++) {
 		PyObjPtr item = PyObjPtr::Take(PySequence_GetItem(pattern, i));
@@ -208,64 +207,50 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 #endif
 		}
 		if (!item) {
-			new_pattern.clear();
 			return -1;
 		}
 		if (!new_pattern.push_back(item)) {
-			new_pattern.clear();
 			return -1;
 		}
 	}
 
 	yajl_handle new_yajl = yajl_alloc(&yajl_handlers, nullptr, (void*)self);
 	if (new_yajl == nullptr) {
-		new_pattern.clear();
 		PyErr_SetString(PyExc_RuntimeError, "Cannot allocate YAJL handle");
 		return -1;
 	}
 
 	if (enable_yajl_allow_comments && yajl_config(new_yajl, yajl_allow_comments, 1) == 0) {
 		yajl_free(new_yajl);
-		new_pattern.clear();
 		PyErr_SetString(PyExc_RuntimeError, "Cannot set yajl_allow_comments");
 		return -1;
 	}
 	if (enable_yajl_dont_validate_strings && yajl_config(new_yajl, yajl_dont_validate_strings, 1) == 0) {
 		yajl_free(new_yajl);
-		new_pattern.clear();
 		PyErr_SetString(PyExc_RuntimeError, "Cannot set yajl_dont_validate_strings");
 		return -1;
 	}
 	if (enable_yajl_allow_trailing_garbage && yajl_config(new_yajl, yajl_allow_trailing_garbage, 1) == 0) {
 		yajl_free(new_yajl);
-		new_pattern.clear();
 		PyErr_SetString(PyExc_RuntimeError, "Cannot set yajl_allow_trailing_garbage");
 		return -1;
 	}
 	if (enable_yajl_allow_multiple_values && yajl_config(new_yajl, yajl_allow_multiple_values, 1) == 0) {
 		yajl_free(new_yajl);
-		new_pattern.clear();
 		PyErr_SetString(PyExc_RuntimeError, "Cannot set yajl_allow_multiple_values");
 		return -1;
 	}
 	if (enable_yajl_allow_partial_values && yajl_config(new_yajl, yajl_allow_partial_values, 1) == 0) {
 		yajl_free(new_yajl);
-		new_pattern.clear();
 		PyErr_SetString(PyExc_RuntimeError, "Cannot set yajl_allow_partial_values");
 		return -1;
 	}
 
 	// swap initialized members with new ones, clearing the rest
 	self->complete.clear();
-
 	self->constructing.clear();
-
 	self->path.clear();
-
-	{
-		self->pattern.swap(new_pattern);
-		new_pattern.clear();
-	}
+	self->pattern.swap(new_pattern);
 
 	self->state = JsonSlicer::State::SEEKING;
 

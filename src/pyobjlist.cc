@@ -28,9 +28,11 @@
 #include <algorithm>
 #include <cassert>
 
-void PyObjList::init() {
-	front_ = nullptr;
-	back_ = nullptr;
+PyObjList::PyObjList(): front_(nullptr), back_(nullptr) {
+}
+
+PyObjList::~PyObjList() {
+	clear();
 }
 
 void PyObjList::clear() {
@@ -47,11 +49,11 @@ void PyObjList::clear() {
 }
 
 PyObjList::iterator PyObjList::begin() {
-	return front_;
+	return PyObjList::iterator(front_);
 }
 
 PyObjList::iterator PyObjList::end() {
-	return nullptr;
+	return PyObjList::iterator(nullptr);;
 }
 
 size_t PyObjList::size() const {
