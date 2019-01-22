@@ -12,15 +12,15 @@
 
 ## Overview
 
-JsonSlicer performs a **stream** or **iterative** JSON parsing,
-which means it **does not load** whole JSON into memory and is able
-to parse **very large** JSON files or streams. The module is written
-in C and uses [YAJL](https://lloyd.github.io/yajl/) JSON parsing
-library, so it's also quite **fast**.
+JsonSlicer performs a **stream** or **iterative**, **pull** JSON
+parsing, which means it **does not load** whole JSON into memory
+and is able to parse **very large** JSON files or streams.  The
+module is written in C and uses [YAJL](https://lloyd.github.io/yajl/)
+JSON parsing library, so it's also quite **fast**.
 
-JsonSlicer takes a **path** of JSON map keys or array indexes, and provides
-**iterator interface** which yields JSON data matching given path as complete
-Python objects.
+JsonSlicer takes a **path** of JSON map keys or array indexes, and
+provides **iterator interface** which yields JSON data matching
+given path as complete Python objects.
 
 ## Example
 
@@ -106,7 +106,16 @@ jsonslicer.JsonSlicer(
 )
 ```
 
-Constructs iterative JSON parser which reads JSON data from _file_ (a `.read()`-supporting [file-like object](https://docs.python.org/3/glossary.html#term-file-like-object) containing a JSON document).
+Constructs iterative JSON parser. which reads JSON data from _file_ (a `.read()`-supporting [file-like object](https://docs.python.org/3/glossary.html#term-file-like-object) containing a JSON document).
+
+_file_ is a `.read()`-supporting [file-like
+object](https://docs.python.org/3/glossary.html#term-file-like-object)
+containing a JSON document. Both binary and text files are supported,
+but binary ones are preferred, bacause the parser has to operate on
+binary data internally anyway, and using text input would require an
+unnecessary decondig/decoding which yields ~3% performance overhead.
+Note that JsonSlicer supports both unicode and binary output regardless
+of input format.
 
 _path_prefix_ is an iterable (usually a list or a tuple) specifying
 a path or a path pattern of objects which the parser should extract
@@ -124,6 +133,10 @@ placeholder in some path positions. For instance,  `(None, None,
 'name')` will yield all four names from the example above, because
 it matches an item under 'name' key on the second nesting level of
 any arrays or map structure.
+
+Both strings and byte objects are allowed in path, regardless of
+input and output encodings.  are automatically converted
+to the format used internally.
 
 _read_size_ is a size of block read by the parser at a time.
 
