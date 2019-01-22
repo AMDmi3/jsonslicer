@@ -112,9 +112,9 @@ Constructs iterative JSON parser. which reads JSON data from _file_ (a `.read()`
 _file_ is a `.read()`-supporting [file-like
 object](https://docs.python.org/3/glossary.html#term-file-like-object)
 containing a JSON document. Both binary and text files are supported,
-but binary ones are preferred, bacause the parser has to operate on
+but binary ones are preferred, because the parser has to operate on
 binary data internally anyway, and using text input would require an
-unnecessary decondig/decoding which yields ~3% performance overhead.
+unnecessary encoding/decoding which yields ~3% performance overhead.
 Note that JsonSlicer supports both unicode and binary output regardless
 of input format.
 
@@ -158,7 +158,7 @@ objects as is (`'friends'`).
   Common usage pattern for this mode is
 
   ```python
-  for object in JsonWriter(...)
+  for object in JsonSlicer(...)
   ```
 
 * _'map_keys'_ - output objects as is when traversing arrays and tuples
@@ -196,7 +196,7 @@ consisting of map key and object when traversing maps.
   Common usage pattern for this mode is
 
   ```python
-  for *path, object in JsonWriter(...)
+  for *path, object in JsonSlicer(...)
   ```
 
 _yajl_allow_comments_ enables corresponding YAJL flag, which is
@@ -242,7 +242,7 @@ is documented as follows:
 
 _encoding_ may be used to override output encoding, which is derived
 from the input file handle if possible, or otherwise set to the
-default one as Python builttn `open()` would use (usually `'UTF-8'`).
+default one as Python builtin `open()` would use (usually `'UTF-8'`).
 
 _errors_ is an optional string that specifies how encoding and
 decoding errors are to be handled. Defaults to `'strict'`
