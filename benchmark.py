@@ -102,7 +102,7 @@ if __name__ == '__main__':
         for n, (*path, item) in enumerate(parser):
             assert(item[b'id'] == n)
 
-    with TestCase('**JsonSlicer (full paths, unicode output)**', 'bytes', args.json_size, results):
+    with TestCase('**JsonSlicer (full paths, unicode output)**', 'str', args.json_size, results):
         gen = io.StringIO(jsondata)
         parser = JsonSlicer(gen, ('level1', 'level2', None), path_mode='full')
         for n, (*path, item) in enumerate(parser):

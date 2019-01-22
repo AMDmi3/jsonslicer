@@ -274,7 +274,7 @@ The results of bundled benchmark on Python 3.7 / clang 6.0.1 / `-O2 -DNODEBUG` /
 |  **JsonSlicer (no paths, binary input, unicode output)** |    str |       1033.3K |
 | **JsonSlicer (no paths, unicode input, unicode output)** |    str |       1006.2K |
 |               **JsonSlicer (full paths, binary output)** |  bytes |        787.6K |
-|              **JsonSlicer (full paths, unicode output)** |  bytes |        586.5K |
+|              **JsonSlicer (full paths, unicode output)** |    str |        586.5K |
 |                                         ijson.yajl2_cffi |  bytes |         75.7K |
 |                                              ijson.yajl2 |  bytes |         52.0K |
 |                                             ijson.python |    str |         32.2K |
