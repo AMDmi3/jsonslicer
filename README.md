@@ -75,12 +75,12 @@ with open('people.json') as data:
 
 # ...as well as complete path information
 with open('people.json') as data:
-    for person in JsonSlicer(data, (None, None), path_format='full'):
-        print(person)
-        # ('friends', 0, {'name': 'John', 'age': 31})
-        # ('friends', 1, {'name': 'Ivan', 'age': 26})
-        # ('colleagues', 'manager', {'name': 'Jack', 'age': 33})
-        # ('colleagues', 'subordinate', {'name': 'Lucy', 'age': 21})
+    for *path, person in JsonSlicer(data, (None, None), path_format='full'):
+        print(path, person)
+        # ('friends', 0) {'name': 'John', 'age': 31})
+        # ('friends', 1) {'name': 'Ivan', 'age': 26})
+        # ('colleagues', 'manager') {'name': 'Jack', 'age': 33})
+        # ('colleagues', 'subordinate') {'name': 'Lucy', 'age': 21})
 
 # Extract all instances of deep nested field
 with open('people.json') as data:
