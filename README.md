@@ -289,7 +289,7 @@ JsonSlicer is currently in beta stage, pending production use in
 
 ## Requirements
 
-- Python 3.6+
+- Python 3.5+
 - pkg-config
 - [yajl](https://lloyd.github.io/yajl/) JSON pasing library
 
