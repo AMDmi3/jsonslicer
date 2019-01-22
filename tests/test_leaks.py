@@ -96,6 +96,7 @@ class TestJsonSlicer(unittest.TestCase):
     def test_leaks_iterate(self):
         def wrapper():
             js = JsonSlicer(io.BytesIO(b'[0,1,2]'), (None,))
+            next(js)
 
         self.assertNoLeaks(wrapper)
 
