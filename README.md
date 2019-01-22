@@ -281,14 +281,11 @@ The results of bundled benchmark on Python 3.7 / clang 6.0.1 / `-O2 -DNODEBUG` /
 
 ## Status/TODO
 
-JsonSlicer is currently in alpha stage, passing tests but pending
-code safety checks and improvements. Also, the following mandatory
-features are planned to be implemented to consider the module ready
-to use:
+JsonSlicer is currently in beta stage, pending production use in
+[Repology](https://repology.org) project. Current testing foci are:
 
-- Allow to transparently operate on text I/O handles (in addition
-  to bytes I/O) and return text data (instead of bytes) with specified
-  encoding
+- Edge cases with uncommon encoding (input/output) configurations
+- Absence of memory leaks
 
 ## Requirements
 

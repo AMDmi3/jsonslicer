@@ -8,7 +8,7 @@ from setuptools import Extension, setup
 
 here = path.abspath(path.dirname(__file__))
 
-version = '0.0.1'
+version = '0.1.0'
 
 
 def pkgconfig(package):
@@ -42,7 +42,7 @@ setup(
     license='MIT',
     keywords=['json', 'parser', 'pull', 'stream'],
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: C++',
