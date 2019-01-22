@@ -9,6 +9,7 @@
 [![PyPI downloads](https://img.shields.io/pypi/dm/jsonslicer.svg)](https://pypi.org/project/jsonslicer/)
 [![PyPI version](https://img.shields.io/pypi/v/jsonslicer.svg)](https://pypi.org/project/jsonslicer/)
 [![PyPI pythons](https://img.shields.io/pypi/pyversions/jsonslicer.svg)](https://pypi.org/project/jsonslicer/)
+[![Github commits (since latest release)](https://img.shields.io/github/commits-since/AMDmi3/jsonslicer/latest.svg)](https://github.com/AMDmi3/jsonslicer)
 
 ## Overview
 
