@@ -264,15 +264,19 @@ and JsonSlicer was written to be better. Namely,
 
 The results of bundled benchmark on Python 3.7 / clang 6.0.1 / `-O2 -DNODEBUG` / FreeBSD 12.0 amd64 / Core i7-6600U CPU @ 2.60GHz.
 
-| Facility                    | Type   | Objects/sec   |
-|:----------------------------|:------:|--------------:|
-| json.loads()                | str    | 1198.7K       |
-| json.load(StringIO())       | str    | 1126.7K       |
-| **JsonSlicer (no paths)**   | bytes  | 1195.2K       |
-| **JsonSlicer (full paths)** | bytes  | 817.9K        |
-| ijson.yajl2_cffi            | bytes  | 75.1K         |
-| ijson.yajl2                 | bytes  | 52.4K         |
-| ijson.python                | str    | 32.9K         |
+|                                                 Facility |   Type |   Objects/sec |
+|:---------------------------------------------------------|:------:|--------------:|
+|                                             json.loads() |    str |       1155.9K |
+|                                    json.load(StringIO()) |    str |       1104.1K |
+|   **JsonSlicer (no paths, binary input, binary output)** |  bytes |       1149.5K |
+|  **JsonSlicer (no paths, unicode input, binary output)** |  bytes |       1121.3K |
+|  **JsonSlicer (no paths, binary input, unicode output)** |    str |       1033.3K |
+| **JsonSlicer (no paths, unicode input, unicode output)** |    str |       1006.2K |
+|               **JsonSlicer (full paths, binary output)** |  bytes |        787.6K |
+|              **JsonSlicer (full paths, unicode output)** |  bytes |        586.5K |
+|                                         ijson.yajl2_cffi |  bytes |         75.7K |
+|                                              ijson.yajl2 |  bytes |         52.0K |
+|                                             ijson.python |    str |         32.2K |
 
 ## Status/TODO
 
