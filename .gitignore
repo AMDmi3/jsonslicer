@@ -1,4 +1,5 @@
 .*
+*.bak
 build
 dist
 jsonslicer.egg-info
