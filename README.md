@@ -281,8 +281,8 @@ The results of bundled benchmark on Python 3.7.2 / clang 6.0.1 / `-O2 -DNDEBUG` 
 
 ## Status/TODO
 
-JsonSlicer is currently in beta stage, pending production use in
-[Repology](https://repology.org) project. Current testing foci are:
+JsonSlicer is currently in beta stage, used in production in
+[Repology](https://repology.org) project. Testing foci are:
 
 - Edge cases with uncommon encoding (input/output) configurations
 - Absence of memory leaks
