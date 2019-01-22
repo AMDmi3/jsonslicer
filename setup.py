@@ -57,6 +57,12 @@ setup(
             extra_compile_args=[
                 '-std=c++11',
                 '-DJSONSLICER_VERSION=\"{}\"'.format(version),
+                # JsonSlicer can operate in two modes, either storing paths
+                # in binary or in unicode form internally. The former is
+                # slightly faster since we need to compare bytes instead of
+                # unicode, both seem to be correct, but I'm leaving the toggle
+                # here if some edge cases are discovered.
+                '-DUSE_BYTES_INTERNALLY',
                 '-fno-exceptions',
                 '-fno-rtti',
             ],

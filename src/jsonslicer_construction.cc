@@ -197,11 +197,15 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	for (Py_ssize_t i = 0; i < PySequence_Size(pattern); i++) {
 		PyObjPtr item = PyObjPtr::Take(PySequence_GetItem(pattern, i));
 		if (item) {
+#ifdef USE_BYTES_INTERNALLY
+			item = encode(item, output_encoding, output_errors);
+#else // use output encoding internally
 			if (binary) {
 				item = encode(item, output_encoding, output_errors);
 			} else {
 				item = decode(item, output_encoding, output_errors);
 			}
+#endif
 		}
 		if (!item) {
 			new_pattern.clear();
@@ -276,6 +280,7 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 	}
 
 	if (binary) {
+		// e.g. output is never decoded
 		self->output_errors = {};
 		self->output_encoding = {};
 	} else {

@@ -159,9 +159,15 @@ int handle_map_key(void* ctx, const unsigned char* str, size_t len) {
 	JsonSlicer* self = (JsonSlicer*)ctx;
 
 	PyObjPtr key = PyObjPtr::Take(PyBytes_FromStringAndSize(reinterpret_cast<const char*>(str), len));
+#ifdef USE_BYTES_INTERNALLY
+	if (key && self->state == JsonSlicer::State::CONSTRUCTING) {
+		key = decode(key, self->output_encoding, self->output_errors);
+	}
+#else // use output encoding internally
 	if (key) {
 		key = decode(key, self->output_encoding, self->output_errors);
 	}
+#endif
 	if (!key.valid()) {
 		return false;
 	}
