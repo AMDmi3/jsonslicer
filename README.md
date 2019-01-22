@@ -44,11 +44,11 @@ from jsonslicer import JsonSlicer
 # Extract specific elements:
 with open('people.json') as data:
     ivans_age = next(JsonSlicer(data, ('friends', 1, 'age')))
-	# 26
+    # 26
 
 with open('people.json') as data:
     managers_name = next(JsonSlicer(data, ('colleagues', 'manager', 'name')))
-	# 'Jack'
+    # 'Jack'
 
 # Iterate over collection(s) by using wildcards in the path:
 with open('people.json') as data:
@@ -92,18 +92,18 @@ with open('people.json') as data:
 
 ```
 jsonslicer.JsonSlicer(
-	file,
-	path_prefix,
-	read_size=1024,
-	path_mode=None,
-	yajl_allow_comments=False,
-	yajl_dont_validate_strings=False,
-	yajl_allow_trailing_garbage=False,
-	yajl_allow_multiple_values=False,
-	yajl_allow_partial_values=False,
-	encoding=None,
-	errors=None,
-	binary=False,
+    file,
+    path_prefix,
+    read_size=1024,
+    path_mode=None,
+    yajl_allow_comments=False,
+    yajl_dont_validate_strings=False,
+    yajl_allow_trailing_garbage=False,
+    yajl_allow_multiple_values=False,
+    yajl_allow_partial_values=False,
+    encoding=None,
+    errors=None,
+    binary=False,
 )
 ```
 
