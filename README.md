@@ -289,7 +289,7 @@ JsonSlicer is currently in beta stage, used in production in
 
 ## Requirements
 
-- Python 3.5+ (lower versions not tested, Python 2 not supported)
+- Python 3.4+ (Python 2 not supported)
 - pkg-config
 - [yajl](https://lloyd.github.io/yajl/) 2.0.3+ (older versions lack pkgconfig file)
 
