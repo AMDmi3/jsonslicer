@@ -22,7 +22,7 @@ matrix:
     - python: 3.6
       env: CXX=g++ YAJL=2.0.4
     - python: 3.6
-      env: CXX=g++ YAJL=2.0.1
+      env: CXX=g++ YAJL=2.0.3
     # extra checks
     - python: 3.6
       env: CXX=g++ ASAN=yes
