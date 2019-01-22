@@ -84,9 +84,7 @@ bool generic_start_container(JsonSlicer* self, T&& make_container, U&& make_key)
 			}
 		}
 
-		if (!self->constructing.push_back(container)) {
-			return false;
-		}
+		return self->constructing.push_back(container);
 	}
 	return true;
 }
@@ -101,9 +99,7 @@ bool generic_end_container(JsonSlicer* self) {
 		PyObjPtr container = self->constructing.pop_back();
 
 		if (self->constructing.empty()) {
-			if (!finish_complete_object(self, container)) {
-				return false;
-			}
+			return finish_complete_object(self, container);
 		}
 	}
 	return true;
