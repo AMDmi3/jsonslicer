@@ -22,6 +22,7 @@ import unittest
 
 from .common import runJS
 
+
 JSON = """
 {
     "friends": [
@@ -34,6 +35,7 @@ JSON = """
     }
 }
 """
+
 
 class TestReadmeExamples(unittest.TestCase):
     def test_readme_examples(self):

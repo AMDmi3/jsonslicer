@@ -19,20 +19,19 @@
 # THE SOFTWARE.
 
 import io
-import json
 import os
-import random
-import sys
 import unittest
+
+from jsonslicer import JsonSlicer
 
 if os.environ.get('TRACEMALLOC'):
     import gc
     import tracemalloc
 
-from jsonslicer import JsonSlicer
-
 
 gen_index = 0
+
+
 def gen_bytes():
     global gen_index
     gen_index += 1
@@ -72,7 +71,6 @@ class TestJsonSlicer(unittest.TestCase):
 
         if leak_message:
             self.fail('Memory leaks detected\n' + leak_message)
-
 
     def test_leaks_construct(self):
         def wrapper():
