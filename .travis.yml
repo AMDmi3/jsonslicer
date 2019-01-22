@@ -5,7 +5,7 @@ matrix:
   include:
     # base
     - python: 3.6
-      env: CXX=g++ BENCHMARK=yes
+      env: CXX=g++ BENCHMARK=yes CPPCHECK=yes
     # python versions
     - python: 3.5
       env: CXX=g++
@@ -13,7 +13,7 @@ matrix:
       env: CXX=g++
     # compilers
     - python: 3.6
-      env: CXX=g++-7 PACKAGES=g++-7
+      env: CXX=g++-7
     - python: 3.6
       env: CXX=clang++
     # yajl versions
@@ -31,7 +31,8 @@ matrix:
 before_script:
   - sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -qq
-  - if [ -n "$PACKAGES" ]; then sudo apt-get install $PACKAGES; fi
+  - if [ "$CXX" = "g++-7" ]; then sudo apt-get install g++-7; fi
+  - if [ -n "$CPPCHECK" ]; then sudo apt-get install cppcheck; fi
   - |-
     if [ -z "$YAJL" ]; then
         sudo apt-get install libyajl-dev
@@ -80,7 +81,5 @@ script:
         python benchmark.py
     fi
 after_success:
-  - |-
-    if [ -n "$COVERAGE" ]; then
-        coveralls -i src
-    fi
+  - if [ -n "$CPPCHECK" ]; then cppcheck --std=c++11 --quiet --enable=style,performance,portability,missingInclude --error-exitcode=0 src; fi
+  - if [ -n "$COVERAGE" ]; then coveralls -i src; fi
