@@ -3,24 +3,42 @@ dist: xenial
 sudo: required
 matrix:
   include:
+    # base
     - python: 3.6
       env: CXX=g++ BENCHMARK=yes
-    - python: 3.6
-      env: CXX=g++-7 PACKAGES=g++-7
-    - python: 3.6
-      env: CXX=clang++
-    - python: 3.6
-      env: CXX=g++ ASAN=yes
-    - python: 3.6
-      env: CXX=g++ TRACEMALLOC=yes COVERAGE=yes
+    # python versions
     - python: 3.5
       env: CXX=g++
     - python: 3.7
       env: CXX=g++
+    # compilers
+    - python: 3.6
+      env: CXX=g++-7 PACKAGES=g++-7
+    - python: 3.6
+      env: CXX=clang++
+    # yajl versions
+    - python: 3.6
+      env: CXX=g++ YAJL=master
+    - python: 3.6
+      env: CXX=g++ YAJL=2.0.4
+    - python: 3.6
+      env: CXX=g++ YAJL=2.0.1
+    # extra checks
+    - python: 3.6
+      env: CXX=g++ ASAN=yes
+    - python: 3.6
+      env: CXX=g++ TRACEMALLOC=yes COVERAGE=yes
 before_script:
   - sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -qq
-  - sudo apt-get install libyajl-dev $PACKAGES
+  - if [ -n "$PACKAGES" ]; then sudo apt-get install $PACKAGES; fi
+  - |-
+    if [ -z "$YAJL" ]; then
+        sudo apt-get install libyajl-dev
+    else
+        sudo apt-get install cmake
+        wget -qO- https://github.com/lloyd/yajl/archive/$YAJL.tar.gz | tar -xzf- && (cd yajl-$YAJL && cmake . && make && sudo make install && sudo ldconfig)
+    fi
   - |-
     if [ -n "$BENCHMARK" ]; then
         pip install ijson
