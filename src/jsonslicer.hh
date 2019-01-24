@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef JSONSLICER_JSONSLICER_H
-#define JSONSLICER_JSONSLICER_H
+#ifndef JSONSLICER_JSONSLICER_HH
+#define JSONSLICER_JSONSLICER_HH
 
 #include "pyobjlist.hh"
 #include "pyobjptr.hh"

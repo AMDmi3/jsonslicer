@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef JSONSLICER_PYOBJPTR_H
-#define JSONSLICER_PYOBJPTR_H
+#ifndef JSONSLICER_PYOBJPTR_HH
+#define JSONSLICER_PYOBJPTR_HH
 
 #include <Python.h>
 

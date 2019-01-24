@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef JSONSLICER_HANDLERS_H
-#define JSONSLICER_HANDLERS_H
+#ifndef JSONSLICER_HANDLERS_HH
+#define JSONSLICER_HANDLERS_HH
 
 #include <yajl/yajl_parse.h>
 
