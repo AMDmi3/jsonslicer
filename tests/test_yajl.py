@@ -26,7 +26,7 @@ from .common import runJS
 class TestJsonSlicerYajlFlags(unittest.TestCase):
     def test_yajl_allow_comments_off(self):
         with self.assertRaises(RuntimeError):
-            runJS('1 // comment')
+            runJS('1 // comment', yajl_allow_comments=False)
 
     def test_yajl_allow_comments_on(self):
         self.assertEqual(
@@ -36,7 +36,7 @@ class TestJsonSlicerYajlFlags(unittest.TestCase):
 
     def test_yajl_dont_validate_strings_off(self):
         with self.assertRaises(RuntimeError):
-            runJS(b'"\xff"', binary=True)
+            runJS(b'"\xff"', binary=True, yajl_dont_validate_strings=False)
 
     def test_yajl_dont_validate_strings_on(self):
         self.assertEqual(
@@ -46,17 +46,17 @@ class TestJsonSlicerYajlFlags(unittest.TestCase):
 
     def test_yajl_allow_trailing_garbage_off(self):
         with self.assertRaises(RuntimeError):
-            runJS('{}{}')
+            runJS('{}{}', yajl_allow_trailing_garbage=False)
 
     def test_yajl_allow_trailing_garbage_on(self):
         self.assertEqual(
-            runJS('{}{}', (), yajl_allow_trailing_garbage=True),
+            runJS('{}{}', yajl_allow_trailing_garbage=True),
             [{}]
         )
 
     def test_yajl_allow_multiple_values_off(self):
         with self.assertRaises(RuntimeError):
-            runJS('{}{}')
+            runJS('{}{}', yajl_allow_multiple_values=False)
 
     def test_yajl_allow_multiple_values_on(self):
         self.assertEqual(
@@ -66,7 +66,7 @@ class TestJsonSlicerYajlFlags(unittest.TestCase):
 
     def test_yajl_allow_partial_values_off(self):
         with self.assertRaises(RuntimeError):
-            runJS('[1', (None,))
+            runJS('[1', (None,), yajl_allow_partial_values=False)
 
     def test_yajl_allow_partial_values_on(self):
         self.assertEqual(
