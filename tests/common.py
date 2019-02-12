@@ -23,7 +23,7 @@ import io
 from jsonslicer import JsonSlicer
 
 
-def runJS(data, path=(), **kwargs):
+def run_js(data, path=(), **kwargs):
     if isinstance(data, bytes):
         dataio = io.BytesIO(data)
     else:

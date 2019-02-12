@@ -20,94 +20,94 @@
 
 import unittest
 
-from .common import runJS
+from .common import run_js
 
 
 class TestJsonSlicerTypesFromRoot(unittest.TestCase):
     def test_parses_int_from_root(self):
-        self.assertEqual(runJS('1000000', ()), [1000000])
+        self.assertEqual(run_js('1000000', ()), [1000000])
 
     def test_parses_sint_from_root(self):
-        self.assertEqual(runJS('-1000000', ()), [-1000000])
+        self.assertEqual(run_js('-1000000', ()), [-1000000])
 
     def test_parses_double_from_root(self):
-        self.assertEqual(runJS('0.33', ()), [0.33])
+        self.assertEqual(run_js('0.33', ()), [0.33])
 
     def test_parses_string_from_root(self):
-        self.assertEqual(runJS('"test"', ()), ['test'])
+        self.assertEqual(run_js('"test"', ()), ['test'])
 
     def test_parses_none_from_root(self):
-        self.assertEqual(runJS('null', ()), [None])
+        self.assertEqual(run_js('null', ()), [None])
 
     def test_parses_true_from_root(self):
-        self.assertEqual(runJS('true', ()), [True])
+        self.assertEqual(run_js('true', ()), [True])
 
     def test_parses_false_from_root(self):
-        self.assertEqual(runJS('false', ()), [False])
+        self.assertEqual(run_js('false', ()), [False])
 
     def test_parses_array_from_root(self):
-        self.assertEqual(runJS('[]', ()), [[]])
+        self.assertEqual(run_js('[]', ()), [[]])
 
     def test_parses_dict_from_root(self):
-        self.assertEqual(runJS('{}', ()), [{}])
+        self.assertEqual(run_js('{}', ()), [{}])
 
 
 class TestJsonSlicerTypesFromContainer(unittest.TestCase):
     def test_parses_int_from_container(self):
-        self.assertEqual(runJS('[1000000]', (None,)), [1000000])
+        self.assertEqual(run_js('[1000000]', (None,)), [1000000])
 
     def test_parses_sint_from_container(self):
-        self.assertEqual(runJS('[-1000000]', (None,)), [-1000000])
+        self.assertEqual(run_js('[-1000000]', (None,)), [-1000000])
 
     def test_parses_double_from_container(self):
-        self.assertEqual(runJS('[0.33]', (None,)), [0.33])
+        self.assertEqual(run_js('[0.33]', (None,)), [0.33])
 
     def test_parses_string_from_container(self):
-        self.assertEqual(runJS('["test"]', (None,)), ['test'])
+        self.assertEqual(run_js('["test"]', (None,)), ['test'])
 
     def test_parses_none_from_container(self):
-        self.assertEqual(runJS('[null]', (None,)), [None])
+        self.assertEqual(run_js('[null]', (None,)), [None])
 
     def test_parses_true_from_container(self):
-        self.assertEqual(runJS('[true]', (None,)), [True])
+        self.assertEqual(run_js('[true]', (None,)), [True])
 
     def test_parses_false_from_container(self):
-        self.assertEqual(runJS('[false]', (None,)), [False])
+        self.assertEqual(run_js('[false]', (None,)), [False])
 
     def test_parses_array_from_container(self):
-        self.assertEqual(runJS('[[]]', (None,)), [[]])
+        self.assertEqual(run_js('[[]]', (None,)), [[]])
 
     def test_parses_dict_from_container(self):
-        self.assertEqual(runJS('[{}]', (None,)), [{}])
+        self.assertEqual(run_js('[{}]', (None,)), [{}])
 
 
 class TestJsonSlicerTypesFromNestedContainer(unittest.TestCase):
     def test_parses_int_from_nested(self):
-        self.assertEqual(runJS('[[1000000]]', (None,)), [[1000000]])
+        self.assertEqual(run_js('[[1000000]]', (None,)), [[1000000]])
 
     def test_parses_sint_from_nested(self):
-        self.assertEqual(runJS('[[-1000000]]', (None,)), [[-1000000]])
+        self.assertEqual(run_js('[[-1000000]]', (None,)), [[-1000000]])
 
     def test_parses_double_from_nested(self):
-        self.assertEqual(runJS('[[0.33]]', (None,)), [[0.33]])
+        self.assertEqual(run_js('[[0.33]]', (None,)), [[0.33]])
 
     def test_parses_string_from_nested(self):
-        self.assertEqual(runJS('[["test"]]', (None,)), [['test']])
+        self.assertEqual(run_js('[["test"]]', (None,)), [['test']])
 
     def test_parses_none_from_nested(self):
-        self.assertEqual(runJS('[[null]]', (None,)), [[None]])
+        self.assertEqual(run_js('[[null]]', (None,)), [[None]])
 
     def test_parses_true_from_nested(self):
-        self.assertEqual(runJS('[[true]]', (None,)), [[True]])
+        self.assertEqual(run_js('[[true]]', (None,)), [[True]])
 
     def test_parses_false_from_nested(self):
-        self.assertEqual(runJS('[[false]]', (None,)), [[False]])
+        self.assertEqual(run_js('[[false]]', (None,)), [[False]])
 
     def test_parses_array_from_nested(self):
-        self.assertEqual(runJS('[[[]]]', (None,)), [[[]]])
+        self.assertEqual(run_js('[[[]]]', (None,)), [[[]]])
 
     def test_parses_dict_from_nested(self):
-        self.assertEqual(runJS('[[{}]]', (None,)), [[{}]])
+        self.assertEqual(run_js('[[{}]]', (None,)), [[{}]])
 
 
 if __name__ == '__main__':

@@ -23,14 +23,14 @@
 import argparse
 import io
 import json
-import os
-import sys
 import time
 
 import ijson.backends.python as ijson_python
 import ijson.backends.yajl2 as ijson_yajl2
 import ijson.backends.yajl2_cffi as ijson_yajl2_cffi
+
 from jsonslicer import JsonSlicer
+
 from tabulate import tabulate
 
 
@@ -126,9 +126,10 @@ if __name__ == '__main__':
         for n, item in enumerate(parser):
             assert(item['id'] == n)
 
-    print(tabulate(results,
+    print(tabulate(
+        results,
         headers=['Facility', 'Type', 'Objects/sec'],
         stralign='right',
-        #colalign=['left', 'center', 'right'],
+        # colalign=['left', 'center', 'right'],
         tablefmt='pipe'
     ))

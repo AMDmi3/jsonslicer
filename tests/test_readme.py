@@ -20,7 +20,7 @@
 
 import unittest
 
-from .common import runJS
+from .common import run_js
 
 
 JSON = """
@@ -40,17 +40,17 @@ JSON = """
 class TestReadmeExamples(unittest.TestCase):
     def test_readme_examples(self):
         self.assertEqual(
-            runJS(JSON, ('friends', 1, 'age')),
+            run_js(JSON, ('friends', 1, 'age')),
             [26]
         )
 
         self.assertEqual(
-            runJS(JSON, ('colleagues', 'manager', 'name')),
+            run_js(JSON, ('colleagues', 'manager', 'name')),
             ['Jack']
         )
 
         self.assertEqual(
-            runJS(JSON, ('friends', None)),
+            run_js(JSON, ('friends', None)),
             [
                 {'name': 'John', 'age': 31},
                 {'name': 'Ivan', 'age': 26},
@@ -58,7 +58,7 @@ class TestReadmeExamples(unittest.TestCase):
         )
 
         self.assertEqual(
-            runJS(JSON, (None, None)),
+            run_js(JSON, (None, None)),
             [
                 {'name': 'John', 'age': 31},
                 {'name': 'Ivan', 'age': 26},
@@ -68,7 +68,7 @@ class TestReadmeExamples(unittest.TestCase):
         )
 
         self.assertEqual(
-            runJS(JSON, ('colleagues', None), path_mode='map_keys'),
+            run_js(JSON, ('colleagues', None), path_mode='map_keys'),
             [
                 ('manager', {'name': 'Jack', 'age': 33}),
                 ('subordinate', {'name': 'Lucy', 'age': 21}),
@@ -76,7 +76,7 @@ class TestReadmeExamples(unittest.TestCase):
         )
 
         self.assertEqual(
-            runJS(JSON, (None, None), path_mode='full'),
+            run_js(JSON, (None, None), path_mode='full'),
             [
                 ('friends', 0, {'name': 'John', 'age': 31}),
                 ('friends', 1, {'name': 'Ivan', 'age': 26}),
@@ -86,7 +86,7 @@ class TestReadmeExamples(unittest.TestCase):
         )
 
         self.assertEqual(
-            sum(runJS(JSON, (None, None, 'age'))),
+            sum(run_js(JSON, (None, None, 'age'))),
             111
         )
 

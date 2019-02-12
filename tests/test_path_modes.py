@@ -20,7 +20,7 @@
 
 import unittest
 
-from .common import runJS
+from .common import run_js
 
 
 JSON = """
@@ -38,7 +38,7 @@ JSON = """
 class TestPathModes(unittest.TestCase):
     def test_path_mode_ignore(self):
         self.assertEqual(
-            runJS(JSON, (None, None), path_mode='ignore'),
+            run_js(JSON, (None, None), path_mode='ignore'),
             [
                 1,
                 2
@@ -47,7 +47,7 @@ class TestPathModes(unittest.TestCase):
 
     def test_path_mode_map_keys(self):
         self.assertEqual(
-            runJS(JSON, (None, None), path_mode='map_keys'),
+            run_js(JSON, (None, None), path_mode='map_keys'),
             [
                 ('b', 1),
                 2
@@ -56,7 +56,7 @@ class TestPathModes(unittest.TestCase):
 
     def test_path_mode_full(self):
         self.assertEqual(
-            runJS(JSON, (None, None), path_mode='full'),
+            run_js(JSON, (None, None), path_mode='full'),
             [
                 ('a', 'b', 1),
                 ('c', 0, 2)

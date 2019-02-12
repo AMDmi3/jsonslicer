@@ -20,57 +20,57 @@
 
 import unittest
 
-from .common import runJS
+from .common import run_js
 
 
 class TestJsonSlicerYajlFlags(unittest.TestCase):
     def test_yajl_allow_comments_off(self):
         with self.assertRaises(RuntimeError):
-            runJS('1 // comment', yajl_allow_comments=False)
+            run_js('1 // comment', yajl_allow_comments=False)
 
     def test_yajl_allow_comments_on(self):
         self.assertEqual(
-            runJS('1 // comment', yajl_allow_comments=True),
+            run_js('1 // comment', yajl_allow_comments=True),
             [1]
         )
 
     def test_yajl_dont_validate_strings_off(self):
         with self.assertRaises(RuntimeError):
-            runJS(b'"\xff"', binary=True, yajl_dont_validate_strings=False)
+            run_js(b'"\xff"', binary=True, yajl_dont_validate_strings=False)
 
     def test_yajl_dont_validate_strings_on(self):
         self.assertEqual(
-            runJS(b'"\xff"', binary=True, yajl_dont_validate_strings=True),
+            run_js(b'"\xff"', binary=True, yajl_dont_validate_strings=True),
             [b'\xff']
         )
 
     def test_yajl_allow_trailing_garbage_off(self):
         with self.assertRaises(RuntimeError):
-            runJS('{}{}', yajl_allow_trailing_garbage=False)
+            run_js('{}{}', yajl_allow_trailing_garbage=False)
 
     def test_yajl_allow_trailing_garbage_on(self):
         self.assertEqual(
-            runJS('{}{}', yajl_allow_trailing_garbage=True),
+            run_js('{}{}', yajl_allow_trailing_garbage=True),
             [{}]
         )
 
     def test_yajl_allow_multiple_values_off(self):
         with self.assertRaises(RuntimeError):
-            runJS('{}{}', yajl_allow_multiple_values=False)
+            run_js('{}{}', yajl_allow_multiple_values=False)
 
     def test_yajl_allow_multiple_values_on(self):
         self.assertEqual(
-            runJS('{}{}', yajl_allow_multiple_values=True),
+            run_js('{}{}', yajl_allow_multiple_values=True),
             [{}, {}]
         )
 
     def test_yajl_allow_partial_values_off(self):
         with self.assertRaises(RuntimeError):
-            runJS('[1', (None,), yajl_allow_partial_values=False)
+            run_js('[1', (None,), yajl_allow_partial_values=False)
 
     def test_yajl_allow_partial_values_on(self):
         self.assertEqual(
-            runJS('[1', (None,), yajl_allow_partial_values=True),
+            run_js('[1', (None,), yajl_allow_partial_values=True),
             [1]
         )
 

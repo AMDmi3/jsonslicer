@@ -40,7 +40,7 @@ def gen_bytes():
 
 @unittest.skipIf(not os.environ.get('TRACEMALLOC'), 'TRACEMALLOC not set')
 class TestJsonSlicer(unittest.TestCase):
-    def assertNoLeaks(self, func):
+    def assertNoLeaks(self, func):  # noqa: N802
         tracemalloc.start(25)
 
         # run function once so unrelated objects get allocated

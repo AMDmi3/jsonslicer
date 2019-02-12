@@ -21,7 +21,7 @@
 import json
 import unittest
 
-from .common import runJS
+from .common import run_js
 
 
 DATA = {
@@ -74,7 +74,7 @@ class TestJsonSlicerPaths(unittest.TestCase):
 
         for path, result in cases.items():
             self.assertEqual(
-                runJS(JSON, path, path_mode='full'),
+                run_js(JSON, path, path_mode='full'),
                 result
             )
 
@@ -141,7 +141,7 @@ class TestJsonSlicerPaths(unittest.TestCase):
 
         for path, result in cases.items():
             self.assertEqual(
-                runJS(JSON, path, path_mode='full'),
+                run_js(JSON, path, path_mode='full'),
                 result
             )
 
