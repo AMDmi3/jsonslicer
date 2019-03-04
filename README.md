@@ -75,7 +75,7 @@ with open('people.json') as data:
 
 # ...as well as complete path information
 with open('people.json') as data:
-    for *path, person in JsonSlicer(data, (None, None), path_format='full'):
+    for *path, person in JsonSlicer(data, (None, None), path_mode='full'):
         print(path, person)
         # ('friends', 0) {'name': 'John', 'age': 31})
         # ('friends', 1) {'name': 'Ivan', 'age': 26})
