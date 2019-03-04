@@ -39,6 +39,8 @@ setup(
     author='Dmitry Marakasov',
     author_email='amdmi3@amdmi3.ru',
     url='https://github.com/AMDmi3/jsonslicer',
+    packages=['jsonslicer'],
+    package_data={'jsonslicer': ['py.typed', '__init__.pyi']},
     license='MIT',
     keywords=['json', 'parser', 'pull', 'stream'],
     classifiers=[
