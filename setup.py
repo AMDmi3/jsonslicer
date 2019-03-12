@@ -8,7 +8,7 @@ from setuptools import Extension, setup
 
 here = path.abspath(path.dirname(__file__))
 
-version = '0.1.3'
+version = '0.1.4'
 
 
 def pkgconfig(package):

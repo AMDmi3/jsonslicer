@@ -1,8 +1,8 @@
-from typing import Any, BinaryIO, Iterator, TextIO, Tuple, Union
+from typing import Any, IO, Iterator, Tuple, Union
 
 class JsonSlicer:
     def __init__(self,
-                 file: Union[BinaryIO, TextIO],
+                 file: IO,
                  path_prefix: Tuple[Union[str, bytes, None], ...],
                  read_size: int=...,
                  path_mode: str=...,

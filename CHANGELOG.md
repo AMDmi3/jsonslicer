@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4
+
+* Type stub fix
+
 ## 0.1.3
 
 * Type stub fixes
