@@ -34,11 +34,6 @@ matrix:
       env: CXX=g++ ASAN=yes
     - python: 3.6
       env: CXX=g++ TRACEMALLOC=yes COVERAGE=yes
-  allow_failures:
-    - python: 3.8-dev
-      env: CXX=g++
-    - python: nightly
-      env: CXX=g++
 before_script:
   - sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -qq
