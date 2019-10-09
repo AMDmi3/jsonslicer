@@ -70,7 +70,11 @@ PyTypeObject PyMutIndex_type = {
 	sizeof(PyMutIndex),        // tp_basicsize
 	0,                         // tp_itemsize
 	nullptr,                   // tp_dealloc
+#if PY_VERSION_HEX >= 0x03080000
+	0,                         // tp_vectorcall_offset
+#else
 	nullptr,                   // tp_print
+#endif
 	nullptr,                   // tp_getattr
 	nullptr,                   // tp_setattr
 	nullptr,                   // tp_reserved
@@ -112,5 +116,11 @@ PyTypeObject PyMutIndex_type = {
 	nullptr,                   // tp_weaklist
 	nullptr,                   // tp_del
 	0,                         // tp_version_tag
-	nullptr                    // tp_finalize
+	nullptr,                   // tp_finalize
+#if PY_VERSION_HEX >= 0x03080000
+	nullptr,                   // tp_vectorcall
+#if PY_VERSION_HEX < 0x03090000
+	nullptr,                   // tp_print
+#endif
+#endif
 };
