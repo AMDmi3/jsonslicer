@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5
+
+* Python 3.8+ compatibility fix
+
 ## 0.1.4
 
 * Type stub fix
