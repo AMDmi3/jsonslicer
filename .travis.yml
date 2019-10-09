@@ -39,7 +39,7 @@ matrix:
       env: CXX=g++
     - python: nightly
       env: CXX=g++
-before_script:
+install:
   - sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -qq
   - if [ "$CXX" = "g++-7" ]; then sudo apt-get install g++-7; fi
@@ -60,6 +60,10 @@ before_script:
   - |-
     if [ -n "$COVERAGE" ]; then
         pip install cpp-coveralls
+    fi
+before_script:
+  - |-
+    if [ -n "$COVERAGE" ]; then
         export CFLAGS="$CFLAGS -O0 -g --coverage"
         export LDFLAGS="$LDFLAGS --coverage"
     fi
