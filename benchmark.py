@@ -28,6 +28,7 @@ import time
 import ijson.backends.python as ijson_python
 import ijson.backends.yajl2 as ijson_yajl2
 import ijson.backends.yajl2_cffi as ijson_yajl2_cffi
+import ijson.backends.yajl2_c as ijson_yajl2_c
 
 from jsonslicer import JsonSlicer
 
@@ -106,6 +107,12 @@ if __name__ == '__main__':
         gen = io.StringIO(jsondata)
         parser = JsonSlicer(gen, ('level1', 'level2', None), path_mode='full')
         for n, (*path, item) in enumerate(parser):
+            assert(item['id'] == n)
+
+    with TestCase('ijson.yajl2_c', 'bytes', args.json_size, results):
+        gen = io.BytesIO(jsondata.encode('utf-8'))
+        parser = ijson_yajl2_c.items(gen, b'level1.level2.item')
+        for n, item in enumerate(parser):
             assert(item['id'] == n)
 
     with TestCase('ijson.yajl2_cffi', 'bytes', args.json_size, results):
