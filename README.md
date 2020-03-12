@@ -263,21 +263,22 @@ and JsonSlicer was written to be better. Namely,
 * It allows iterating over dictionaries and allows more flexibility when
   specifying paths/patterns of objects to iterate over
 
-The results of bundled benchmark on Python 3.7.2 / clang 6.0.1 / `-O2 -DNDEBUG` / FreeBSD 12.0 amd64 / Core i7-6600U CPU @ 2.60GHz.
+The results of bundled benchmark on Python 3.8.2 / clang 8.0.1 / `-O2 -DNDEBUG` / FreeBSD 12.1 amd64 / Core i7-6600U CPU @ 2.60GHz.
 
 |                                                 Facility |   Type |   Objects/sec |
-|:---------------------------------------------------------|:------:|--------------:|
-|                                             json.loads() |    str |       1155.9K |
-|                                    json.load(StringIO()) |    str |       1104.1K |
-|   **JsonSlicer (no paths, binary input, binary output)** |  bytes |       1149.5K |
-|  **JsonSlicer (no paths, unicode input, binary output)** |  bytes |       1121.3K |
-|  **JsonSlicer (no paths, binary input, unicode output)** |    str |       1033.3K |
-| **JsonSlicer (no paths, unicode input, unicode output)** |    str |       1006.2K |
-|               **JsonSlicer (full paths, binary output)** |  bytes |        787.6K |
-|              **JsonSlicer (full paths, unicode output)** |    str |        586.5K |
-|                                         ijson.yajl2_cffi |  bytes |         75.7K |
-|                                              ijson.yajl2 |  bytes |         52.0K |
-|                                             ijson.python |    str |         32.2K |
+|---------------------------------------------------------:|-------:|--------------:|
+|                                             json.loads() |    str |       1147.6K |
+|                                    json.load(StringIO()) |    str |       1139.3K |
+|   **JsonSlicer (no paths, binary input, binary output)** |  bytes |       1149.7K |
+|  **JsonSlicer (no paths, unicode input, binary output)** |  bytes |       1134.5K |
+|  **JsonSlicer (no paths, binary input, unicode output)** |    str |       1012.3K |
+| **JsonSlicer (no paths, unicode input, unicode output)** |    str |        996.2K |
+|               **JsonSlicer (full paths, binary output)** |  bytes |        763.1K |
+|              **JsonSlicer (full paths, unicode output)** |    str |        567.2K |
+|                                            ijson.yajl2_c |  bytes |        548.8K |
+|                                         ijson.yajl2_cffi |  bytes |         71.6K |
+|                                              ijson.yajl2 |  bytes |         56.4K |
+|                                             ijson.python |    str |         32.0K |
 
 ## Status/TODO
 
