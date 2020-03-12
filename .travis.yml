@@ -26,6 +26,8 @@ matrix:
     - python: 3.6
       env: CXX=g++ YAJL=master
     - python: 3.6
+      env: CXX=g++ YAJL=2.1.0
+    - python: 3.6
       env: CXX=g++ YAJL=2.0.4
     - python: 3.6
       env: CXX=g++ YAJL=2.0.3
