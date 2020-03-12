@@ -92,7 +92,7 @@ script:
     fi
   - |-
     if [ -n "$BENCHMARK" ]; then
-        echo "Note that these benchmark results are not reliable, since they are not run in the proper clean environment withoit interference form other processes, and Travis build may have debug flags turned on as well. See README.md for a real benchmark results. "
+        echo "Note that these benchmark results are not reliable, since they are not run in the proper clean environment without interference form other processes, and Travis build may have debug flags turned on as well. See README.md for a benchmark results on real hardware. "
         python benchmark.py
     fi
 after_success:
