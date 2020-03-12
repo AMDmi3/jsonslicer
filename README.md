@@ -259,9 +259,11 @@ comprehensions or in any place where iterator is accepted.
 The closest competitor is [ijson](https://github.com/isagalaev/ijson),
 and JsonSlicer was written to be better. Namely,
 
-* It's about 15x faster, similar in performance to Python's native `json` module
-* It allows iterating over dictionaries and allows more flexibility when
-  specifying paths/patterns of objects to iterate over
+* It's 15x to 2x faster (depending on ijson backend), close in
+  performance to Python's native `json` module
+* It supports more flexible paths/patterns specifying which objects
+  to iterate over in JSON hierarchy and provides consistent interface
+  for iteration over arrays and dictionaries
 
 The results of bundled benchmark on Python 3.8.2 / clang 8.0.1 / `-O2 -DNDEBUG` / FreeBSD 12.1 amd64 / Core i7-6600U CPU @ 2.60GHz.
 
