@@ -57,7 +57,7 @@ class TestCase:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-n', '--json-size', type=int, default=10000, help='number of objects to generate')
+    parser.add_argument('-n', '--json-size', type=int, default=100000, help='number of objects to generate')
     args = parser.parse_args()
 
     jsondata = '{"level1":{"level2":[' + ','.join(('{{"id":{}}}'.format(i) for i in range(args.json_size))) + ']}}'
