@@ -259,8 +259,9 @@ comprehensions or in any place where iterator is accepted.
 The closest competitor is [ijson](https://github.com/isagalaev/ijson),
 and JsonSlicer was written to be better. Namely,
 
-* It's 15x to 2x faster (depending on ijson backend), close in
-  performance to Python's native `json` module
+* It's up to 35x faster depending on ijson backend (starting with 3.0,
+  ijson supports comparable performance via yajl2_c backend), close in
+  performance to Python's native `json` module.
 * It supports more flexible paths/patterns specifying which objects
   to iterate over in JSON hierarchy and provides consistent interface
   for iteration over arrays and dictionaries
@@ -277,7 +278,7 @@ The results of bundled benchmark on Python 3.8.2 / clang 8.0.1 / `-O2 -DNDEBUG` 
 | **JsonSlicer (no paths, unicode input, unicode output)** |    str |        996.2K |
 |               **JsonSlicer (full paths, binary output)** |  bytes |        763.1K |
 |              **JsonSlicer (full paths, unicode output)** |    str |        567.2K |
-|                                            ijson.yajl2_c |  bytes |        548.8K |
+|                                            ijson.yajl2_c |  bytes |       1062.0K |
 |                                         ijson.yajl2_cffi |  bytes |         71.6K |
 |                                              ijson.yajl2 |  bytes |         56.4K |
 |                                             ijson.python |    str |         32.0K |
@@ -292,7 +293,7 @@ JsonSlicer is currently in beta stage, used in production in
 
 ## Requirements
 
-- Python 3.4+ (Python 2 not supported)
+- Python 3.4+
 - pkg-config
 - [yajl](https://lloyd.github.io/yajl/) 2.0.3+ (older versions lack pkgconfig file)
 
