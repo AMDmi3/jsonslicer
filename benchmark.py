@@ -73,55 +73,55 @@ if __name__ == '__main__':
         for n, item in enumerate(json.load(gen)['level1']['level2']):
             assert(item['id'] == n)
 
-    with TestCase('**JsonSlicer (no paths, binary input, binary output)**', 'bytes', args.json_size, results):
+    with TestCase('**JsonSlicer (no paths, binary input)**', 'bytes', args.json_size, results):
         gen = io.BytesIO(jsondata.encode('utf-8'))
         parser = JsonSlicer(gen, (b'level1', b'level2', None), binary=True)
         for n, item in enumerate(parser):
             assert(item[b'id'] == n)
 
-    with TestCase('**JsonSlicer (no paths, unicode input, binary output)**', 'bytes', args.json_size, results):
+    with TestCase('**JsonSlicer (no paths, unicode input)**', 'bytes', args.json_size, results):
         gen = io.StringIO(jsondata)
         parser = JsonSlicer(gen, (b'level1', b'level2', None), binary=True)
         for n, item in enumerate(parser):
             assert(item[b'id'] == n)
 
-    with TestCase('**JsonSlicer (no paths, binary input, unicode output)**', 'str', args.json_size, results):
+    with TestCase('**JsonSlicer (no paths, binary input)**', 'str', args.json_size, results):
         gen = io.BytesIO(jsondata.encode('utf-8'))
         parser = JsonSlicer(gen, ('level1', 'level2', None))
         for n, item in enumerate(parser):
             assert(item['id'] == n)
 
-    with TestCase('**JsonSlicer (no paths, unicode input, unicode output)**', 'str', args.json_size, results):
+    with TestCase('**JsonSlicer (no paths, unicode input)**', 'str', args.json_size, results):
         gen = io.StringIO(jsondata)
         parser = JsonSlicer(gen, ('level1', 'level2', None))
         for n, item in enumerate(parser):
             assert(item['id'] == n)
 
-    with TestCase('**JsonSlicer (full paths, binary output)**', 'bytes', args.json_size, results):
+    with TestCase('**JsonSlicer (full paths)**', 'bytes', args.json_size, results):
         gen = io.BytesIO(jsondata.encode('utf-8'))
         parser = JsonSlicer(gen, (b'level1', b'level2', None), path_mode='full', binary=True)
         for n, (*path, item) in enumerate(parser):
             assert(item[b'id'] == n)
 
-    with TestCase('**JsonSlicer (full paths, unicode output)**', 'str', args.json_size, results):
+    with TestCase('**JsonSlicer (full paths)**', 'str', args.json_size, results):
         gen = io.StringIO(jsondata)
         parser = JsonSlicer(gen, ('level1', 'level2', None), path_mode='full')
         for n, (*path, item) in enumerate(parser):
             assert(item['id'] == n)
 
-    with TestCase('ijson.yajl2_c', 'bytes', args.json_size, results):
+    with TestCase('ijson.yajl2_c', 'str', args.json_size, results):
         gen = io.BytesIO(jsondata.encode('utf-8'))
         parser = ijson_yajl2_c.items(gen, b'level1.level2.item')
         for n, item in enumerate(parser):
             assert(item['id'] == n)
 
-    with TestCase('ijson.yajl2_cffi', 'bytes', args.json_size, results):
+    with TestCase('ijson.yajl2_cffi', 'str', args.json_size, results):
         gen = io.BytesIO(jsondata.encode('utf-8'))
         parser = ijson_yajl2_cffi.items(gen, b'level1.level2.item')
         for n, item in enumerate(parser):
             assert(item['id'] == n)
 
-    with TestCase('ijson.yajl2', 'bytes', args.json_size, results):
+    with TestCase('ijson.yajl2', 'str', args.json_size, results):
         gen = io.BytesIO(jsondata.encode('utf-8'))
         parser = ijson_yajl2.items(gen, 'level1.level2.item')
         for n, item in enumerate(parser):
@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
     print(tabulate(
         results,
-        headers=['Facility', 'Type', 'Objects/sec'],
+        headers=['Facility', 'Output type', 'Objects/sec'],
         stralign='right',
         # colalign=['left', 'center', 'right'],
         tablefmt='pipe'
