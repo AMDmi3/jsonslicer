@@ -65,8 +65,10 @@ if __name__ == '__main__':
     results = []
 
     def _assert_items(parser, item_getter=lambda x: x, item_key='id'):
+        n = 0
         for n, item in enumerate(parser):
             assert(item_getter(item)[item_key] == n)
+        assert(n + 1 == args.json_size)
 
     with TestCase('json.loads()', 'str', args.json_size, results):
         _assert_items(json.loads(jsondata)['level1']['level2'])
@@ -107,12 +109,12 @@ if __name__ == '__main__':
 
     with TestCase('ijson.yajl2_c', 'str', args.json_size, results):
         gen = io.BytesIO(jsondata.encode('utf-8'))
-        parser = ijson_yajl2_c.items(gen, b'level1.level2.item')
+        parser = ijson_yajl2_c.items(gen, 'level1.level2.item')
         _assert_items(parser)
 
     with TestCase('ijson.yajl2_cffi', 'str', args.json_size, results):
         gen = io.BytesIO(jsondata.encode('utf-8'))
-        parser = ijson_yajl2_cffi.items(gen, b'level1.level2.item')
+        parser = ijson_yajl2_cffi.items(gen, 'level1.level2.item')
         _assert_items(parser)
 
     with TestCase('ijson.yajl2', 'str', args.json_size, results):
