@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.6
+
+* Provide more clear messages on missing dependencies
+
 ## 0.1.5
 
 * Python 3.8+ compatibility fix

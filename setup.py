@@ -9,7 +9,7 @@ from setuptools import Extension, setup
 
 here = path.abspath(path.dirname(__file__))
 
-version = '0.1.5'
+version = '0.1.6'
 
 
 def pkgconfig(package):
