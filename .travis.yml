@@ -39,6 +39,8 @@ matrix:
   allow_failures:
     - python: nightly
       env: CXX=g++
+    - python: 3.6
+      env: CXX=g++ ASAN=yes
 install:
   - sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -qq
