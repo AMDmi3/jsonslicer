@@ -4,11 +4,9 @@ sudo: required
 matrix:
   include:
     # base
-    - python: 3.6
+    - python: 3.8
       env: CXX=g++ BENCHMARK=yes CPPCHECK=yes
     # python versions
-    - python: 3.4
-      env: CXX=g++
     - python: 3.5
       env: CXX=g++
     - python: 3.7
