@@ -45,14 +45,16 @@ class TestCase:
     def __enter__(self):
         self.start_time = time.monotonic()
 
-    def __exit__(self, *args):
+    def __exit__(self, exc_type, exc_val, exc_tb):
         elapsed = time.monotonic() - self.start_time
 
         self.results.append((
             self.name,
             self.type,
-            '{:.1f}K'.format(self.iters / elapsed / 1000)
+            '{:.1f}K'.format(self.iters / elapsed / 1000) if not exc_type else '*failed*'
         ))
+
+        return True
 
 
 if __name__ == '__main__':
