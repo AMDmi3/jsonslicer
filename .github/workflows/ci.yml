@@ -46,6 +46,8 @@ jobs:
           make
           sudo make install
           sudo ldconfig
+      - name: Install dev depends
+        run: pip install -r requirements-dev.txt
       - name: Install depends (cppcheck)
         if: ${{ contains(matrix.features, 'cppcheck') }}
         run: sudo apt-get install cppcheck
@@ -80,6 +82,9 @@ jobs:
 
       - name: Install
         run: python setup.py install
+
+      - name: Run flake8
+        run: make flake8
 
       - name: Run tests
         if: ${{ !contains(matrix.features, 'asan') }}
