@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.7
+
+* Make YAJL error verbosity tunable
+
 ## 0.1.6
 
 * Provide more clear messages on missing dependencies
