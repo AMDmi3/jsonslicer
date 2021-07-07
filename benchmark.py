@@ -27,8 +27,8 @@ import time
 
 import ijson.backends.python as ijson_python
 import ijson.backends.yajl2 as ijson_yajl2
-import ijson.backends.yajl2_cffi as ijson_yajl2_cffi
 import ijson.backends.yajl2_c as ijson_yajl2_c
+import ijson.backends.yajl2_cffi as ijson_yajl2_cffi
 
 from jsonslicer import JsonSlicer
 
