@@ -1,6 +1,10 @@
+PYTHON?=	python3
 FLAKE8?=	flake8
+TWINE?=		twine
 
 all: build
+
+lint: flake8
 
 build:
 	python3 setup.py build
@@ -8,14 +12,16 @@ build:
 clean:
 	rm -rf build
 
-test::
+test:
 	python3 -m unittest discover
 
 flake8:
-	# D10  - Missing docstrings
-	# E501 - Line too long
-	# E722 - Do not use bare except
-	${FLAKE8} --ignore=D10,E501,E722 --count *.py tests
-
-flake8-all:
 	${FLAKE8} *.py tests
+
+sdist::
+	${PYTHON} setup.py sdist
+
+release::
+	rm -rf dist
+	${PYTHON} setup.py sdist
+	${TWINE} upload dist/*.tar.gz
