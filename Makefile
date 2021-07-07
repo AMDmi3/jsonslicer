@@ -1,5 +1,13 @@
 FLAKE8?=	flake8
 
+all: build
+
+build:
+	python3 setup.py build
+
+clean:
+	rm -rf build
+
 test::
 	python3 -m unittest discover
 
