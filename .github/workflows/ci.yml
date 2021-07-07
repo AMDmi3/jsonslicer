@@ -1,0 +1,114 @@
+name: CI
+on: [ push, pull_request ]
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { python: '3.8', cxx: g++, features: 'cppcheck,benchmark', yajl: package }
+          # python versions
+          - { python: '3.5', cxx: g++, features: '', yajl: package }
+          - { python: '3.6', cxx: g++, features: '', yajl: package }
+          - { python: '3.7', cxx: g++, features: '', yajl: package }
+          - { python: '3.9', cxx: g++, features: '', yajl: package }
+          - { python: '3.10.0-beta.3', cxx: g++, features: '', yajl: package }
+          # compilers
+          - { python: '3.8', cxx: clang++, features: '', yajl: package }
+          # yajl versions
+          - { python: '3.8', cxx: g++, features: '', yajl: master }
+          - { python: '3.8', cxx: g++, features: '', yajl: 2.0.3 }
+          - { python: '3.8', cxx: g++, features: '', yajl: 2.0.4 }
+          - { python: '3.8', cxx: g++, features: '', yajl: 2.1.0 }
+          # extra
+          - { python: '3.8', cxx: g++, features: asan, yajl: package }
+          - { python: '3.8', cxx: g++, features: 'tracemalloc,coverage', yajl: package }
+    steps:
+      - uses: actions/checkout@v2
+
+      ######################################################################
+      # Depends
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install yajl (package)
+        if: matrix.yajl == 'package'
+        run: sudo apt-get install libyajl-dev
+      - name: Install yajl (git)
+        if: matrix.yajl != 'package'
+        run: |
+          sudo apt-get install cmake
+          wget -qO- https://github.com/lloyd/yajl/archive/${{ matrix.yajl }}.tar.gz | tar -xzf-
+          cd yajl-${{ matrix.yajl }}
+          cmake .
+          make
+          sudo make install
+          sudo ldconfig
+      - name: Install depends (cppcheck)
+        if: ${{ contains(matrix.features, 'cppcheck') }}
+        run: sudo apt-get install cppcheck
+      - name: Install depends (benchmark)
+        if: ${{ contains(matrix.features, 'benchmark') }}
+        run: |
+          pip install ijson
+          pip install tabulate
+          pip install cffi
+
+      ######################################################################
+      # Env
+      - name: Set up environment
+        run: |
+          echo 'CC=${{ matrix.cxx }}' >> $GITHUB_ENV
+          echo 'CFLAGS=-UNDEBUG -Wall -Wextra -Werror -Wno-error=deprecated-declarations' >> $GITHUB_ENV  # warning for python 3.8 only
+      - name: Set up environment (coverage)
+        if: ${{ contains(matrix.features, 'coverage') }}
+        run: |
+          echo "CFLAGS=$CFLAGS -O0 -g --coverage" >> $GITHUB_ENV
+          echo "LDFLAGS=$LDFLAGS --coverage" >> $GITHUB_ENV
+      - name: Set up environment (asan)
+        if: ${{ contains(matrix.features, 'asan') }}
+        run: |
+          echo "CFLAGS=$CFLAGS -O0 -g -fno-omit-frame-pointer -fsanitize=address" >> $GITHUB_ENV
+          echo "LDFLAGS=$LDFLAGS -fsanitize=address" >> $GITHUB_ENV
+
+      ######################################################################
+      # Main
+      - name: Build
+        run: python setup.py build
+
+      - name: Install
+        run: python setup.py install
+
+      - name: Run tests
+        if: ${{ !contains(matrix.features, 'asan') }}
+        run: python setup.py test
+
+      - name: Run tests (asan)
+        if: ${{ contains(matrix.features, 'asan') }}
+        run: python setup.py test
+        continue-on-error: true
+        env:
+          LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libasan.so.6
+          #LSAN_OPTIONS: suppressions=$(pwd)/.lsan.suppressions
+          PYTHONPATH: .
+
+      - name: Run benchmark
+        if: ${{ contains(matrix.features, 'benchmark') }}
+        run: |
+          echo "Note that these benchmark results are not reliable, since they are not run in the proper clean environment without interference form other processes, and Travis build may have debug flags turned on as well. See README.md for a benchmark results on real hardware."
+          python benchmark.py
+
+      - name: Run cppcheck
+        if: ${{ contains(matrix.features, 'cppcheck') }}
+        continue-on-error: true
+        run: cppcheck --std=c++11 --quiet --enable=style,performance,portability,missingInclude src
+
+      ######################################################################
+      # Post
+      - name: Upload coverage
+        if: ${{ contains(matrix.features, 'coverage') }}
+        uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: true

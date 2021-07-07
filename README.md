@@ -4,8 +4,8 @@
 	<img src="https://repology.org/badge/vertical-allrepos/python:jsonslicer.svg" alt="jsonslicer packaging status" align="right">
 </a>
 
-[![Build Status](https://travis-ci.org/AMDmi3/jsonslicer.svg?branch=master)](https://travis-ci.org/AMDmi3/jsonslicer)
-[![Coverage Status](https://coveralls.io/repos/github/AMDmi3/jsonslicer/badge.svg?branch=master)](https://coveralls.io/github/AMDmi3/jsonslicer?branch=master)
+[![CI](https://github.com/AMDmi3/jsonslicer/actions/workflows/ci.yml/badge.svg)](https://github.com/AMDmi3/jsonslicer/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/AMDmi3/jsonslicer/branch/master/graph/badge.svg?token=LUBcpfIgCr)](https://codecov.io/gh/AMDmi3/jsonslicer)
 [![PyPI downloads](https://img.shields.io/pypi/dm/jsonslicer.svg)](https://pypi.org/project/jsonslicer/)
 [![PyPI version](https://img.shields.io/pypi/v/jsonslicer.svg)](https://pypi.org/project/jsonslicer/)
 [![PyPI pythons](https://img.shields.io/pypi/pyversions/jsonslicer.svg)](https://pypi.org/project/jsonslicer/)
