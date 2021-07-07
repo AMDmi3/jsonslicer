@@ -40,6 +40,7 @@ PyObject* JsonSlicer_new(PyTypeObject* type, PyObject*, PyObject*) {
 		new(&self->input_errors) PyObjPtr();
 		new(&self->output_encoding) PyObjPtr();
 		new(&self->output_errors) PyObjPtr();
+		self->yajl_verbose_errors = 1;
 
 		self->yajl = nullptr;
 
@@ -103,6 +104,7 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 		"yajl_allow_trailing_garbage",
 		"yajl_allow_multiple_values",
 		"yajl_allow_partial_values",
+		"yajl_verbose_errors",
 		"encoding",
 		"errors",
 		"binary",
@@ -111,7 +113,7 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 
 	const char* path_mode_arg = nullptr;
 	if (!PyArg_ParseTupleAndKeywords(
-			args, kwargs, "OO|$nspppppOOp", const_cast<char**>(keywords),
+			args, kwargs, "OO|$nsppppppOOp", const_cast<char**>(keywords),
 			&io,
 			&pattern,
 			&read_size,
@@ -121,6 +123,7 @@ int JsonSlicer_init(JsonSlicer* self, PyObject* args, PyObject* kwargs) {
 			&enable_yajl_allow_trailing_garbage,
 			&enable_yajl_allow_multiple_values,
 			&enable_yajl_allow_partial_values,
+			&self->yajl_verbose_errors,
 			&encoding,
 			&errors,
 			&binary

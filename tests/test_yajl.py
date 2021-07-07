@@ -74,6 +74,20 @@ class TestJsonSlicerYajlFlags(unittest.TestCase):
             [1]
         )
 
+    def test_yajl_verbose_errors_on(self):
+        with self.assertRaises(RuntimeError) as e:
+            run_js('', (None,), yajl_verbose_errors=True)
+
+        self.assertTrue('premature EOF' in str(e.exception))
+        self.assertTrue('--^' in str(e.exception))
+
+    def test_yajl_verbose_errors_off(self):
+        with self.assertRaises(RuntimeError) as e:
+            run_js('', (None,), yajl_verbose_errors=False)
+
+        self.assertTrue('premature EOF' in str(e.exception))
+        self.assertTrue('--^' not in str(e.exception))
+
 
 if __name__ == '__main__':
     unittest.main()

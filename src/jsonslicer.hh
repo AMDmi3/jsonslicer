@@ -51,6 +51,7 @@ struct JsonSlicer {
 	PyObjPtr input_errors;
 	PyObjPtr output_encoding;
 	PyObjPtr output_errors;
+	int yajl_verbose_errors;
 
 	// YAJL handle
 	yajl_handle yajl;

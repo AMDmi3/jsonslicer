@@ -101,6 +101,7 @@ jsonslicer.JsonSlicer(
     yajl_allow_trailing_garbage=False,
     yajl_allow_multiple_values=False,
     yajl_allow_partial_values=False,
+    yajl_verbose_errors=True,
     encoding=None,
     errors=None,
     binary=False,
@@ -239,6 +240,10 @@ is documented as follows:
 > in the middle of parsing a value yajl will enter an error state
 > (premature EOF).  Setting this flag suppresses that check and the
 > corresponding error.
+
+_yajl_verbose_errors_ enables verbose YAJL errors, with exception
+message including the JSON text where the error occured, along with
+an arrow pointing to the specific char.
 
 _encoding_ may be used to override output encoding, which is derived
 from the input file handle if possible, or otherwise set to the
