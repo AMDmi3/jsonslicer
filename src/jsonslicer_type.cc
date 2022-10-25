@@ -83,7 +83,4 @@ PyTypeObject JsonSlicerType = {
 	nullptr,                   // tp_print
 #endif
 #endif
-#if PY_VERSION_HEX >= 0x030b0000
-	0,                         // tp_inline_values_offset
-#endif
 };
