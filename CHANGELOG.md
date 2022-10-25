@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.8
+
+* Python 3.11 support finalized
+* Cosmetic code fixes
+* Minor documentation updates
+
 ## 0.1.7
 
 * Make YAJL error verbosity tunable
