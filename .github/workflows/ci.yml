@@ -41,7 +41,11 @@ jobs:
         if: matrix.yajl != 'package'
         run: |
           sudo apt-get install cmake
-          wget -qO- https://github.com/lloyd/yajl/archive/${{ matrix.yajl }}.tar.gz | tar -xzf-
+          if [ "${{ matrix.yajl }}" = "master" ]; then
+            wget -qO- https://github.com/lloyd/yajl/archive/refs/heads/${{ matrix.yajl }}.tar.gz | tar -xzf-
+          else
+            wget -qO- https://github.com/lloyd/yajl/archive/refs/tags/${{ matrix.yajl }}.tar.gz | tar -xzf-
+          fi
           cd yajl-${{ matrix.yajl }}
           cmake .
           make
