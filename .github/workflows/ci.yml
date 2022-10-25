@@ -13,7 +13,8 @@ jobs:
           - { python: '3.7', cxx: g++, features: '', yajl: package }
           - { python: '3.9', cxx: g++, features: '', yajl: package }
           - { python: '3.10', cxx: g++, features: '', yajl: package }
-          - { python: '3.11.0-alpha.2', cxx: g++, features: '', yajl: package }
+          - { python: '3.11', cxx: g++, features: '', yajl: package }
+          #- { python: '3.12-dev', cxx: g++, features: '', yajl: package }
           # compilers
           - { python: '3.8', cxx: clang++, features: '', yajl: package }
           # yajl versions
