@@ -9,7 +9,6 @@ jobs:
         include:
           - { python: '3.8', cxx: g++, features: 'cppcheck,benchmark', yajl: package }
           # python versions
-          - { python: '3.5', cxx: g++, features: '', yajl: package }
           - { python: '3.6', cxx: g++, features: '', yajl: package }
           - { python: '3.7', cxx: g++, features: '', yajl: package }
           - { python: '3.9', cxx: g++, features: '', yajl: package }
